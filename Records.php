@@ -18,8 +18,10 @@ class Records
     public const PRODUCTS = 'EcommerceEnhanced_products';
     public const BRANDS = 'EcommerceEnhanced_brands';
     public const VARIANTS = 'EcommerceEnhanced_variants';
+    public const CATEGORIES = 'EcommerceEnhanced_categories';
     public const ITEM_LISTS = 'EcommerceEnhanced_itemLists';
     public const PROMOTIONS = 'EcommerceEnhanced_promotions';
+    public const SEARCH_TERMS = 'EcommerceEnhanced_searchTerms';
 
     public const COUPONS = 'EcommerceEnhanced_coupons';
     public const PAYMENT_TYPES = 'EcommerceEnhanced_paymentTypes';
@@ -32,6 +34,7 @@ class Records
 
     public const ORDERS = 'EcommerceEnhanced_orders';
     public const REVENUE = 'EcommerceEnhanced_revenue';
+    public const ITEMS = 'EcommerceEnhanced_items';
     public const PURCHASERS = 'EcommerceEnhanced_purchasers';
     public const FIRST_TIME_PURCHASERS = 'EcommerceEnhanced_firstTimePurchasers';
     public const CONVERTED_VISITS = 'EcommerceEnhanced_convertedVisits';
@@ -43,6 +46,7 @@ class Records
     public const BUYER_METRICS = [
         self::ORDERS => Metrics::ORDERS,
         self::REVENUE => Metrics::REVENUE,
+        self::ITEMS => Metrics::ITEMS,
         self::PURCHASERS => Metrics::PURCHASERS,
         self::FIRST_TIME_PURCHASERS => Metrics::FIRST_TIME_PURCHASERS,
         self::CONVERTED_VISITS => Metrics::CONVERTED_VISITS,

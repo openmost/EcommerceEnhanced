@@ -82,7 +82,7 @@ class Ratio extends ProcessedMetric
 
     public function compute(Row $row)
     {
-        $precision = $this->type === Dimension::TYPE_MONEY ? 2 : 4;
+        $precision = $this->type === Dimension::TYPE_PERCENT ? 4 : 2;
 
         return Piwik::getQuotientSafe($this->getMetric($row, $this->numerator), $this->getMetric($row, $this->denominator), $precision);
     }
@@ -102,6 +102,10 @@ class Ratio extends ProcessedMetric
         if ($this->type === Dimension::TYPE_MONEY) {
             // Sparklines format without calling beforeFormat(), the site then comes from the request
             return $formatter->getPrettyMoney($value, $this->idSite ?: Common::getRequestVar('idSite', 0, 'int'));
+        }
+
+        if ($this->type === Dimension::TYPE_NUMBER) {
+            return $formatter->getPrettyNumber($value, 2);
         }
 
         return $formatter->getPrettyPercentFromQuotient($value);

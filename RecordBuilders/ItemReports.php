@@ -20,7 +20,7 @@ use Piwik\Plugins\EcommerceEnhanced\Records;
 use Piwik\Tracker\GoalManager;
 
 /**
- * Product, brand, variant, item list and promotion reports, the GA4 "items" view: how often items were seen,
+ * Product, brand, variant, category, item list and promotion reports, the GA4 "items" view: how often items were seen,
  * added to cart and bought, and the revenue they made. Order lines are counted once per variant line.
  */
 class ItemReports extends Base
@@ -47,11 +47,26 @@ class ItemReports extends Base
 
         $productName = 'log_action_item_name.name';
         $variant = "IF({t}.variant IS NULL, NULL, CONCAT(log_action_item_name.name, ' - ', {t}.variant))";
+        $joinName = [$this, 'joinName'];
+
+        $categories = new DataTable();
+        foreach (['', '2', '3', '4', '5'] as $level) {
+            // A product counts in each of its categories, as in the native Product Category report
+            $joinCategory = function (string $logTable) use ($level): array {
+                return [[
+                    'table' => 'log_action',
+                    'tableAlias' => 'log_action_item_category',
+                    'joinOn' => $logTable . '.idaction_category' . $level . ' = log_action_item_category.idaction',
+                ]];
+            };
+            $this->addItemRows($categories, $logAggregator, 'log_action_item_category.name', 'log_action_item_category.name', $joinCategory, '{t}.idaction_category' . $level . ' IS NOT NULL');
+        }
 
         return [
-            Records::PRODUCTS => $this->buildItemTable($logAggregator, $productName, $productName, true),
-            Records::BRANDS => $this->buildItemTable($logAggregator, self::EVENT_ITEM . '.brand', self::ORDER_ITEM . '.brand', false),
-            Records::VARIANTS => $this->buildItemTable($logAggregator, $this->forTable($variant, self::EVENT_ITEM), $this->forTable($variant, self::ORDER_ITEM), true),
+            Records::PRODUCTS => $this->addItemRows(new DataTable(), $logAggregator, $productName, $productName, $joinName),
+            Records::BRANDS => $this->addItemRows(new DataTable(), $logAggregator, self::EVENT_ITEM . '.brand', self::ORDER_ITEM . '.brand'),
+            Records::VARIANTS => $this->addItemRows(new DataTable(), $logAggregator, $this->forTable($variant, self::EVENT_ITEM), $this->forTable($variant, self::ORDER_ITEM), $joinName),
+            Records::CATEGORIES => $categories,
             Records::ITEM_LISTS => $this->buildListTable($logAggregator),
             Records::PROMOTIONS => $this->buildPromotionTable($logAggregator),
         ];
@@ -66,21 +81,29 @@ class ItemReports extends Base
             Records::PRODUCTS => Metrics::ITEMS_VIEWED,
             Records::BRANDS => Metrics::ITEMS_VIEWED,
             Records::VARIANTS => Metrics::ITEMS_VIEWED,
+            Records::CATEGORIES => Metrics::ITEMS_VIEWED,
             Records::ITEM_LISTS => Metrics::LIST_VIEWS,
             Records::PROMOTIONS => Metrics::PROMOTION_VIEWS,
         ];
     }
 
-    private function buildItemTable(LogAggregator $logAggregator, string $eventLabel, string $orderLabel, bool $withName): DataTable
+    /**
+     * Views, wishlist and cart adds from the interaction lines, purchases from the order lines.
+     *
+     * @param callable|null $joins log table => joins needed by the labels
+     * @param string $where extra condition, {t} being the log table
+     */
+    private function addItemRows(DataTable $table, LogAggregator $logAggregator, string $eventLabel, string $orderLabel, ?callable $joins = null, string $where = '1 = 1'): DataTable
     {
-        $table = new DataTable();
+        $types = [EventType::VIEW_ITEM, EventType::ADD_TO_WISHLIST, EventType::ADD_TO_CART];
 
         $this->addRows($table, $logAggregator, self::EVENT_ITEM, $eventLabel, [
             Metrics::ITEMS_VIEWED => sprintf('SUM(IF(%s.event_type = %d, 1, 0))', self::EVENT_ITEM, EventType::VIEW_ITEM),
+            Metrics::ITEMS_ADDED_TO_WISHLIST => sprintf('SUM(IF(%1$s.event_type = %2$d, %1$s.quantity, 0))', self::EVENT_ITEM, EventType::ADD_TO_WISHLIST),
             Metrics::ITEMS_ADDED_TO_CART => sprintf('SUM(IF(%1$s.event_type = %2$d, %1$s.quantity, 0))', self::EVENT_ITEM, EventType::ADD_TO_CART),
-        ], sprintf('%s.event_type IN (%d, %d)', self::EVENT_ITEM, EventType::VIEW_ITEM, EventType::ADD_TO_CART), $withName ? $this->joinName(self::EVENT_ITEM) : []);
+        ], sprintf('%s.event_type IN (%s) AND ', self::EVENT_ITEM, implode(', ', $types)) . $this->forTable($where, self::EVENT_ITEM), $joins ? $joins(self::EVENT_ITEM) : []);
 
-        $this->addOrderRows($table, $logAggregator, $orderLabel, $withName);
+        $this->addRows($table, $logAggregator, self::ORDER_ITEM, $orderLabel, $this->getOrderMetrics(), sprintf('%s.idgoal = %d AND ', self::ORDER_ITEM, GoalManager::IDGOAL_ORDER) . $this->forTable($where, self::ORDER_ITEM), $joins ? $joins(self::ORDER_ITEM) : []);
 
         return $table;
     }
@@ -125,11 +148,6 @@ class ItemReports extends Base
         $this->addRows($table, $logAggregator, self::ORDER_ITEM, $this->forTable($label, self::ORDER_ITEM), $this->getOrderMetrics(), sprintf('%s.idgoal = %d AND ', self::ORDER_ITEM, GoalManager::IDGOAL_ORDER) . $this->forTable($where, self::ORDER_ITEM));
     }
 
-    private function addOrderRows(DataTable $table, LogAggregator $logAggregator, string $label, bool $withName): void
-    {
-        $this->addRows($table, $logAggregator, self::ORDER_ITEM, $label, $this->getOrderMetrics(), sprintf('%s.idgoal = %d', self::ORDER_ITEM, GoalManager::IDGOAL_ORDER), $withName ? $this->joinName(self::ORDER_ITEM) : []);
-    }
-
     /**
      * @return array<string, string>
      */
@@ -153,7 +171,7 @@ class ItemReports extends Base
     /**
      * @return array<int, array<string, string>>
      */
-    private function joinName(string $logTable): array
+    public function joinName(string $logTable): array
     {
         return [[
             'table' => 'log_action',

@@ -21,6 +21,7 @@ use Piwik\Plugins\EcommerceEnhanced\Columns\Metrics\StoredMetric;
 class Metrics
 {
     public const ITEMS_VIEWED = 'ee_items_viewed';
+    public const ITEMS_ADDED_TO_WISHLIST = 'ee_items_added_to_wishlist';
     public const ITEMS_ADDED_TO_CART = 'ee_items_added_to_cart';
     public const ITEMS_PURCHASED = 'ee_items_purchased';
     public const ITEM_REVENUE = 'ee_item_revenue';
@@ -30,7 +31,13 @@ class Metrics
     public const PROMOTION_VIEWS = 'ee_promotion_views';
     public const PROMOTION_CLICKS = 'ee_promotion_clicks';
     public const REVENUE = 'ee_revenue';
+    public const SEARCHES = 'ee_searches';
+    public const ITEMS_LISTED = 'ee_items_listed';
     public const ITEMS = 'ee_items';
+    public const SUBTOTAL = 'ee_subtotal';
+    public const TAX = 'ee_tax';
+    public const SHIPPING = 'ee_shipping';
+    public const DISCOUNT = 'ee_discount';
     public const VISITS = 'nb_visits';
     public const CONVERTED_VISITS = 'ee_converted_visits';
     public const UNIQUE_VISITORS = 'nb_uniq_visitors';
@@ -49,12 +56,14 @@ class Metrics
     public const PROMOTION_CLICK_RATE = 'ee_promotion_click_rate';
     public const AVERAGE_ORDER_VALUE = 'ee_average_order_value';
     public const CONVERSION_RATE = 'ee_conversion_rate';
+    public const ITEMS_PER_ORDER = 'ee_items_per_order';
 
     /**
      * name => [translation key, type]
      */
     private const STORED = [
         self::ITEMS_VIEWED => ['EcommerceEnhanced_ItemsViewed', Dimension::TYPE_NUMBER],
+        self::ITEMS_ADDED_TO_WISHLIST => ['EcommerceEnhanced_ItemsAddedToWishlist', Dimension::TYPE_NUMBER],
         self::ITEMS_ADDED_TO_CART => ['EcommerceEnhanced_ItemsAddedToCart', Dimension::TYPE_NUMBER],
         self::ITEMS_PURCHASED => ['EcommerceEnhanced_ItemsPurchased', Dimension::TYPE_NUMBER],
         self::ITEM_REVENUE => ['EcommerceEnhanced_ItemRevenue', Dimension::TYPE_MONEY],
@@ -64,6 +73,8 @@ class Metrics
         self::PROMOTION_VIEWS => ['EcommerceEnhanced_PromotionViews', Dimension::TYPE_NUMBER],
         self::PROMOTION_CLICKS => ['EcommerceEnhanced_PromotionClicks', Dimension::TYPE_NUMBER],
         self::REVENUE => ['General_ColumnRevenue', Dimension::TYPE_MONEY],
+        self::SEARCHES => ['EcommerceEnhanced_Searches', Dimension::TYPE_NUMBER],
+        self::ITEMS_LISTED => ['EcommerceEnhanced_ItemsListed', Dimension::TYPE_NUMBER],
         self::ITEMS => ['EcommerceEnhanced_ItemsInOrders', Dimension::TYPE_NUMBER],
         self::VISITS => ['General_ColumnNbVisits', Dimension::TYPE_NUMBER],
         self::CONVERTED_VISITS => ['EcommerceEnhanced_ConvertedVisits', Dimension::TYPE_NUMBER],
@@ -74,12 +85,16 @@ class Metrics
     ];
 
     /**
-     * name => translation key, percentages computed by the API across rows
+     * name => [translation key, type], values computed or read by the API, declared so Matomo formats them
      */
     private const PRECOMPUTED = [
-        self::STEP_RATE => 'EcommerceEnhanced_StepRate',
-        self::ABANDONMENT_RATE => 'EcommerceEnhanced_AbandonmentRate',
-        self::CART_ABANDONMENT_RATE => 'EcommerceEnhanced_CartAbandonmentRate',
+        self::STEP_RATE => ['EcommerceEnhanced_StepRate', Dimension::TYPE_PERCENT],
+        self::ABANDONMENT_RATE => ['EcommerceEnhanced_AbandonmentRate', Dimension::TYPE_PERCENT],
+        self::CART_ABANDONMENT_RATE => ['EcommerceEnhanced_CartAbandonmentRate', Dimension::TYPE_PERCENT],
+        self::SUBTOTAL => ['General_Subtotal', Dimension::TYPE_MONEY],
+        self::TAX => ['General_Tax', Dimension::TYPE_MONEY],
+        self::SHIPPING => ['General_Shipping', Dimension::TYPE_MONEY],
+        self::DISCOUNT => ['General_Discount', Dimension::TYPE_MONEY],
     ];
 
     /**
@@ -92,6 +107,7 @@ class Metrics
         self::PROMOTION_CLICK_RATE => ['EcommerceEnhanced_PromotionClickRate', self::PROMOTION_CLICKS, self::PROMOTION_VIEWS, Dimension::TYPE_PERCENT],
         self::AVERAGE_ORDER_VALUE => ['General_AverageOrderValue', self::REVENUE, self::ORDERS, Dimension::TYPE_MONEY],
         self::CONVERSION_RATE => ['EcommerceEnhanced_ConversionRate', self::CONVERTED_VISITS, self::VISITS, Dimension::TYPE_PERCENT],
+        self::ITEMS_PER_ORDER => ['EcommerceEnhanced_ItemsPerOrder', self::ITEMS, self::ORDERS, Dimension::TYPE_NUMBER],
         self::ARPU => ['EcommerceEnhanced_Arpu', self::REVENUE, self::UNIQUE_VISITORS, Dimension::TYPE_MONEY],
         self::ARPPU => ['EcommerceEnhanced_Arppu', self::REVENUE, self::PURCHASERS, Dimension::TYPE_MONEY],
     ];
@@ -108,7 +124,8 @@ class Metrics
                 [$translationKey, $type] = self::STORED[$name];
                 $metrics[] = new StoredMetric($name, $translationKey, $type);
             } elseif (isset(self::PRECOMPUTED[$name])) {
-                $metrics[] = new Precomputed($name, self::PRECOMPUTED[$name]);
+                [$translationKey, $type] = self::PRECOMPUTED[$name];
+                $metrics[] = new Precomputed($name, $translationKey, $type);
             } elseif (isset(self::RATIOS[$name])) {
                 [$translationKey, $numerator, $denominator, $type] = self::RATIOS[$name];
                 $metrics[] = new Ratio($name, $translationKey, $numerator, $denominator, $type);

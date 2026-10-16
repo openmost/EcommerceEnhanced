@@ -35,7 +35,7 @@ class GetPromotions extends Base
         $this->name = Piwik::translate('EcommerceEnhanced_PromotionNamePlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_PromotionsDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_Merchandising';
-        $this->order = 5;
+        $this->order = 6;
         $this->dimension = new PromotionName();
     }
 }

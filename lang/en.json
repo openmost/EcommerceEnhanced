@@ -188,6 +188,20 @@
         "TeaserRetentionCohorts": "Customer retention cohorts",
         "TeaserRetentionCohortsDescription": "Customers grouped by the month of their first purchase, and how many buy again in the following months.",
         "TeaserLifetimeValue": "Customer lifetime value",
-        "TeaserLifetimeValueDescription": "Lifetime value by acquisition channel and RFM segments (recency, frequency, monetary value) of your customers."
+        "TeaserLifetimeValueDescription": "Lifetime value by acquisition channel and RFM segments (recency, frequency, monetary value) of your customers.",
+        "ItemsAddedToWishlist": "Items added to wishlist",
+        "ItemsAddedToWishlistDocumentation": "Quantity of items added to a wishlist (add_to_wishlist).",
+        "ProductCategoriesReport": "Product categories",
+        "CategoriesDocumentation": "Each product category, at every level, with the number of times its products were viewed, added to cart and bought, and their revenue. A product counts in each of its categories.",
+        "Searches": "Searches",
+        "SearchesDocumentation": "Number of product search result pages (view_search_results).",
+        "ItemsListed": "Products listed",
+        "ItemsListedDocumentation": "Products shown in the search results.",
+        "SearchTermsDocumentation": "What visitors searched in your shop, how many products the search returned, and how many of those visits placed an order.",
+        "ItemsPerOrder": "Items per order",
+        "ItemsPerOrderDocumentation": "Items bought divided by orders.",
+        "Transactions": "Transactions",
+        "TransactionId": "Transaction",
+        "TransactionsDocumentation": "Every order of the period, most recent first, with its revenue, subtotal, tax, shipping, discount and items, and the coupon, payment type, shipping tier, customer type and currency sent with the purchase. At most 500 orders are listed, as in the Ecommerce log."
     }
 }

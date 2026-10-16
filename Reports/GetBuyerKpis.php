@@ -31,12 +31,14 @@ class GetBuyerKpis extends Base
         Metrics::UNIQUE_VISITORS,
         Metrics::CONVERTED_VISITS,
         Metrics::CART_VISITS,
+        Metrics::ITEMS,
     ];
 
     protected $ratioNames = [
         Metrics::ARPU,
         Metrics::ARPPU,
         Metrics::AVERAGE_ORDER_VALUE,
+        Metrics::ITEMS_PER_ORDER,
         Metrics::CONVERSION_RATE,
         Metrics::CART_ABANDONMENT_RATE,
     ];
@@ -76,7 +78,7 @@ class GetBuyerKpis extends Base
             $view->config->addSparklineMetric([Metrics::REVENUE, Metrics::ORDERS], 10);
             $view->config->addSparklineMetric([Metrics::PURCHASERS, Metrics::FIRST_TIME_PURCHASERS], 20);
             $view->config->addSparklineMetric([Metrics::ARPU, Metrics::ARPPU], 30);
-            $view->config->addSparklineMetric([Metrics::AVERAGE_ORDER_VALUE], 40);
+            $view->config->addSparklineMetric([Metrics::AVERAGE_ORDER_VALUE, Metrics::ITEMS_PER_ORDER], 40);
             $view->config->addSparklineMetric([Metrics::CONVERSION_RATE], 50);
             $view->config->addSparklineMetric([Metrics::CART_ABANDONMENT_RATE], 60);
 

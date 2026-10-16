@@ -16,7 +16,7 @@ use Piwik\Plugins\EcommerceEnhanced\Records;
 use Piwik\Tracker\GoalManager;
 
 /**
- * The GA4 monetization overview numbers: orders, revenue, purchasers, first time purchasers, visits with a cart
+ * The GA4 monetization overview numbers: orders, revenue, items, purchasers, first time purchasers, visits with a cart
  * and visits with an order.
  *
  * Purchasers are unique visitors over the whole period, they cannot be summed from days: every period is computed
@@ -55,6 +55,7 @@ class BuyerReports extends Base
         $select = sprintf(
             'SUM(IF(log_conversion.idgoal = %1$d, 1, 0)) AS `%2$s`,
             ROUND(SUM(IF(log_conversion.idgoal = %1$d, log_conversion.revenue, 0)), 2) AS `%3$s`,
+            SUM(IF(log_conversion.idgoal = %1$d, log_conversion.items, 0)) AS `%9$s`,
             COUNT(DISTINCT IF(log_conversion.idgoal = %1$d, log_conversion.idvisitor, NULL)) AS `%4$s`,
             COUNT(DISTINCT IF(log_conversion.idgoal = %1$d AND %5$s, log_conversion.idvisitor, NULL)) AS `%6$s`,
             COUNT(DISTINCT IF(log_conversion.idgoal = %1$d, log_conversion.idvisit, NULL)) AS `%7$s`,
@@ -66,7 +67,8 @@ class BuyerReports extends Base
             $firstTime,
             Records::FIRST_TIME_PURCHASERS,
             Records::CONVERTED_VISITS,
-            Records::CART_VISITS
+            Records::CART_VISITS,
+            Records::ITEMS
         );
 
         $where = $logAggregator->getWhereStatement('log_conversion', 'server_time')

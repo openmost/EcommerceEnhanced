@@ -11,7 +11,13 @@ namespace Piwik\Plugins\EcommerceEnhanced;
 
 use Piwik\Archive;
 use Piwik\DataTable;
+use Piwik\Date;
+use Piwik\Db;
+use Piwik\Period;
 use Piwik\Piwik;
+use Piwik\Segment;
+use Piwik\Site;
+use Piwik\Tracker\GoalManager;
 
 /**
  * Ecommerce reports built from the GA4 ecommerce data: products, brands, variants, item lists, promotions,
@@ -22,6 +28,8 @@ use Piwik\Piwik;
  */
 class API extends \Piwik\Plugin\API
 {
+    public const MAX_TRANSACTIONS = 500;
+
     /**
      * Products with their views, adds to cart, purchases and revenue.
      *
@@ -50,6 +58,79 @@ class API extends \Piwik\Plugin\API
     public function getVariants($idSite, $period, $date, $segment = false)
     {
         return $this->getRecord(Records::VARIANTS, $idSite, $period, $date, $segment);
+    }
+
+    /**
+     * Product categories, every level, with their views, adds to cart, purchases and revenue.
+     *
+     * @return DataTable|DataTable\Map
+     */
+    public function getCategories($idSite, $period, $date, $segment = false)
+    {
+        return $this->getRecord(Records::CATEGORIES, $idSite, $period, $date, $segment);
+    }
+
+    /**
+     * Product search terms with their searches, visits, products listed and visits that ordered.
+     *
+     * @return DataTable|DataTable\Map
+     */
+    public function getSearchTerms($idSite, $period, $date, $segment = false)
+    {
+        return $this->getRecord(Records::SEARCH_TERMS, $idSite, $period, $date, $segment);
+    }
+
+    /**
+     * The orders of the period, most recent first, with their revenue split and their GA4 details. Read from the
+     * orders themselves, like the Ecommerce log, at most 500 orders.
+     *
+     * @return DataTable
+     */
+    public function getTransactions($idSite, $period, $date, $segment = false)
+    {
+        Piwik::checkUserHasViewAccess($idSite);
+
+        $idSite = (int) $idSite;
+        $timezone = Site::getTimezoneFor($idSite);
+        $range = Period\Factory::build($period, $date, $timezone);
+        $start = Date::factory($range->getDateStart()->toString() . ' 00:00:00', $timezone);
+        $end = Date::factory($range->getDateEnd()->toString() . ' 23:59:59', $timezone);
+
+        $select = 'log_conversion.idorder, log_conversion.server_time, log_conversion.revenue, log_conversion.revenue_subtotal,
+            log_conversion.revenue_tax, log_conversion.revenue_shipping, log_conversion.revenue_discount, log_conversion.items,
+            log_conversion.ee_coupon, log_conversion.ee_payment_type, log_conversion.ee_shipping_tier,
+            log_conversion.ee_customer_type, log_conversion.ee_currency';
+        $where = 'log_conversion.idsite = ? AND log_conversion.idgoal = ? AND log_conversion.server_time >= ? AND log_conversion.server_time <= ?';
+        $bind = [$idSite, GoalManager::IDGOAL_ORDER, $start->getDatetime(), $end->getDatetime()];
+
+        $query = (new Segment((string) $segment, [$idSite], $start, $end))
+            ->getSelectQuery($select, 'log_conversion', $where, $bind, 'log_conversion.server_time DESC', false, self::MAX_TRANSACTIONS);
+
+        $customerTypes = [
+            Tracker\Payload::CUSTOMER_TYPE_NEW => Piwik::translate('EcommerceEnhanced_CustomerTypeNew'),
+            Tracker\Payload::CUSTOMER_TYPE_RETURNING => Piwik::translate('EcommerceEnhanced_CustomerTypeReturning'),
+        ];
+
+        $table = new DataTable();
+        foreach (Db::fetchAll($query['sql'], $query['bind']) as $order) {
+            $table->addRowFromSimpleArray([
+                'label' => $order['idorder'],
+                'date' => Date::factory($order['server_time'])->setTimezone($timezone)->getDatetime(),
+                Metrics::REVENUE => (float) $order['revenue'],
+                Metrics::SUBTOTAL => (float) $order['revenue_subtotal'],
+                Metrics::TAX => (float) $order['revenue_tax'],
+                Metrics::SHIPPING => (float) $order['revenue_shipping'],
+                Metrics::DISCOUNT => (float) $order['revenue_discount'],
+                Metrics::ITEMS => (int) $order['items'],
+                'coupon' => (string) $order['ee_coupon'],
+                'payment_type' => (string) $order['ee_payment_type'],
+                'shipping_tier' => (string) $order['ee_shipping_tier'],
+                'customer_type' => $customerTypes[(int) $order['ee_customer_type']] ?? '',
+                'currency' => (string) $order['ee_currency'],
+            ]);
+        }
+
+        return $table;
     }
 
     /**

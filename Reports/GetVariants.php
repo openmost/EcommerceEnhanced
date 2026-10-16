@@ -18,6 +18,7 @@ class GetVariants extends Base
 
     protected $metricNames = [
         Metrics::ITEMS_VIEWED,
+        Metrics::ITEMS_ADDED_TO_WISHLIST,
         Metrics::ITEMS_ADDED_TO_CART,
         Metrics::ITEMS_PURCHASED,
         Metrics::ITEM_REVENUE,

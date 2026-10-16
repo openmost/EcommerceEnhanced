@@ -9,14 +9,16 @@
 
 namespace Piwik\Plugins\EcommerceEnhanced\Columns\Metrics;
 
+use Piwik\Columns\Dimension;
+use Piwik\Common;
 use Piwik\DataTable\Row;
 use Piwik\Metrics\Formatter;
 use Piwik\Piwik;
 use Piwik\Plugin\ProcessedMetric;
 
 /**
- * A percentage the API computes across rows (a funnel step compared to the first step). Declared as a processed
- * metric only so Matomo formats it, the value is kept as computed.
+ * A value the API computes or reads as is (a funnel step compared to the first step, the tax of an order).
+ * Declared as a processed metric only so Matomo formats it, the value is kept as computed.
  */
 class Precomputed extends ProcessedMetric
 {
@@ -30,10 +32,16 @@ class Precomputed extends ProcessedMetric
      */
     private $translationKey;
 
-    public function __construct(string $name, string $translationKey)
+    /**
+     * @var string
+     */
+    private $type;
+
+    public function __construct(string $name, string $translationKey, string $type = Dimension::TYPE_PERCENT)
     {
         $this->name = $name;
         $this->translationKey = $translationKey;
+        $this->type = $type;
     }
 
     public function getName()
@@ -64,8 +72,17 @@ class Precomputed extends ProcessedMetric
         return [];
     }
 
+    public function getSemanticType(): ?string
+    {
+        return $this->type;
+    }
+
     public function format($value, Formatter $formatter)
     {
+        if ($this->type === Dimension::TYPE_MONEY) {
+            return $formatter->getPrettyMoney($value, Common::getRequestVar('idSite', 0, 'int'));
+        }
+
         return $formatter->getPrettyPercentFromQuotient($value);
     }
 }

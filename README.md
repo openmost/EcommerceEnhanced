@@ -2,14 +2,53 @@
 
 ## Description
 
-GA4 ecommerce for Matomo. Ecommerce Enhanced reads the GA4 ecommerce events your shop already sends to its dataLayer and records them in Matomo, on top of the native Matomo ecommerce:
+**Get GA4 grade ecommerce analytics in Matomo, without changing a line of your shop.**
 
-- every shopping step (list views, product views, adds to cart, checkout steps, purchases, refunds, promotions) is tracked as a Matomo event and stored with its full GA4 detail;
-- carts and orders are sent as native Matomo ecommerce requests, so the native Ecommerce reports keep working;
-- brands, variants, item lists, promotions, coupons, payment types, shipping tiers and customer types get their own reports, segments and Custom Reports dimensions;
-- shopping and checkout behavior funnels are built in, without the Funnels plugin.
+Your shop already describes every product view, add to cart, checkout step and order in its GA4 dataLayer. Native Matomo ecommerce only keeps the order and a few product fields. Ecommerce Enhanced reads the whole GA4 dataLayer and turns it into the reports GA4 users rely on: product and brand performance, item lists, promotions, coupons, shopping and checkout funnels, sales by source / medium, buyers and revenue per user. Your data stays in your Matomo, with no sampling.
 
-No Tag Manager is needed, and no connector per CMS: one line in your tracking code is enough.
+One line in your tracking code, or one checkbox in Matomo Tag Manager, and it works with WooCommerce, Shopify, Magento, PrestaShop and every shop that speaks GA4.
+
+### What you get for free
+
+**Collection that just works**
+
+- Reads GA4 dataLayer pushes, `gtag()` calls and legacy Universal Analytics Enhanced Ecommerce, from any CMS or extension (GTM4WP, Google Analytics for WooCommerce, Shopify, Magento, PrestaShop, Elevar, Stape...).
+- Works without Tag Manager (`_paq.push(['EcommerceEnhanced::enable'])`), with a checkbox in the Matomo Tag Manager "Matomo Configuration" variable, or from JavaScript with `_paq.push(['EcommerceEnhanced::track', ...])`.
+- Every GA4 ecommerce event: item list views and clicks, product views, wishlist, adds and removals from cart, cart views, checkout, shipping and payment steps, purchases, refunds, promotion views and clicks, product searches and leads.
+- Native Matomo carts and orders are still sent, so the Ecommerce reports, goals and abandoned carts you know keep working, even if you deactivate the plugin.
+- Variants kept apart, even when they share a SKU, with brand, list, promotion, coupon, discount and up to 10 custom item parameters per product line.
+- Item lists and promotions remembered from the click to the order, as GA4 attributes them.
+- Duplicate orders blocked, even when the confirmation page is reloaded or order ids are anonymised.
+- Privacy by design: emails, phone numbers, addresses and hashed identifiers are never read, coupon codes can be hashed or skipped.
+
+**Reports GA4 users expect**
+
+- Shopping behavior and checkout behavior funnels, with step and abandonment rates, without the Funnels plugin.
+- Product performance, brands, variants and product categories: views, adds to cart, purchases, item revenue, cart to view and purchase to view rates.
+- Item lists and promotions: views, clicks, click rate, and the items added to cart and bought after them.
+- Product search terms: what visitors searched and what they viewed, added and bought next.
+- Order details: orders, revenue and average order value by coupon, payment type, shipping tier, customer type (new or returning), affiliation and currency.
+- Transactions: every order with its revenue, tax, shipping, items, coupon, payment and shipping choices.
+- Sales by source / medium, the way GA4 shows it: `google / organic`, `newsletter / email`, `(direct) / (none)`.
+- Buyers and revenue: purchasers, first time purchasers, revenue per user (ARPU) and per paying user (ARPPU), average order value and items per order, conversion rate and cart abandonment rate.
+- Every step also appears in the Events report (category "Ecommerce"), with viewing steps kept out of the bounce rate, as in GA4.
+
+**Native Matomo integration**
+
+- 24 new segments (`eeItemBrand`, `eeOrderCoupon`, `eeStep`, `eePromotionName`...), for example "visits that added to cart without buying": `eeStep==add_to_cart;eeStep!=purchase`.
+- Every field available in Custom Reports, the segment editor, the API, scheduled reports and dashboards.
+- GDPR tools (data subject export and deletion) and the deletion of old raw data cover every stored row.
+
+### What Premium adds
+
+Every Premium report is visible in the free edition with a preview, so you know what you get. Premium shows them with your data, from the data already collected: no new tracking, no history lost, no report to rebuild.
+
+- **Active users and buyers (Premium):** 1, 7 and 30 day active users and buyers (DAU, WAU, MAU) and the DAU / MAU stickiness ratio.
+- **Customers (Premium):** repeat purchase rate, time between purchases, retention cohorts by first purchase month, customer lifetime value and RFM segments.
+- **Acquisition (Premium):** sales by first user source, time and visits from the first visit to the first purchase, abandoned carts by channel.
+- **Shopping behavior (Premium):** the shopping and checkout funnels split by device and by channel, and the lead pipeline from `generate_lead` to `close_convert_lead`.
+- **Merchandising (Premium):** products bought together (market basket analysis), most abandoned products, product profit and margin from your cost of goods, reports and segments for your custom item parameters.
+- **Orders (Premium):** refunds, refund rate by product and net revenue, discount depth by product, coupon and category, orders by basket size and value, revenue of foreign currency orders converted to your website currency.
 
 ### Why the GA4 format
 
@@ -301,9 +340,14 @@ Administration, Websites, Manage, then the Ecommerce Enhanced section of a websi
 
 In the Ecommerce menu:
 
+- **Overview:** buyers and revenue (purchasers, first time purchasers, ARPU, ARPPU, average order value, items per order, conversion rate, cart abandonment rate), as sparklines and over time.
 - **Shopping behavior:** visits that viewed a product, added to cart, began checkout and bought; visits through the checkout steps, with step and abandonment rates.
-- **Merchandising:** products, brands, variants, item lists and promotions with views, adds to cart, purchases, item revenue and rates.
-- **Order details:** orders and revenue by coupon, payment type, shipping tier, customer type, affiliation and currency.
+- **Merchandising:** products, brands, variants, product categories, item lists, promotions and product search terms with views, wishlist and cart adds, purchases, item revenue and rates.
+- **Order details:** transactions (every order with its revenue split and GA4 details), and orders and revenue by coupon, payment type, shipping tier, customer type, affiliation and currency.
+- **Sales:** sales by source / medium, next to the native sales by channel, campaign, page and location.
+- **Customers:** Premium reports, see above.
+
+Premium reports appear as locked cards next to the free ones until Ecommerce Enhanced Premium is activated.
 
 ## Segments
 
