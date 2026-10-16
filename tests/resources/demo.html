@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Ecommerce Enhanced demo shop</title>
+    <!-- Manual test page: open it from the Matomo host, with ?idsite=<id of an ecommerce site> -->
+    <script>
+        var idSite = new URLSearchParams(location.search).get('idsite') || '1';
+        var matomoUrl = location.href.split('/plugins/')[0] + '/';
+
+        window.dataLayer = window.dataLayer || [];
+        dataLayer.push({ecommerce: null});
+        dataLayer.push({
+            event: 'view_item_list',
+            ecommerce: {
+                item_list_id: 'home_featured',
+                item_list_name: 'Home featured',
+                items: [
+                    {item_id: 'TEE-1', item_name: 'Organic tee', item_brand: 'Lumen', item_category: 'Apparel', item_category2: 'Tees', item_variant: 'Red', price: 20, index: 1},
+                    {item_id: 'MUG-1', item_name: 'Stone mug', item_brand: 'Nord', item_category: 'Home', price: 12, index: 2}
+                ]
+            }
+        });
+
+        var _paq = window._paq = window._paq || [];
+        _paq.push(['EcommerceEnhanced::enable']);
+        _paq.push(['trackPageView']);
+        _paq.push(['setTrackerUrl', matomoUrl + 'matomo.php']);
+        _paq.push(['setSiteId', idSite]);
+    </script>
+    <script async src="../../../../matomo.js"></script>
+</head>
+<body>
+<h1>Ecommerce Enhanced demo shop</h1>
+<p>Each button pushes one GA4 event to the dataLayer.</p>
+<button id="select" onclick="dataLayer.push({ecommerce: null}); dataLayer.push({event: 'select_item', ecommerce: {item_list_name: 'Home featured', items: [{item_id: 'TEE-1', item_name: 'Organic tee'}]}})">select_item</button>
+<button id="add" onclick="dataLayer.push({ecommerce: null}); dataLayer.push({event: 'add_to_cart', ecommerce: {currency: 'EUR', value: 60, items: [{item_id: 'TEE-1', item_name: 'Organic tee', item_brand: 'Lumen', item_variant: 'Red', price: 20, quantity: 1}, {item_id: 'TEE-1', item_name: 'Organic tee', item_brand: 'Lumen', item_variant: 'Blue', price: 20, quantity: 2}]}})">add_to_cart</button>
+<button id="shipping" onclick="dataLayer.push({ecommerce: null}); dataLayer.push({event: 'add_shipping_info', ecommerce: {currency: 'EUR', value: 60, shipping_tier: 'Express', items: []}})">add_shipping_info</button>
+<button id="payment" onclick="gtag('event', 'add_payment_info', {currency: 'EUR', value: 60, payment_type: 'Credit card', items: []})">add_payment_info (gtag)</button>
+<button id="purchase" onclick="dataLayer.push({ecommerce: null}); dataLayer.push({event: 'purchase', ecommerce: {transaction_id: 'DEMO-' + Date.now(), currency: 'EUR', value: 60, tax: 12, shipping: 4.9, coupon: 'WELCOME', customer_type: 'new', items: [{item_id: 'TEE-1', item_name: 'Organic tee', item_brand: 'Lumen', item_variant: 'Red', price: 20, quantity: 1}, {item_id: 'TEE-1', item_name: 'Organic tee', item_brand: 'Lumen', item_variant: 'Blue', price: 20, quantity: 2}]}})">purchase</button>
+<button id="ua" onclick="dataLayer.push({event: 'productClick', ecommerce: {click: {actionField: {list: 'Search results'}, products: [{id: 'MUG-1', name: 'Stone mug', brand: 'Nord', category: 'Home/Kitchen', position: 4}]}}})">UA productClick</button>
+<script>
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+</script>
+</body>
+</html>

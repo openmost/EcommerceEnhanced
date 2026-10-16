@@ -1,0 +1,30 @@
+{
+    "EcommerceEnhanced": {
+        "PluginDescription": "GA4 ecommerce for Matomo: reads your GA4 dataLayer and records brands, variants, item lists, promotions, coupons, checkout steps and every shopping step, on top of the native Matomo ecommerce.",
+        "OrderCurrency": "Order currency",
+        "OrderCoupon": "Order coupon",
+        "OrderPaymentType": "Payment type",
+        "OrderShippingTier": "Shipping tier",
+        "OrderAffiliation": "Order affiliation",
+        "OrderCustomerType": "Customer type",
+        "CustomerTypeNew": "New customer",
+        "CustomerTypeReturning": "Returning customer",
+        "SettingValueIncludesTaxAndShipping": "The GA4 value includes tax and shipping",
+        "SettingValueIncludesTaxAndShippingHelp": "GA4 defines the purchase value without tax and shipping. Some shop extensions send the grand total instead. Check this box if yours does, so the Matomo revenue is not counted twice.",
+        "SettingEventsReportTypes": "Ecommerce steps shown in the Events report",
+        "SettingEventsReportTypesHelp": "Each step is tracked as an event with the category \"Ecommerce\", a readable action and the GA4 event name as the name. Unchecked steps are still recorded in the Ecommerce Enhanced reports.",
+        "SettingNonInteractionTypes": "Steps that do not count as an interaction",
+        "SettingNonInteractionTypesHelp": "These steps keep the visit alive but do not count as an action, so they do not lower the bounce rate. Viewing steps are checked by default, as in GA4.",
+        "SettingCouponStorage": "Coupon codes",
+        "SettingCouponStorageHelp": "Single use coupon codes can identify a person. Store a hash of them, or nothing, if your codes are personal.",
+        "SettingCouponStorageFull": "Store the codes",
+        "SettingCouponStorageHashed": "Store a hash of the codes",
+        "SettingCouponStorageNone": "Do not store coupon codes",
+        "SettingItemCustomParams": "Custom item parameters",
+        "SettingItemCustomParamsHelp": "Names of up to %1$s custom item parameters of your dataLayer to record, for example size or color. Only add names at the end of the list: each one keeps its position for good.",
+        "SettingItemCustomParamName": "Parameter name",
+        "SettingItemCustomParamsTooMany": "At most %1$s custom item parameters can be recorded.",
+        "SettingItemCustomParamsInvalid": "\"%1$s\" is not a valid parameter name: use letters, digits and underscores, starting with a letter, 40 characters at most.",
+        "DeactivatedWarning": "Ecommerce Enhanced is deactivated. Its data is kept, but while the plugin is deactivated, GDPR deletions and the deletion of old raw data no longer cover it. Activate it again, or uninstall it to delete its data."
+    }
+}
