@@ -142,6 +142,44 @@ class API extends \Piwik\Plugin\API
     }
 
     /**
+     * GA4 monetization overview: orders, revenue, purchasers, first time purchasers, average revenue per user and per
+     * paying user, ecommerce conversion rate and cart abandonment rate.
+     *
+     * @return DataTable|DataTable\Map
+     */
+    public function getBuyerKpis($idSite, $period, $date, $segment = false)
+    {
+        Piwik::checkUserHasViewAccess($idSite);
+
+        $names = array_merge(array_keys(Records::BUYER_METRICS), [Metrics::VISITS, Metrics::UNIQUE_VISITORS]);
+        $table = Archive::build($idSite, $period, $date, $segment)->getDataTableFromNumeric($names);
+
+        $table->filter(function (DataTable $table) {
+            foreach ($table->getRows() as $row) {
+                foreach (Records::BUYER_METRICS as $record => $metric) {
+                    $row->renameColumn($record, $metric);
+                }
+
+                $cartVisits = (int) $row->getColumn(Metrics::CART_VISITS);
+                $convertedVisits = (int) $row->getColumn(Metrics::CONVERTED_VISITS);
+                $row->setColumn(Metrics::CART_ABANDONMENT_RATE, $cartVisits === 0 ? 0 : round(1 - $convertedVisits / $cartVisits, 4));
+            }
+        });
+
+        return $table;
+    }
+
+    /**
+     * Visits, orders and revenue by GA4 style source / medium.
+     *
+     * @return DataTable|DataTable\Map
+     */
+    public function getSourceMedium($idSite, $period, $date, $segment = false)
+    {
+        return $this->getRecord(Records::SOURCE_MEDIUM, $idSite, $period, $date, $segment);
+    }
+
+    /**
      * Visits that viewed a product, added to cart, began checkout and bought.
      *
      * @return DataTable|DataTable\Map

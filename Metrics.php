@@ -32,6 +32,14 @@ class Metrics
     public const REVENUE = 'ee_revenue';
     public const ITEMS = 'ee_items';
     public const VISITS = 'nb_visits';
+    public const CONVERTED_VISITS = 'ee_converted_visits';
+    public const UNIQUE_VISITORS = 'nb_uniq_visitors';
+    public const PURCHASERS = 'ee_purchasers';
+    public const FIRST_TIME_PURCHASERS = 'ee_first_time_purchasers';
+    public const CART_VISITS = 'ee_cart_visits';
+    public const ARPU = 'ee_arpu';
+    public const ARPPU = 'ee_arppu';
+    public const CART_ABANDONMENT_RATE = 'ee_cart_abandonment_rate';
     public const STEP_RATE = 'ee_step_rate';
     public const ABANDONMENT_RATE = 'ee_abandonment_rate';
 
@@ -40,6 +48,7 @@ class Metrics
     public const LIST_CLICK_RATE = 'ee_list_click_rate';
     public const PROMOTION_CLICK_RATE = 'ee_promotion_click_rate';
     public const AVERAGE_ORDER_VALUE = 'ee_average_order_value';
+    public const CONVERSION_RATE = 'ee_conversion_rate';
 
     /**
      * name => [translation key, type]
@@ -57,6 +66,11 @@ class Metrics
         self::REVENUE => ['General_ColumnRevenue', Dimension::TYPE_MONEY],
         self::ITEMS => ['EcommerceEnhanced_ItemsInOrders', Dimension::TYPE_NUMBER],
         self::VISITS => ['General_ColumnNbVisits', Dimension::TYPE_NUMBER],
+        self::CONVERTED_VISITS => ['EcommerceEnhanced_ConvertedVisits', Dimension::TYPE_NUMBER],
+        self::UNIQUE_VISITORS => ['General_ColumnNbUniqVisitors', Dimension::TYPE_NUMBER],
+        self::PURCHASERS => ['EcommerceEnhanced_Purchasers', Dimension::TYPE_NUMBER],
+        self::FIRST_TIME_PURCHASERS => ['EcommerceEnhanced_FirstTimePurchasers', Dimension::TYPE_NUMBER],
+        self::CART_VISITS => ['EcommerceEnhanced_CartVisits', Dimension::TYPE_NUMBER],
     ];
 
     /**
@@ -65,6 +79,7 @@ class Metrics
     private const PRECOMPUTED = [
         self::STEP_RATE => 'EcommerceEnhanced_StepRate',
         self::ABANDONMENT_RATE => 'EcommerceEnhanced_AbandonmentRate',
+        self::CART_ABANDONMENT_RATE => 'EcommerceEnhanced_CartAbandonmentRate',
     ];
 
     /**
@@ -76,6 +91,9 @@ class Metrics
         self::LIST_CLICK_RATE => ['EcommerceEnhanced_ListClickRate', self::LIST_CLICKS, self::LIST_VIEWS, Dimension::TYPE_PERCENT],
         self::PROMOTION_CLICK_RATE => ['EcommerceEnhanced_PromotionClickRate', self::PROMOTION_CLICKS, self::PROMOTION_VIEWS, Dimension::TYPE_PERCENT],
         self::AVERAGE_ORDER_VALUE => ['General_AverageOrderValue', self::REVENUE, self::ORDERS, Dimension::TYPE_MONEY],
+        self::CONVERSION_RATE => ['EcommerceEnhanced_ConversionRate', self::CONVERTED_VISITS, self::VISITS, Dimension::TYPE_PERCENT],
+        self::ARPU => ['EcommerceEnhanced_Arpu', self::REVENUE, self::UNIQUE_VISITORS, Dimension::TYPE_MONEY],
+        self::ARPPU => ['EcommerceEnhanced_Arppu', self::REVENUE, self::PURCHASERS, Dimension::TYPE_MONEY],
     ];
 
     /**

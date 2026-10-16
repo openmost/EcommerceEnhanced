@@ -33,14 +33,14 @@ abstract class Base extends RecordBuilder
      * @param array<string, string> $metrics metric name => SQL aggregate
      * @param array<int, array<string, string>> $joins
      */
-    protected function addRows(DataTable $table, LogAggregator $logAggregator, string $logTable, string $label, array $metrics, string $where, array $joins = []): void
+    protected function addRows(DataTable $table, LogAggregator $logAggregator, string $logTable, string $label, array $metrics, string $where, array $joins = [], string $datetimeColumn = 'server_time'): void
     {
         $select = $label . ' AS label';
         foreach ($metrics as $name => $sql) {
             $select .= sprintf(', %s AS `%s`', $sql, $name);
         }
 
-        $where = $logAggregator->getWhereStatement($logTable, 'server_time') . ' AND ' . $where;
+        $where = $logAggregator->getWhereStatement($logTable, $datetimeColumn) . ' AND ' . $where;
         $query = $logAggregator->generateQuery($select, array_merge([$logTable], $joins), $where, $label, false);
         $result = $logAggregator->getDb()->query($query['sql'], $query['bind']);
 

@@ -11,6 +11,7 @@ namespace Piwik\Plugins\EcommerceEnhanced\Columns\Metrics;
 
 use Piwik\Archive\DataTableFactory;
 use Piwik\Columns\Dimension;
+use Piwik\Common;
 use Piwik\DataTable;
 use Piwik\DataTable\Row;
 use Piwik\Metrics\Formatter;
@@ -99,7 +100,8 @@ class Ratio extends ProcessedMetric
     public function format($value, Formatter $formatter)
     {
         if ($this->type === Dimension::TYPE_MONEY) {
-            return $formatter->getPrettyMoney($value, $this->idSite);
+            // Sparklines format without calling beforeFormat(), the site then comes from the request
+            return $formatter->getPrettyMoney($value, $this->idSite ?: Common::getRequestVar('idSite', 0, 'int'));
         }
 
         return $formatter->getPrettyPercentFromQuotient($value);

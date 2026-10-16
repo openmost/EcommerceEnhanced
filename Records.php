@@ -28,6 +28,27 @@ class Records
     public const CUSTOMER_TYPES = 'EcommerceEnhanced_customerTypes';
     public const CURRENCIES = 'EcommerceEnhanced_currencies';
 
+    public const SOURCE_MEDIUM = 'EcommerceEnhanced_sourceMedium';
+
+    public const ORDERS = 'EcommerceEnhanced_orders';
+    public const REVENUE = 'EcommerceEnhanced_revenue';
+    public const PURCHASERS = 'EcommerceEnhanced_purchasers';
+    public const FIRST_TIME_PURCHASERS = 'EcommerceEnhanced_firstTimePurchasers';
+    public const CONVERTED_VISITS = 'EcommerceEnhanced_convertedVisits';
+    public const CART_VISITS = 'EcommerceEnhanced_cartVisits';
+
+    /**
+     * Numeric records of the buyer KPIs => metric name in the API output.
+     */
+    public const BUYER_METRICS = [
+        self::ORDERS => Metrics::ORDERS,
+        self::REVENUE => Metrics::REVENUE,
+        self::PURCHASERS => Metrics::PURCHASERS,
+        self::FIRST_TIME_PURCHASERS => Metrics::FIRST_TIME_PURCHASERS,
+        self::CONVERTED_VISITS => Metrics::CONVERTED_VISITS,
+        self::CART_VISITS => Metrics::CART_VISITS,
+    ];
+
     public const SHOPPING_BEHAVIOR = 'EcommerceEnhanced_shoppingBehavior';
     public const CHECKOUT_BEHAVIOR = 'EcommerceEnhanced_checkoutBehavior';
 
