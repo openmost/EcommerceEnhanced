@@ -167,6 +167,13 @@ class Payload
             $items[] = $item;
         }
 
+        // GA4 allows the list and the promotion on the items only, the step row takes them from the first item
+        foreach (self::ITEM_INHERITED as $key) {
+            if ($event[$key] === null && !empty($items) && $items[0][$key] !== null) {
+                $event[$key] = $items[0][$key];
+            }
+        }
+
         $event['items_count'] = count($items);
         $event['dropped_items'] = min(65535, $event['dropped_items']);
 

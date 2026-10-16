@@ -65,6 +65,18 @@ class PayloadTest extends TestCase
         $this->assertSame(1, $data['event']['items_count']);
     }
 
+    public function testEventListAndPromotionFallBackOnTheFirstItem()
+    {
+        $data = Payload::fromArray(EventType::VIEW_PROMOTION, ['items' => [
+            ['item_id' => 'A', 'promotion_name' => 'Summer sale', 'item_list_name' => 'Home'],
+            ['item_id' => 'B', 'promotion_name' => 'Other'],
+        ]]);
+
+        $this->assertSame('Summer sale', $data['event']['promotion_name']);
+        $this->assertSame('Home', $data['event']['item_list_name']);
+        $this->assertSame('Other', $data['items'][1]['promotion_name']);
+    }
+
     public function testItemsAreCapped()
     {
         $data = Payload::fromArray(EventType::VIEW_ITEM_LIST, ['items' => array_fill(0, Payload::MAX_ITEMS + 5, ['item_id' => 'A'])]);
