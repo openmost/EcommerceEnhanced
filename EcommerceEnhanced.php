@@ -27,6 +27,9 @@ class EcommerceEnhanced extends \Piwik\Plugin
             'Tracker.Cache.getSiteAttributes' => 'addSiteAttributes',
             'MeasurableSettings.updated' => 'onMeasurableSettingsUpdated',
             'TagManager.filterVariables' => 'replaceMatomoConfigurationVariable',
+            'Widget.addWidgetConfigs' => 'addPremiumTeasers',
+            'AssetManager.getStylesheetFiles' => 'getStylesheetFiles',
+            'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
         ];
     }
 
@@ -92,6 +95,32 @@ class EcommerceEnhanced extends \Piwik\Plugin
                 $variables[$index] = StaticContainer::get(TagManager\MatomoConfigurationVariable::class);
             }
         }
+    }
+
+    /**
+     * @param \Piwik\Widget\WidgetConfig[] $configs
+     */
+    public function addPremiumTeasers(&$configs)
+    {
+        if (!PremiumTeasers::isPremiumActivated()) {
+            $configs = array_merge($configs, PremiumTeasers::getWidgetConfigs());
+        }
+    }
+
+    /**
+     * @param string[] $stylesheets
+     */
+    public function getStylesheetFiles(&$stylesheets)
+    {
+        $stylesheets[] = 'plugins/EcommerceEnhanced/stylesheets/premium.less';
+    }
+
+    /**
+     * @param string[] $translationKeys
+     */
+    public function getClientSideTranslationKeys(&$translationKeys)
+    {
+        $translationKeys[] = 'EcommerceEnhanced_Customers';
     }
 
     public function onMeasurableSettingsUpdated($settings, $idSite)

@@ -1,0 +1,74 @@
+.ee-premium {
+  .card-content {
+    padding-bottom: 0 !important;
+  }
+
+  .ee-premium-description {
+    margin: 0 0 12px;
+  }
+
+  .ee-premium-badge {
+    display: inline-block;
+    margin-right: 6px;
+    padding: 2px 8px;
+    border-radius: 1rem;
+    background-color: #FFA32A;
+    color: #000;
+    font-size: 12px;
+    line-height: normal;
+  }
+
+  .ee-premium-preview {
+    position: relative;
+    margin: 0 -20px;
+  }
+
+  .ee-premium-image {
+    display: block;
+    width: 100%;
+    min-height: 160px;
+    height: auto;
+    background-color: #F3F3F3;
+  }
+
+  .ee-premium-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .ee-premium-link {
+    position: relative;
+    margin: 0;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, .92);
+    box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, .05);
+    text-align: center;
+    transition: .2s ease transform, .2s ease box-shadow;
+
+    &:hover {
+      box-shadow: 2px 2px 6px 0 rgba(255, 163, 42, .2);
+      transform: scale(1.03);
+    }
+
+    .icon-locked {
+      margin-right: .5rem;
+      color: #FFA32A;
+    }
+
+    a {
+      color: inherit;
+
+      // The whole card is clickable
+      &:after {
+        content: '';
+        position: absolute;
+        inset: 0;
+      }
+    }
+  }
+}

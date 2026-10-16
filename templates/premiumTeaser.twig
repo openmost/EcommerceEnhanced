@@ -1,0 +1,19 @@
+<div class="card ee-premium">
+    <div class="card-content">
+        <h2 class="card-title">{{ name }}</h2>
+        <p class="ee-premium-description">
+            <span class="ee-premium-badge">Premium</span>
+            {{ description }}
+        </p>
+        <div class="ee-premium-preview">
+            <img class="ee-premium-image" src="{{ image }}" alt="" loading="lazy">
+            <div class="ee-premium-overlay">
+                <p class="ee-premium-link">
+                    <span class="icon-locked"></span>
+                    <a href="{{ premiumUrl }}" target="_blank" rel="noreferrer noopener">{{ 'EcommerceEnhanced_PremiumLinkText'|translate }}</a>
+                    {{ 'EcommerceEnhanced_PremiumText'|translate(name) }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
