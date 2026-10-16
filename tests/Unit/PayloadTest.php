@@ -75,6 +75,10 @@ class PayloadTest extends TestCase
         $this->assertSame('Summer sale', $data['event']['promotion_name']);
         $this->assertSame('Home', $data['event']['item_list_name']);
         $this->assertSame('Other', $data['items'][1]['promotion_name']);
+
+        $checkout = Payload::fromArray(EventType::BEGIN_CHECKOUT, ['items' => [['item_id' => 'A', 'item_list_name' => 'Home']]]);
+        $this->assertNull($checkout['event']['item_list_name']);
+        $this->assertSame('Home', $checkout['items'][0]['item_list_name']);
     }
 
     public function testItemsAreCapped()

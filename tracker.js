@@ -1081,12 +1081,16 @@
 
     var queue = [];
     var flushScheduled = false;
+    var flushAttempts = 0;
+    var MAX_FLUSH_ATTEMPTS = 100;
 
+    // Events read before the tracker exists wait for it, up to 10 seconds; a later push retries
     function flush() {
         var trackers = getTrackers();
         if (!trackers.length) {
-            if (!flushScheduled) {
+            if (!flushScheduled && flushAttempts < MAX_FLUSH_ATTEMPTS) {
                 flushScheduled = true;
+                flushAttempts++;
                 setTimeout(function () {
                     flushScheduled = false;
                     flush();
@@ -1094,6 +1098,8 @@
             }
             return;
         }
+
+        flushAttempts = 0;
 
         while (queue.length) {
             var event = queue.shift();
@@ -1119,6 +1125,7 @@
         }
 
         if (queue.length) {
+            flushAttempts = 0;
             flush();
         }
     }

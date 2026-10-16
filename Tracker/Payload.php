@@ -167,9 +167,11 @@ class Payload
             $items[] = $item;
         }
 
-        // GA4 allows the list and the promotion on the items only, the step row takes them from the first item
+        // GA4 allows the list and the promotion on the items only: list and promotion steps take them from their
+        // first item. Other steps keep them on their items only, the list there is an attribution, not a view
+        $isListStep = in_array($type, [EventType::VIEW_ITEM_LIST, EventType::SELECT_ITEM, EventType::VIEW_PROMOTION, EventType::SELECT_PROMOTION, EventType::VIEW_SEARCH_RESULTS], true);
         foreach (self::ITEM_INHERITED as $key) {
-            if ($event[$key] === null && !empty($items) && $items[0][$key] !== null) {
+            if ($isListStep && $event[$key] === null && !empty($items) && $items[0][$key] !== null) {
                 $event[$key] = $items[0][$key];
             }
         }

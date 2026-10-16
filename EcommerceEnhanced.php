@@ -10,6 +10,7 @@
 namespace Piwik\Plugins\EcommerceEnhanced;
 
 use Piwik\Common;
+use Piwik\Container\StaticContainer;
 use Piwik\Notification;
 use Piwik\Piwik;
 use Piwik\Plugins\EcommerceEnhanced\Dao\Schema;
@@ -25,6 +26,7 @@ class EcommerceEnhanced extends \Piwik\Plugin
             'Db.getActionReferenceColumnsByTable' => 'addActionReferenceColumnsByTable',
             'Tracker.Cache.getSiteAttributes' => 'addSiteAttributes',
             'MeasurableSettings.updated' => 'onMeasurableSettingsUpdated',
+            'TagManager.filterVariables' => 'replaceMatomoConfigurationVariable',
         ];
     }
 
@@ -76,6 +78,20 @@ class EcommerceEnhanced extends \Piwik\Plugin
     public function addSiteAttributes(&$content, $idSite)
     {
         $content[SiteConfig::CACHE_KEY] = SiteConfig::buildCacheEntry(new MeasurableSettings((int) $idSite));
+    }
+
+    /**
+     * Adds the "read the GA4 ecommerce dataLayer" option to the Matomo Configuration variable of Tag Manager.
+     *
+     * @param \Piwik\Plugins\TagManager\Template\Variable\BaseVariable[] $variables
+     */
+    public function replaceMatomoConfigurationVariable(&$variables)
+    {
+        foreach ($variables as $index => $variable) {
+            if ($variable->getId() === TagManager\MatomoConfigurationVariable::ID && !$variable instanceof TagManager\MatomoConfigurationVariable) {
+                $variables[$index] = StaticContainer::get(TagManager\MatomoConfigurationVariable::class);
+            }
+        }
     }
 
     public function onMeasurableSettingsUpdated($settings, $idSite)

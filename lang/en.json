@@ -126,6 +126,8 @@
         "Step_begin_checkout": "Checkout",
         "Step_add_shipping_info": "Shipping info",
         "Step_add_payment_info": "Payment info",
-        "Step_purchase": "Purchase"
+        "Step_purchase": "Purchase",
+        "TagManagerOptionTitle": "Read the GA4 ecommerce dataLayer (Ecommerce Enhanced)",
+        "TagManagerOptionDescription": "Records the GA4, gtag and Universal Analytics ecommerce events your shop pushes to window.dataLayer: product views, carts, checkout steps, orders and refunds. The tracker must be registered as the default tracker."
     }
 }
