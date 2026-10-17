@@ -16,7 +16,7 @@ class OrderDetailsSubcategory extends Subcategory
 {
     protected $categoryId = 'Goals_Ecommerce';
     protected $id = 'EcommerceEnhanced_OrderDetails';
-    protected $order = 14;
+    protected $order = 17;
 
     public function getHelp()
     {

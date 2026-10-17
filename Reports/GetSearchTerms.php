@@ -34,7 +34,7 @@ class GetSearchTerms extends Base
         $this->name = Piwik::translate('EcommerceEnhanced_SearchTermPlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_SearchTermsDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_Merchandising';
-        $this->order = 7;
+        $this->order = 22;
         $this->dimension = new SearchTerm();
     }
 }

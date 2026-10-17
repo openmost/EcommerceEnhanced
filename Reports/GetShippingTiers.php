@@ -10,6 +10,7 @@
 namespace Piwik\Plugins\EcommerceEnhanced\Reports;
 
 use Piwik\Piwik;
+use Piwik\Plugins\CoreVisualizations\Visualizations\JqplotGraph\Pie;
 use Piwik\Plugins\EcommerceEnhanced\Columns\OrderShippingTier;
 use Piwik\Plugins\EcommerceEnhanced\Metrics;
 
@@ -33,7 +34,8 @@ class GetShippingTiers extends Base
         $this->name = Piwik::translate('EcommerceEnhanced_OrderShippingTierPlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_ShippingTiersDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_OrderDetails';
-        $this->order = 3;
+        $this->order = 4;
+        $this->defaultView = Pie::ID;
         $this->dimension = new OrderShippingTier();
     }
 }

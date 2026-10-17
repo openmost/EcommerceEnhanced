@@ -27,27 +27,28 @@ class PremiumTeasers
     public const IMAGE_GRAPH = 'premium-graph';
 
     /**
-     * id => [subcategory, order, image]. Name and description are the translations EcommerceEnhanced_Teaser{Id}
-     * and EcommerceEnhanced_Teaser{Id}Description.
+     * id => [subcategory, widget order, image]. The order is the one of the Premium widget, so the card stands where
+     * the report will (report widgets are ordered 100 + report order). Name and description are the translations
+     * EcommerceEnhanced_Teaser{Id} and EcommerceEnhanced_Teaser{Id}Description.
      */
     private const TEASERS = [
+        'Refunds' => ['General_Overview', 35, self::IMAGE_GRAPH],
         'ActiveUsers' => ['General_Overview', 40, self::IMAGE_GRAPH],
-        'FirstUserSource' => ['Ecommerce_Sales', 2, self::IMAGE_TABLE],
-        'AbandonedCartsByChannel' => ['Ecommerce_Sales', 3, self::IMAGE_TABLE],
-        'TimeToPurchase' => ['Ecommerce_Sales', 4, self::IMAGE_TABLE],
-        'BehaviorByDeviceAndChannel' => ['EcommerceEnhanced_ShoppingBehavior', 10, self::IMAGE_TABLE],
-        'LeadPipeline' => ['EcommerceEnhanced_ShoppingBehavior', 11, self::IMAGE_TABLE],
-        'ProductAffinity' => ['EcommerceEnhanced_Merchandising', 10, self::IMAGE_TABLE],
-        'AbandonedProducts' => ['EcommerceEnhanced_Merchandising', 11, self::IMAGE_TABLE],
-        'ProductProfit' => ['EcommerceEnhanced_Merchandising', 12, self::IMAGE_TABLE],
-        'CustomItemParameters' => ['EcommerceEnhanced_Merchandising', 13, self::IMAGE_TABLE],
-        'Refunds' => ['EcommerceEnhanced_OrderDetails', 10, self::IMAGE_GRAPH],
-        'DiscountDepth' => ['EcommerceEnhanced_OrderDetails', 11, self::IMAGE_TABLE],
-        'BasketDistribution' => ['EcommerceEnhanced_OrderDetails', 12, self::IMAGE_TABLE],
-        'MultiCurrency' => ['EcommerceEnhanced_OrderDetails', 13, self::IMAGE_TABLE],
+        'FirstUserSource' => ['Ecommerce_Sales', 120, self::IMAGE_TABLE],
+        'BehaviorByDeviceAndChannel' => ['EcommerceEnhanced_ShoppingBehavior', 110, self::IMAGE_TABLE],
+        'AbandonedCartsByChannel' => ['EcommerceEnhanced_ShoppingBehavior', 112, self::IMAGE_TABLE],
+        'AbandonedProducts' => ['EcommerceEnhanced_ShoppingBehavior', 114, self::IMAGE_TABLE],
+        'LeadPipeline' => ['EcommerceEnhanced_ShoppingBehavior', 120, self::IMAGE_TABLE],
+        'CustomItemParameters' => ['EcommerceEnhanced_Merchandising', 105, self::IMAGE_TABLE],
+        'ProductAffinity' => ['EcommerceEnhanced_Merchandising', 130, self::IMAGE_TABLE],
+        'ProductProfit' => ['EcommerceEnhanced_Merchandising', 140, self::IMAGE_TABLE],
+        'BasketDistribution' => ['EcommerceEnhanced_OrderDetails', 101, self::IMAGE_GRAPH],
+        'DiscountDepth' => ['EcommerceEnhanced_OrderDetails', 106, self::IMAGE_TABLE],
+        'MultiCurrency' => ['EcommerceEnhanced_OrderDetails', 112, self::IMAGE_TABLE],
         'RepeatPurchase' => ['EcommerceEnhanced_Customers', 1, self::IMAGE_GRAPH],
-        'RetentionCohorts' => ['EcommerceEnhanced_Customers', 2, self::IMAGE_TABLE],
-        'LifetimeValue' => ['EcommerceEnhanced_Customers', 3, self::IMAGE_TABLE],
+        'TimeToPurchase' => ['EcommerceEnhanced_Customers', 104, self::IMAGE_GRAPH],
+        'RetentionCohorts' => ['EcommerceEnhanced_Customers', 106, self::IMAGE_TABLE],
+        'LifetimeValue' => ['EcommerceEnhanced_Customers', 107, self::IMAGE_TABLE],
     ];
 
     public static function isPremiumActivated(): bool
@@ -79,7 +80,7 @@ class PremiumTeasers
             $config->setAction('premiumTeaser');
             $config->setParameters(['teaser' => $id]);
             $config->setName('EcommerceEnhanced_Teaser' . $id);
-            $config->setOrder(1000 + $order);
+            $config->setOrder($order);
             $configs[] = $config;
         }
 

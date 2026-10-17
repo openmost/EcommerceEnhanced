@@ -16,7 +16,7 @@ class ShoppingBehaviorSubcategory extends Subcategory
 {
     protected $categoryId = 'Goals_Ecommerce';
     protected $id = 'EcommerceEnhanced_ShoppingBehavior';
-    protected $order = 12;
+    protected $order = 16;
 
     public function getHelp()
     {

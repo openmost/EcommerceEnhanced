@@ -359,16 +359,16 @@ Up to 10 item dimensions per website. Renaming one keeps the values recorded bef
 
 ## Reports
 
-In the Ecommerce menu:
+In the Ecommerce menu, in the order a shop owner reads them (Premium in italics):
 
-- **Overview:** buyers and revenue (purchasers, first time purchasers, ARPU, ARPPU, average order value, items per order, conversion rate, cart abandonment rate), as sparklines and over time.
-- **Shopping behavior:** visits that viewed a product, added to cart, began checkout and bought; visits through the checkout steps, with step and abandonment rates.
-- **Merchandising:** products, brands, variants, product categories, item lists, promotions and product search terms with views, wishlist and cart adds, purchases, item revenue and rates.
-- **Order details:** transactions (every order with its revenue split and GA4 details), and orders and revenue by coupon, payment type, shipping tier, customer type, affiliation and currency.
-- **Sales:** sales by source / medium, next to the native sales by channel, campaign, page and location.
-- **Customers:** Premium reports, see above.
+- **Overview:** buyers and revenue (purchasers, first time purchasers, ARPU, ARPPU, average order value, items per order, conversion rate, cart abandonment rate) as sparklines and over time; *refunds and net revenue*; *daily, weekly and monthly active users and buyers*.
+- **Merchandising:** products, product categories, brands and variants with views, wishlist and cart adds, purchases, item revenue and rates; *one report per item dimension*; item lists, promotions and product search terms; *products bought together*; *profit and margin by product, category and brand*.
+- **Sales:** sales by source / medium, next to the native sales by channel, campaign, page and location; *sales by first user channel and source / medium*.
+- **Shopping behavior:** the shopping and checkout funnels with step and abandonment rates; *the same journey by device type and by channel*; *abandoned carts by channel and source / medium, most abandoned products*; *lead pipeline and leads by source*.
+- **Order details:** transactions (every order with its revenue split and GA4 details); *orders by basket size and by order value*; payment types and shipping tiers (pies); coupons and *discount depth by coupon, product and category*; *refunds over time and refunded products*; affiliations and order currencies.
+- **Customers:** *repeat purchases*; new and returning customers; *time to first purchase*; *retention cohorts*; *lifetime value by channel*; *RFM segments*.
 
-Premium reports appear as locked cards next to the free ones until Ecommerce Enhanced Premium is activated.
+Premium reports appear as locked cards, in the place of the report, until Ecommerce Enhanced Premium is activated.
 
 ## Segments
 

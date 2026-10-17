@@ -37,7 +37,7 @@ class GetBrands extends Base
         $this->name = Piwik::translate('EcommerceEnhanced_ItemBrandPlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_BrandsDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_Merchandising';
-        $this->order = 2;
+        $this->order = 3;
         $this->dimension = new ItemBrand();
     }
 }

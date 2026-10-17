@@ -10,6 +10,7 @@
 namespace Piwik\Plugins\EcommerceEnhanced\Reports;
 
 use Piwik\Piwik;
+use Piwik\Plugins\CoreVisualizations\Visualizations\JqplotGraph\Pie;
 use Piwik\Plugins\EcommerceEnhanced\Columns\OrderCustomerType;
 use Piwik\Plugins\EcommerceEnhanced\Metrics;
 
@@ -32,8 +33,9 @@ class GetCustomerTypes extends Base
         $this->action = 'getCustomerTypes';
         $this->name = Piwik::translate('EcommerceEnhanced_OrderCustomerTypePlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_CustomerTypesDocumentation');
-        $this->subcategoryId = 'EcommerceEnhanced_OrderDetails';
-        $this->order = 4;
+        $this->subcategoryId = 'EcommerceEnhanced_Customers';
+        $this->order = 3;
+        $this->defaultView = Pie::ID;
         $this->dimension = new OrderCustomerType();
     }
 }

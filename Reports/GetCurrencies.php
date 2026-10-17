@@ -10,6 +10,7 @@
 namespace Piwik\Plugins\EcommerceEnhanced\Reports;
 
 use Piwik\Piwik;
+use Piwik\Plugins\CoreVisualizations\Visualizations\JqplotGraph\Pie;
 use Piwik\Plugins\EcommerceEnhanced\Columns\OrderCurrency;
 use Piwik\Plugins\EcommerceEnhanced\Metrics;
 
@@ -33,7 +34,8 @@ class GetCurrencies extends Base
         $this->name = Piwik::translate('EcommerceEnhanced_OrderCurrencyPlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_CurrenciesDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_OrderDetails';
-        $this->order = 6;
+        $this->order = 12;
+        $this->defaultView = Pie::ID;
         $this->dimension = new OrderCurrency();
     }
 }

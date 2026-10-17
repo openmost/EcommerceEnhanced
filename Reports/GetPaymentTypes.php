@@ -10,6 +10,7 @@
 namespace Piwik\Plugins\EcommerceEnhanced\Reports;
 
 use Piwik\Piwik;
+use Piwik\Plugins\CoreVisualizations\Visualizations\JqplotGraph\Pie;
 use Piwik\Plugins\EcommerceEnhanced\Columns\OrderPaymentType;
 use Piwik\Plugins\EcommerceEnhanced\Metrics;
 
@@ -33,7 +34,8 @@ class GetPaymentTypes extends Base
         $this->name = Piwik::translate('EcommerceEnhanced_OrderPaymentTypePlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_PaymentTypesDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_OrderDetails';
-        $this->order = 2;
+        $this->order = 3;
+        $this->defaultView = Pie::ID;
         $this->dimension = new OrderPaymentType();
     }
 }

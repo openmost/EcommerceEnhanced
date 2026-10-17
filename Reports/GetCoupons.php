@@ -33,7 +33,7 @@ class GetCoupons extends Base
         $this->name = Piwik::translate('EcommerceEnhanced_OrderCouponPlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_CouponsDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_OrderDetails';
-        $this->order = 1;
+        $this->order = 5;
         $this->dimension = new OrderCoupon();
     }
 }

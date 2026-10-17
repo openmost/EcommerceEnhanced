@@ -33,7 +33,7 @@ class GetAffiliations extends Base
         $this->name = Piwik::translate('EcommerceEnhanced_OrderAffiliationPlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_AffiliationsDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_OrderDetails';
-        $this->order = 5;
+        $this->order = 11;
         $this->dimension = new OrderAffiliation();
     }
 }

@@ -14,6 +14,8 @@ use Piwik\Piwik;
 use Piwik\Plugin\Report;
 use Piwik\Plugin\ViewDataTable;
 use Piwik\Plugins\CoreVisualizations\Visualizations\HtmlTable;
+use Piwik\Plugins\CoreVisualizations\Visualizations\JqplotGraph\Bar;
+use Piwik\Plugins\CoreVisualizations\Visualizations\JqplotGraph\Pie;
 use Piwik\Plugins\EcommerceEnhanced\Metrics;
 use Piwik\Site;
 
@@ -46,6 +48,13 @@ abstract class Base extends Report
      */
     protected $keepRowOrder = false;
 
+    /**
+     * Visualization shown first, a table unless a distribution reads better as a pie or bars.
+     *
+     * @var string|null
+     */
+    protected $defaultView = null;
+
     protected function init()
     {
         $this->module = 'EcommerceEnhanced';
@@ -53,6 +62,11 @@ abstract class Base extends Report
         $this->metrics = Metrics::make($this->metricNames);
         $this->processedMetrics = Metrics::make($this->ratioNames);
         $this->defaultSortColumn = $this->keepRowOrder ? '' : ($this->metricNames[0] ?? 'label');
+    }
+
+    public function getDefaultTypeViewDataTable()
+    {
+        return $this->defaultView ?? HtmlTable::ID;
     }
 
     public function isEnabled()
@@ -79,6 +93,12 @@ abstract class Base extends Report
         $view->config->show_exclude_low_population = false;
         $view->config->show_table_all_columns = false;
         $view->config->columns_to_display = array_merge(['label'], $this->metricNames, $this->ratioNames);
+
+        // A pie or bars plots one metric, the main one; the others stay available in the series picker
+        if ($view->isViewDataTableId(Pie::ID) || $view->isViewDataTableId(Bar::ID)) {
+            $view->config->columns_to_display = ['label', $this->metricNames[0]];
+            $view->config->selectable_columns = $this->metricNames;
+        }
 
         if ($this->keepRowOrder) {
             $view->config->enable_sort = false;

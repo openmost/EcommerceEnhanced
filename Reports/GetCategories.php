@@ -37,7 +37,7 @@ class GetCategories extends Base
         $this->name = Piwik::translate('EcommerceEnhanced_ProductCategoriesReport');
         $this->documentation = Piwik::translate('EcommerceEnhanced_BrandsDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_Merchandising';
-        $this->order = 4;
+        $this->order = 2;
         $this->dimension = new ProductCategory();
     }
 }

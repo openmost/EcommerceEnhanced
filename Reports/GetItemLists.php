@@ -35,7 +35,7 @@ class GetItemLists extends Base
         $this->name = Piwik::translate('EcommerceEnhanced_ListNamePlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_ItemListsDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_Merchandising';
-        $this->order = 5;
+        $this->order = 20;
         $this->dimension = new ListName();
     }
 }

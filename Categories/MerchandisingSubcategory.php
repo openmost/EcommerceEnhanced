@@ -16,7 +16,7 @@ class MerchandisingSubcategory extends Subcategory
 {
     protected $categoryId = 'Goals_Ecommerce';
     protected $id = 'EcommerceEnhanced_Merchandising';
-    protected $order = 13;
+    protected $order = 11;
 
     public function getHelp()
     {
