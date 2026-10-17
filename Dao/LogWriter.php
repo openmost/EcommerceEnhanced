@@ -63,6 +63,9 @@ class LogWriter
         'lead_status' => 'lead_status',
         'items_count' => 'items_count',
         'dropped_items' => 'dropped_items',
+        'order_no' => 'order_no',
+        'seconds_since_previous_order' => 'seconds_since_previous_order',
+        'first_idvisit' => 'first_idvisit',
     ];
 
     /**
@@ -135,6 +138,86 @@ class LogWriter
     {
         $this->deleteCartItems((int) $context['idvisit']);
         $this->insertOrderLines($context, GoalManager::IDGOAL_ORDER, $idOrder, $items, $customSlots);
+    }
+
+    /**
+     * Where an order stands in the history of its visitor, read once at tracking time so archiving never has to
+     * scan the past orders of each buyer: rank of the order (1 for a first order), time since the previous order
+     * and first visit. Both queries use the (idsite, idvisitor) index of log_visit, then primary keys.
+     *
+     * @return array{order_no: int, seconds_since_previous_order: int|null, first_idvisit: int|null}
+     */
+    public function getCustomerHistory(int $idSite, string $idVisitor, string $serverTime): array
+    {
+        $firstVisit = Db::fetchOne(
+            sprintf('SELECT idvisit FROM %s WHERE idsite = ? AND idvisitor = ? ORDER BY visit_first_action_time ASC LIMIT 1', Common::prefixTable('log_visit')),
+            [$idSite, $idVisitor]
+        );
+
+        $orders = Db::fetchRow(
+            sprintf(
+                'SELECT COUNT(*) AS orders, MAX(IF(conversion.server_time < ?, conversion.server_time, NULL)) AS previous_order
+                FROM %s AS visit STRAIGHT_JOIN %s AS conversion ON conversion.idvisit = visit.idvisit AND conversion.idgoal = ?
+                WHERE visit.idsite = ? AND visit.idvisitor = ? AND conversion.server_time <= ?',
+                Common::prefixTable('log_visit'),
+                Common::prefixTable('log_conversion')
+            ),
+            [$serverTime, GoalManager::IDGOAL_ORDER, $idSite, $idVisitor, $serverTime]
+        ) ?: [];
+
+        $previous = empty($orders['previous_order']) ? null : max(0, strtotime($serverTime . ' UTC') - strtotime($orders['previous_order'] . ' UTC'));
+
+        return [
+            'order_no' => max(1, min(65535, (int) ($orders['orders'] ?? 0))),
+            'seconds_since_previous_order' => $previous,
+            'first_idvisit' => $firstVisit === false || $firstVisit === null ? null : (int) $firstVisit,
+        ];
+    }
+
+    /**
+     * The order a refund refers to, with its visit and revenue.
+     *
+     * @return array{idorder: string, idvisit: int, revenue: float|null}|null
+     */
+    public function findOrder(int $idSite, string $orderRef): ?array
+    {
+        // log_conversion and the plugin tables may have different collations after a MySQL upgrade: compare bytes,
+        // after the primary key restricted the rows to the visit
+        $order = Db::fetchRow(
+            sprintf(
+                'SELECT purchase.idorder, purchase.idvisit, conversion.revenue
+                FROM %s AS purchase
+                LEFT JOIN %s AS conversion ON conversion.idvisit = purchase.idvisit AND conversion.idgoal = ? AND CAST(conversion.idorder AS BINARY) = CAST(purchase.idorder AS BINARY)
+                WHERE purchase.idsite = ? AND purchase.order_ref = ? AND purchase.event_type = ? LIMIT 1',
+                Common::prefixTable(Schema::TABLE_EVENT),
+                Common::prefixTable('log_conversion')
+            ),
+            [GoalManager::IDGOAL_ORDER, $idSite, $orderRef, EventType::PURCHASE]
+        );
+
+        if (empty($order) || $order['idorder'] === null) {
+            return null;
+        }
+
+        return [
+            'idorder' => (string) $order['idorder'],
+            'idvisit' => (int) $order['idvisit'],
+            'revenue' => $order['revenue'] === null ? null : (float) $order['revenue'],
+        ];
+    }
+
+    public function getVisitorOfVisit(int $idVisit): ?string
+    {
+        $idVisitor = Db::fetchOne(sprintf('SELECT idvisitor FROM %s WHERE idvisit = ?', Common::prefixTable('log_visit')), [$idVisit]);
+
+        return $idVisitor === false || $idVisitor === null ? null : (string) $idVisitor;
+    }
+
+    public function hasFullRefund(int $idSite, string $orderRef): bool
+    {
+        $sql = sprintf('SELECT 1 FROM %s WHERE idsite = ? AND order_ref = ? AND event_type = ? AND items_count = 0 LIMIT 1', Common::prefixTable(Schema::TABLE_EVENT));
+
+        return (bool) Db::fetchOne($sql, [$idSite, $orderRef, EventType::REFUND]);
     }
 
     public function hasOrderConversion(int $idVisit, string $idOrder): bool

@@ -97,7 +97,8 @@ class RequestProcessor extends Tracker\RequestProcessor
         // Core rejects an order id seen before, but not once PrivacyManager replaced it by a random hash. The keyed
         // hash of the raw id restores the check, with the same outcome as core
         if ($kind === self::KIND_ORDER && ($orderRef = self::getOrderRef($rawOrderId)) !== null && $this->writer->findOrderId($request->getIdSite(), $orderRef) !== null) {
-            throw new InvalidRequestParameterException(sprintf('Invalid non-unique idsite/idorder combination (%d, %s), conversion was not inserted.', $request->getIdSite(), $rawOrderId));
+            // The raw order id is left out: with order ids anonymised it must not reach the logs
+            throw new InvalidRequestParameterException(sprintf('Invalid non-unique idsite/idorder combination for site %d, conversion was not inserted.', $request->getIdSite()));
         }
 
         if ($kind === self::KIND_EVENT) {
@@ -223,8 +224,9 @@ class RequestProcessor extends Tracker\RequestProcessor
                 return;
             }
 
+            $history = $this->writer->getCustomerHistory((int) $context['idsite'], (string) $visitProperties->getProperty('idvisitor'), $context['server_time']);
             $this->writer->insertOrderItems($context, $idOrder, $data['items'], $customSlots);
-            $this->writer->insertEvent($context, EventType::PURCHASE, $data['event'], [], $idOrder, self::getOrderRef($eeRequest['rawOrderId']), $customSlots);
+            $this->writer->insertEvent($context, EventType::PURCHASE, $history + $data['event'], [], $idOrder, self::getOrderRef($eeRequest['rawOrderId']), $customSlots);
             return;
         }
 
@@ -232,10 +234,55 @@ class RequestProcessor extends Tracker\RequestProcessor
             return;
         }
 
-        // The order id as stored with the order, anonymised or not, never the raw id the refund carries
+        $idOrder = null;
         $orderRef = self::getOrderRef($data['event']['transaction_id'] ?? null);
-        $idOrder = $orderRef === null ? null : $this->writer->findOrderId((int) $context['idsite'], $orderRef);
+        if ($eeRequest['type'] === EventType::REFUND) {
+            $refund = $this->prepareRefund($request, $visitProperties, $orderRef, $data);
+            if ($refund === null) {
+                return;
+            }
+
+            [$idOrder, $data] = $refund;
+        } elseif ($orderRef !== null) {
+            // The order id as stored with the order, anonymised or not, never the raw id the event carries
+            $idOrder = $this->writer->findOrderId((int) $context['idsite'], $orderRef);
+        }
+
         $this->writer->insertEvent($context, $eeRequest['type'], $data['event'], $data['items'], $idOrder, $orderRef, $customSlots);
+    }
+
+    /**
+     * A refund changes the revenue reports, and the tracking endpoint is public: it is only recorded when it comes
+     * from the back office (an authenticated tracking request) or from the visitor who placed the order. A full
+     * refund counts once per order, its amount defaults to the order revenue.
+     *
+     * @param array<string, mixed> $data
+     * @return array{0: string|null, 1: array<string, mixed>}|null order id as stored and the refund, null to drop it
+     */
+    private function prepareRefund(Request $request, VisitProperties $visitProperties, ?string $orderRef, array $data): ?array
+    {
+        $idSite = $request->getIdSite();
+        $order = $orderRef === null ? null : $this->writer->findOrder($idSite, $orderRef);
+
+        if (!$request->isAuthenticated()) {
+            $orderVisitor = $order === null ? null : $this->writer->getVisitorOfVisit($order['idvisit']);
+            if ($orderVisitor === null || $orderVisitor !== (string) $visitProperties->getProperty('idvisitor')) {
+                Common::printDebug('Ecommerce Enhanced: refund ignored, it must come from the visitor of the order or from an authenticated request.');
+                return null;
+            }
+        }
+
+        if (empty($data['items'])) {
+            if ($orderRef !== null && $this->writer->hasFullRefund($idSite, $orderRef)) {
+                return null;
+            }
+
+            if (!isset($data['event']['value']) && $order !== null && $order['revenue'] !== null) {
+                $data['event']['value'] = $order['revenue'];
+            }
+        }
+
+        return [$order['idorder'] ?? null, $data];
     }
 
     /**

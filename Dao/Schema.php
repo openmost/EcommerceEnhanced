@@ -57,7 +57,8 @@ class Schema
             `attribution` TINYINT UNSIGNED NOT NULL DEFAULT 0,
             PRIMARY KEY (`idee_order_item`),
             UNIQUE KEY `uniq_line` (`idvisit`, `idgoal`, `idorder`, `line_no`),
-            INDEX `index_idsite_servertime` (`idsite`, `server_time`)');
+            INDEX `index_idsite_servertime` (`idsite`, `server_time`),
+            INDEX `index_idsite_idorder` (`idsite`, `idorder`)');
 
         DbHelper::createTable(self::TABLE_EVENT, '
             `idee_event` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -93,6 +94,9 @@ class Schema
             `lead_status` VARCHAR(100) NULL,
             `items_count` SMALLINT UNSIGNED NOT NULL DEFAULT 0,
             `dropped_items` SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+            `order_no` SMALLINT UNSIGNED NULL,
+            `seconds_since_previous_order` INT UNSIGNED NULL,
+            `first_idvisit` BIGINT UNSIGNED NULL,
             PRIMARY KEY (`idee_event`),
             INDEX `index_idsite_servertime` (`idsite`, `server_time`),
             INDEX `index_idvisit` (`idvisit`),
