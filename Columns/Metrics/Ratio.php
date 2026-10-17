@@ -11,12 +11,12 @@ namespace Piwik\Plugins\EcommerceEnhanced\Columns\Metrics;
 
 use Piwik\Archive\DataTableFactory;
 use Piwik\Columns\Dimension;
-use Piwik\Common;
 use Piwik\DataTable;
 use Piwik\DataTable\Row;
 use Piwik\Metrics\Formatter;
 use Piwik\Piwik;
 use Piwik\Plugin\ProcessedMetric;
+use Piwik\Request;
 
 /**
  * A metric divided by another one, computed at display time so it stays right for any period.
@@ -108,7 +108,7 @@ class Ratio extends ProcessedMetric
     {
         if ($this->type === Dimension::TYPE_MONEY) {
             // Sparklines format without calling beforeFormat(), the site then comes from the request
-            return $formatter->getPrettyMoney($value, $this->idSite ?: Common::getRequestVar('idSite', 0, 'int'));
+            return $formatter->getPrettyMoney($value, $this->idSite ?: Request::fromRequest()->getIntegerParameter('idSite', 0));
         }
 
         if ($this->type === Dimension::TYPE_NUMBER) {

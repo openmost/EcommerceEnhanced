@@ -849,8 +849,39 @@
         return encodeURIComponent(value);
     }
 
+    // The server reads at most 128 KB of payload: the last items are dropped, and counted, until it fits
+    var MAX_PAYLOAD_BYTES = 120000;
+
+    function byteLength(text) {
+        return unescape(encodeURIComponent(text)).length;
+    }
+
+    function fitPayload(data) {
+        var json = stringify(data, true);
+        if (!data || !data.items || byteLength(json) <= MAX_PAYLOAD_BYTES) {
+            return json;
+        }
+
+        var fitted = {};
+        for (var key in data) {
+            if (hasOwn(data, key)) {
+                fitted[key] = data[key];
+            }
+        }
+
+        fitted.items = data.items.slice();
+        while (fitted.items.length && byteLength(json) > MAX_PAYLOAD_BYTES) {
+            var drop = Math.max(1, Math.ceil(fitted.items.length / 10));
+            fitted.items = fitted.items.slice(0, fitted.items.length - drop);
+            fitted.dropped_items = (data.dropped_items || 0) + data.items.length - fitted.items.length;
+            json = stringify(fitted, true);
+        }
+
+        return json;
+    }
+
     function buildPayloadParams(name, data) {
-        var json = data ? stringify(data, true) : null;
+        var json = data ? fitPayload(data) : null;
 
         return 'eex_v=' + PAYLOAD_VERSION + '&eex_e=' + encode(name) + (json ? '&eex_d=' + encode(json) : '');
     }

@@ -9,7 +9,6 @@
 
 namespace Piwik\Plugins\EcommerceEnhanced\Reports;
 
-use Piwik\Common;
 use Piwik\Piwik;
 use Piwik\Plugin\Report;
 use Piwik\Plugin\ViewDataTable;
@@ -17,6 +16,7 @@ use Piwik\Plugins\CoreVisualizations\Visualizations\HtmlTable;
 use Piwik\Plugins\CoreVisualizations\Visualizations\JqplotGraph\Bar;
 use Piwik\Plugins\CoreVisualizations\Visualizations\JqplotGraph\Pie;
 use Piwik\Plugins\EcommerceEnhanced\Metrics;
+use Piwik\Request;
 use Piwik\Site;
 
 /**
@@ -76,7 +76,7 @@ abstract class Base extends Report
 
     public function isEnabled()
     {
-        $idSite = Common::getRequestVar('idSite', false, 'int');
+        $idSite = Request::fromRequest()->getIntegerParameter('idSite', 0);
 
         return !empty($idSite) && (new Site($idSite))->isEcommerceEnabled();
     }

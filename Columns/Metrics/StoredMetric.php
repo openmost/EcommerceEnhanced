@@ -11,11 +11,11 @@ namespace Piwik\Plugins\EcommerceEnhanced\Columns\Metrics;
 
 use Piwik\Archive\DataTableFactory;
 use Piwik\Columns\Dimension;
-use Piwik\Common;
 use Piwik\DataTable;
 use Piwik\Metrics\Formatter;
 use Piwik\Piwik;
 use Piwik\Plugin\Metric;
+use Piwik\Request;
 
 /**
  * A metric read as is from the archive, formatted by its type.
@@ -76,7 +76,7 @@ class StoredMetric extends Metric
     {
         if ($this->type === Dimension::TYPE_MONEY) {
             // Sparklines format without calling beforeFormat(), the site then comes from the request
-            return $formatter->getPrettyMoney($value, $this->idSite ?: Common::getRequestVar('idSite', 0, 'int'));
+            return $formatter->getPrettyMoney($value, $this->idSite ?: Request::fromRequest()->getIntegerParameter('idSite', 0));
         }
 
         if ($this->type === Dimension::TYPE_PERCENT) {

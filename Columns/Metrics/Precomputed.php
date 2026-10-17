@@ -10,11 +10,11 @@
 namespace Piwik\Plugins\EcommerceEnhanced\Columns\Metrics;
 
 use Piwik\Columns\Dimension;
-use Piwik\Common;
 use Piwik\DataTable\Row;
 use Piwik\Metrics\Formatter;
 use Piwik\Piwik;
 use Piwik\Plugin\ProcessedMetric;
+use Piwik\Request;
 
 /**
  * A value the API computes or reads as is (a funnel step compared to the first step, the tax of an order).
@@ -80,7 +80,7 @@ class Precomputed extends ProcessedMetric
     public function format($value, Formatter $formatter)
     {
         if ($this->type === Dimension::TYPE_MONEY) {
-            return $formatter->getPrettyMoney($value, Common::getRequestVar('idSite', 0, 'int'));
+            return $formatter->getPrettyMoney($value, Request::fromRequest()->getIntegerParameter('idSite', 0));
         }
 
         if ($this->type === Dimension::TYPE_NUMBER) {

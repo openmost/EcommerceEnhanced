@@ -9,16 +9,16 @@
 
 namespace Piwik\Plugins\EcommerceEnhanced;
 
-use Piwik\Common;
 use Piwik\Menu\MenuAdmin;
 use Piwik\Piwik;
 use Piwik\Plugins\UsersManager\UserPreferences;
+use Piwik\Request;
 
 class Menu extends \Piwik\Plugin\Menu
 {
     public function configureAdminMenu(MenuAdmin $menu)
     {
-        $idSite = Common::getRequestVar('idSite', (new UserPreferences())->getDefaultWebsiteId(), 'int');
+        $idSite = Request::fromRequest()->getIntegerParameter('idSite', (int) (new UserPreferences())->getDefaultWebsiteId());
 
         if (!empty($idSite) && Piwik::isUserHasAdminAccess($idSite)) {
             $menu->addMeasurableItem('EcommerceEnhanced_SettingsMenu', $this->urlForAction('settings'), 45);

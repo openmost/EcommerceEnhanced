@@ -9,6 +9,7 @@
 
 namespace Piwik\Plugins\EcommerceEnhanced\Tracker;
 
+use Piwik\Common;
 use Piwik\Plugins\EcommerceEnhanced\EventType;
 
 /**
@@ -126,7 +127,13 @@ class Payload
     public static function parse(string $eventName, string $json): ?array
     {
         $type = EventType::fromName($eventName);
-        if ($type === null || $json === '' || strlen($json) > self::MAX_JSON_BYTES) {
+        if ($type === null || $json === '') {
+            return null;
+        }
+
+        if (strlen($json) > self::MAX_JSON_BYTES) {
+            // tracker.js trims its payloads below the limit: a larger one was built by hand or by another client
+            Common::printDebug(sprintf('Ecommerce Enhanced: %s payload of %d bytes ignored, the limit is %d bytes.', $eventName, strlen($json), self::MAX_JSON_BYTES));
             return null;
         }
 

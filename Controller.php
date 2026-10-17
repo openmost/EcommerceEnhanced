@@ -9,8 +9,8 @@
 
 namespace Piwik\Plugins\EcommerceEnhanced;
 
-use Piwik\Common;
 use Piwik\Piwik;
+use Piwik\Request;
 
 class Controller extends \Piwik\Plugin\Controller
 {
@@ -21,7 +21,7 @@ class Controller extends \Piwik\Plugin\Controller
     {
         $this->checkSitePermission();
 
-        $id = Common::getRequestVar('teaser', '', 'string');
+        $id = Request::fromRequest()->getStringParameter('teaser', '');
         if (!PremiumTeasers::exists($id)) {
             throw new \Exception('Unknown report.');
         }
@@ -39,7 +39,7 @@ class Controller extends \Piwik\Plugin\Controller
      */
     public function settings()
     {
-        $idSite = Common::getRequestVar('idSite', 0, 'int');
+        $idSite = Request::fromRequest()->getIntegerParameter('idSite', 0);
         Piwik::checkUserHasAdminAccess($idSite);
 
         return $this->renderTemplate('settings', [

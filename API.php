@@ -87,7 +87,7 @@ class API extends \Piwik\Plugin\API
      * The orders of the period, most recent first, with their revenue split and their GA4 details. Read from the
      * orders themselves, like the Ecommerce log, at most 500 orders.
      *
-     * @return DataTable
+     * @return DataTable|DataTable\Map
      */
     public function getTransactions($idSite, $period, $date, $segment = false)
     {
@@ -98,7 +98,13 @@ class API extends \Piwik\Plugin\API
             throw new \Exception(Piwik::translate('EcommerceEnhanced_TransactionsDisabled'));
         }
 
-        $idSite = (int) $idSite;
+        return PeriodTables::build((int) $idSite, (string) $period, (string) $date, function (string $period, string $date) use ($idSite, $segment) {
+            return $this->buildTransactions((int) $idSite, $period, $date, $segment);
+        });
+    }
+
+    private function buildTransactions(int $idSite, string $period, string $date, $segment): DataTable
+    {
         $timezone = Site::getTimezoneFor($idSite);
         $range = Period\Factory::build($period, $date, $timezone);
         $start = Date::factory($range->getDateStart()->toString() . ' 00:00:00', $timezone);

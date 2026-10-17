@@ -77,7 +77,7 @@ function load({pageViews = 1, dataLayer, tagManagerEvents} = {}) {
     }
     window.window = window;
 
-    const context = vm.createContext({window, Matomo: window.Matomo, JSON, Math, Date, Object, String, isFinite, isNaN, parseFloat, encodeURIComponent, decodeURIComponent, setTimeout});
+    const context = vm.createContext({window, Matomo: window.Matomo, JSON, Math, Date, Object, String, isFinite, isNaN, parseFloat, encodeURIComponent, decodeURIComponent, unescape, setTimeout});
     vm.runInContext(source, context);
 
     return {ee: window.Matomo.EcommerceEnhanced, calls, window};
@@ -252,4 +252,22 @@ test('in Tag Manager, reads the container data layer only, so a synchronised pus
 
     const names = calls.filter((c) => c[0] === 'request').map((c) => c[1].eex_e);
     assert.deepStrictEqual(names, ['view_item', 'add_to_wishlist']);
+});
+
+test('trims a payload above the server limit by dropping the last items, and counts them', () => {
+    const {ee, calls} = load();
+    const items = [];
+    for (let i = 0; i < 200; i++) {
+        const item = {item_id: 'SKU' + i, item_name: 'Product '.repeat(30) + i, price: 10, quantity: 1};
+        for (let k = 0; k < 30; k++) {
+            item['param' + k] = 'x'.repeat(100);
+        }
+        items.push(item);
+    }
+    ee.track('add_to_cart', {currency: 'EUR', value: 2000, items});
+
+    const event = calls.find((c) => c[0] === 'request' && c[1].eex_e === 'add_to_cart')[1];
+    assert.ok(JSON.stringify(event.eex_d).length <= 120000);
+    assert.ok(event.eex_d.items.length < 200);
+    assert.strictEqual(event.eex_d.items.length + event.eex_d.dropped_items, 200);
 });
