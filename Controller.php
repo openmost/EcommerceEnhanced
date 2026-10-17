@@ -33,4 +33,18 @@ class Controller extends \Piwik\Plugin\Controller
             'premiumUrl' => PremiumTeasers::URL,
         ]);
     }
+
+    /**
+     * Website settings of Ecommerce Enhanced and Premium, see SettingsPage.
+     */
+    public function settings()
+    {
+        $idSite = Common::getRequestVar('idSite', 0, 'int');
+        Piwik::checkUserHasAdminAccess($idSite);
+
+        return $this->renderTemplate('settings', [
+            'idSite' => $idSite,
+            'title' => Piwik::translate('EcommerceEnhanced_SettingsPageTitle'),
+        ]);
+    }
 }

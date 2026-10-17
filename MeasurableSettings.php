@@ -93,6 +93,8 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
                 }
             };
         });
+
+        SettingsPage::applyVisibility($this, (int) $this->idSite);
     }
 
     /**

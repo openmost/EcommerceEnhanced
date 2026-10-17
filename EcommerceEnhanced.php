@@ -127,6 +127,13 @@ class EcommerceEnhanced extends \Piwik\Plugin
     public function getClientSideTranslationKeys(&$translationKeys)
     {
         $translationKeys[] = 'EcommerceEnhanced_Customers';
+        $translationKeys[] = 'EcommerceEnhanced_SettingsPageTitle';
+        $translationKeys[] = 'EcommerceEnhanced_SettingsPageIntro';
+        $translationKeys[] = 'EcommerceEnhanced_SettingsSectionFree';
+        $translationKeys[] = 'EcommerceEnhanced_SettingsSectionPremium';
+        $translationKeys[] = 'EcommerceEnhanced_SettingsSaved';
+        $translationKeys[] = 'EcommerceEnhanced_PremiumLinkText';
+        $translationKeys[] = 'EcommerceEnhanced_PremiumText';
     }
 
     public function onMeasurableSettingsUpdated($settings, $idSite)

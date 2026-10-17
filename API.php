@@ -16,8 +16,10 @@ use Piwik\Date;
 use Piwik\Db;
 use Piwik\Period;
 use Piwik\Piwik;
+use Piwik\Plugins\CorePluginsAdmin\SettingsMetadata;
 use Piwik\Segment;
 use Piwik\Site;
+use Piwik\Tracker\Cache;
 use Piwik\Tracker\GoalManager;
 
 /**
@@ -282,6 +284,40 @@ class API extends \Piwik\Plugin\API
     public function getCheckoutBehavior($idSite, $period, $date, $segment = false)
     {
         return $this->getFunnel(Records::CHECKOUT_BEHAVIOR, RecordBuilders\FunnelReports::CHECKOUT_STEPS, $idSite, $period, $date, $segment);
+    }
+
+    /**
+     * Website settings of Ecommerce Enhanced, and of Premium when activated, in the format of the Matomo settings
+     * components. They are edited on the Ecommerce Enhanced page under Websites, not in the website form.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getSiteSettings($idSite)
+    {
+        Piwik::checkUserHasAdminAccess($idSite);
+
+        return (new SettingsMetadata())->formatSettings(SettingsPage::load((int) $idSite), (int) $idSite);
+    }
+
+    /**
+     * Saves the website settings, every value is validated before anything is saved.
+     *
+     * @param array<string, array<int, array{name: string, value: mixed}>> $settingValues plugin name => settings
+     */
+    public function updateSiteSettings($idSite, $settingValues)
+    {
+        Piwik::checkUserHasAdminAccess($idSite);
+
+        $idSite = (int) $idSite;
+        $sections = SettingsPage::load($idSite);
+        (new SettingsMetadata())->setPluginSettings($sections, is_array($settingValues) ? $settingValues : [], $idSite);
+        foreach ($sections as $settings) {
+            $settings->save();
+        }
+
+        Cache::deleteCacheWebsiteAttributes($idSite);
+
+        return true;
     }
 
     /**

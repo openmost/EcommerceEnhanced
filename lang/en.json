@@ -202,7 +202,13 @@
         "ItemsPerOrderDocumentation": "Items bought divided by orders.",
         "Transactions": "Transactions",
         "TransactionId": "Transaction",
-        "TransactionsDocumentation": "Every order of the period, most recent first, with its revenue, subtotal, tax, shipping, discount and items, and the coupon, payment type, shipping tier, customer type and currency sent with the purchase. At most 500 orders are listed, as in the Ecommerce log."
+        "TransactionsDocumentation": "Every order of the period, most recent first, with its revenue, subtotal, tax, shipping, discount and items, and the coupon, payment type, shipping tier, customer type and currency sent with the purchase. At most 500 orders are listed, as in the Ecommerce log.",
+        "SettingsMenu": "Ecommerce Enhanced",
+        "SettingsPageTitle": "Ecommerce Enhanced settings",
+        "SettingsPageIntro": "How this website sends its GA4 ecommerce data and how Matomo records it. Changes apply to the data tracked from now on.",
+        "SettingsSectionFree": "Collection",
+        "SettingsSectionPremium": "Premium reports",
+        "SettingsSaved": "The Ecommerce Enhanced settings have been saved."
     },
     "OpenmostCommunication": {
         "Dismiss": "Dismiss",
