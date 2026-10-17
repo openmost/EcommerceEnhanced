@@ -83,7 +83,6 @@
         destination: 1, origin: 1, start_date: 1, end_date: 1
     };
 
-    var PERSONAL_KEY = /email|phone|sha256|_hash$|hash_|first_?name|last_?name|street|postal|zip|address|birth|customer/i;
 
     var EVENT_ITEM_INHERITED = ['item_list_id', 'item_list_name', 'promotion_id', 'promotion_name', 'creative_name', 'creative_slot'];
 
@@ -396,7 +395,7 @@
             }
 
             if (hasOwn(ITEM_STRINGS, param) || hasOwn(ITEM_KNOWN_KEYS, param) || /^item_category/.test(param)
-                || PERSONAL_KEY.test(param) || !/^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(param)) {
+                || !/^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(param)) {
                 continue;
             }
 

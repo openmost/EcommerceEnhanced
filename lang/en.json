@@ -15,11 +15,6 @@
         "SettingEventsReportTypesHelp": "Each step is tracked as an event with the category \"Ecommerce\", a readable action and the GA4 event name as the name. Unchecked steps are still recorded in the Ecommerce Enhanced reports.",
         "SettingNonInteractionTypes": "Steps that do not count as an interaction",
         "SettingNonInteractionTypesHelp": "These steps keep the visit alive but do not count as an action, so they do not lower the bounce rate. Viewing steps are checked by default, as in GA4.",
-        "SettingCouponStorage": "Coupon codes",
-        "SettingCouponStorageHelp": "Single use coupon codes can identify a person. Store a hash of them, or nothing, if your codes are personal.",
-        "SettingCouponStorageFull": "Store the codes",
-        "SettingCouponStorageHashed": "Store a hash of the codes",
-        "SettingCouponStorageNone": "Do not store coupon codes",
         "SettingItemCustomParams": "Custom item parameters",
         "SettingItemCustomParamsHelp": "Names of up to %1$s custom item parameters of your dataLayer to record, for example size or color. Only add names at the end of the list: each one keeps its position for good.",
         "SettingItemCustomParamName": "Parameter name",
@@ -215,8 +210,9 @@
         "ItemDimensionHowToTitle": "How to send this item dimension",
         "ItemDimensionHowTo": "Add the parameter to each item of your GA4 ecommerce pushes, with the name of the dimension as key. Ecommerce Enhanced records it for product views, carts, orders and refunds.",
         "ItemDimensionCreateTitle": "Configure an Item dimension",
-        "ItemDimensionPersonal": "\"%1$s\" looks like personal data (email, phone, name, address, customer...): Ecommerce Enhanced never records such item parameters. Choose another name.",
-        "TransactionsDisabled": "The list of transactions is hidden for this website, as the visitor log is disabled in the privacy settings."
+        "TransactionsDisabled": "The list of transactions is hidden for this website, as the visitor log is disabled in the privacy settings.",
+        "SettingStoreCouponCodes": "Store coupon codes as sent",
+        "SettingStoreCouponCodesHelp": "Unchecked, a hash of each coupon code is stored: codes stay distinct in the reports but cannot be read, as single use and gift codes can identify a person or be spent. Check it if your codes are shared promotional codes, such as SUMMER10, you want to read in the reports. Applies to the orders tracked from now on."
     },
     "OpenmostCommunication": {
         "Dismiss": "Dismiss",

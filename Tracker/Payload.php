@@ -38,7 +38,7 @@ class Payload
     public const MAX_LIST_ITEMS = 30;
 
     /**
-     * Free text fields a visitor or a form may fill with personal data.
+     * Free text fields a visitor or a form may fill with personal data, and that no setting chooses.
      */
     private const FREE_TEXT_FIELDS = ['search_term', 'lead_source', 'lead_status'];
 
@@ -263,7 +263,8 @@ class Payload
                 }
 
                 $name = self::toParamName($name);
-                $value = is_scalar($value) && !is_bool($value) ? self::withoutPersonalData(self::toText((string) $value, 100)) : null;
+                // Only the item dimensions the website configured are stored: what they hold is the choice of the site
+                $value = is_scalar($value) && !is_bool($value) ? self::toText((string) $value, 100) : null;
                 if ($name !== null && $value !== null) {
                     $item['custom'][$name] = $value;
                 }

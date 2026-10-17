@@ -351,8 +351,8 @@ class RequestProcessor extends Tracker\RequestProcessor
             return $data;
         }
 
-        $transform = function (?string $coupon) use ($storage): ?string {
-            if ($coupon === null || $storage === MeasurableSettings::COUPON_NONE) {
+        $transform = function (?string $coupon): ?string {
+            if ($coupon === null) {
                 return null;
             }
 
@@ -360,7 +360,7 @@ class RequestProcessor extends Tracker\RequestProcessor
                 return substr(hash_hmac('sha256', trim($code), 'EcommerceEnhanced' . SettingsPiwik::getSalt()), 0, 16);
             }, explode(',', $coupon));
 
-            return Common::mb_substr(implode(',', $codes), 0, 255);
+            return mb_substr(implode(',', $codes), 0, 255, 'UTF-8');
         };
 
         $data['event']['coupon'] = $transform($data['event']['coupon']);

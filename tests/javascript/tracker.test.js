@@ -88,7 +88,7 @@ const ga4Items = [
     {item_id: 'SKU1', item_name: 'Tee', item_variant: 'Blue', price: '22,00', quantity: '2'},
 ];
 
-test('parses a GA4 dataLayer push with clean values and no personal data', () => {
+test('parses a GA4 dataLayer push with clean values and never reads user_data', () => {
     const {ee} = load();
     const [event] = ee.parse({event: 'add_to_cart', ecommerce: {currency: 'eur', value: 64, items: ga4Items}, user_data: {email: 'x@y.z'}});
 
@@ -98,8 +98,9 @@ test('parses a GA4 dataLayer push with clean values and no personal data', () =>
     assert.strictEqual(event.data.items.length, 2);
     assert.strictEqual(event.data.items[1].price, 22);
     assert.strictEqual(event.data.items[1].quantity, 2);
-    assert.deepStrictEqual(plain(event.data.items[0].custom), {size: 'M'});
-    assert.ok(!JSON.stringify(event).includes('x@y.z'));
+    // Unknown item keys are all sent, the server stores the item dimensions the website created
+    assert.deepStrictEqual(plain(event.data.items[0].custom), {size: 'M', email: 'x@y.z'});
+    assert.ok(!('user_data' in event.data));
 });
 
 test('parses gtag arguments, gtag set currency and prefixed event names', () => {

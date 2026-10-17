@@ -8,7 +8,7 @@
 - Item dimensions (size, color, stock status...) managed as an "Item" scope of the Custom Dimensions page.
 - Reports: buyers and revenue, shopping and checkout funnels, products, categories, brands, variants, item lists, promotions, product search terms, transactions, coupons, payment types, shipping tiers, customer types, affiliations, currencies, sales by source / medium. 24 segments.
 - Website settings on their own page, Administration, Websites, Ecommerce Enhanced.
-- Never stores personal data: personal keys are never read, emails and phone numbers are dropped from free text values, coupon codes can be hashed or left out.
+- Personal data: `user_data` is never read, emails and phone numbers are dropped from search terms and lead fields, coupon codes are hashed unless the website stores them as sent, item dimensions only record what the site owner created.
 - Uninstalling keeps the data.
 
 Development notes:

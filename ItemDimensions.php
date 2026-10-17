@@ -31,7 +31,6 @@ class ItemDimensions
      */
     public const ID_OFFSET = 900000;
 
-    private const PERSONAL_KEY = '/email|phone|sha256|_hash$|hash_|first_?name|last_?name|street|postal|zip|address|birth|customer/i';
 
     public static function isItemDimensionId($idDimension): bool
     {
@@ -162,11 +161,6 @@ class ItemDimensions
         $name = trim($name);
         if (!preg_match('/^[A-Za-z][A-Za-z0-9_]{0,39}$/', $name)) {
             throw new \Exception(Piwik::translate('EcommerceEnhanced_SettingItemCustomParamsInvalid', [$name]));
-        }
-
-        // The tracker never reads such keys, see PERSONAL_KEY in tracker.js: the dimension would stay empty
-        if (preg_match(self::PERSONAL_KEY, $name)) {
-            throw new \Exception(Piwik::translate('EcommerceEnhanced_ItemDimensionPersonal', [$name]));
         }
 
         if (in_array($name, $otherNames, true)) {

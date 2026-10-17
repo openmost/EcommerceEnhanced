@@ -18,12 +18,11 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
 {
     public const COUPON_FULL = 'full';
     public const COUPON_HASHED = 'hashed';
-    public const COUPON_NONE = 'none';
 
     public MeasurableSetting $valueIncludesTaxAndShipping;
     public MeasurableSetting $eventsReportTypes;
     public MeasurableSetting $nonInteractionTypes;
-    public MeasurableSetting $couponStorage;
+    public MeasurableSetting $storeCouponCodes;
     public MeasurableSetting $itemCustomParams;
     public MeasurableSetting $itemCustomParamMeta;
 
@@ -57,16 +56,11 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
             $field->availableValues = $eventNames;
         });
 
-        $this->couponStorage = $this->makeSetting('coupon_storage', self::COUPON_FULL, FieldConfig::TYPE_STRING, function (FieldConfig $field) {
-            $field->title = Piwik::translate('EcommerceEnhanced_SettingCouponStorage');
-            $field->inlineHelp = Piwik::translate('EcommerceEnhanced_SettingCouponStorageHelp');
-            $field->uiControl = FieldConfig::UI_CONTROL_SINGLE_SELECT;
-            $field->availableValues = [
-                self::COUPON_FULL => Piwik::translate('EcommerceEnhanced_SettingCouponStorageFull'),
-                self::COUPON_HASHED => Piwik::translate('EcommerceEnhanced_SettingCouponStorageHashed'),
-                self::COUPON_NONE => Piwik::translate('EcommerceEnhanced_SettingCouponStorageNone'),
-            ];
-            $field->validators[] = new \Piwik\Validators\WhitelistedValue([self::COUPON_FULL, self::COUPON_HASHED, self::COUPON_NONE]);
+        // Single use and gift codes can identify a person or be spent: a hash is stored unless the site opts in
+        $this->storeCouponCodes = $this->makeSetting('store_coupon_codes', false, FieldConfig::TYPE_BOOL, function (FieldConfig $field) {
+            $field->title = Piwik::translate('EcommerceEnhanced_SettingStoreCouponCodes');
+            $field->inlineHelp = Piwik::translate('EcommerceEnhanced_SettingStoreCouponCodesHelp');
+            $field->uiControl = FieldConfig::UI_CONTROL_CHECKBOX;
         });
 
         $this->itemCustomParams = $this->makeSetting('item_custom_params', [], FieldConfig::TYPE_ARRAY, function (FieldConfig $field) {

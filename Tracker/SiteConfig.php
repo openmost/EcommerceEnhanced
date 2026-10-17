@@ -53,7 +53,7 @@ class SiteConfig
             'value_includes_tax_and_shipping' => (bool) $settings->valueIncludesTaxAndShipping->getValue(),
             'events_report_types' => $toTypes($settings->eventsReportTypes->getValue()),
             'non_interaction_types' => $toTypes($settings->nonInteractionTypes->getValue()),
-            'coupon_storage' => (string) $settings->couponStorage->getValue(),
+            'coupon_storage' => $settings->storeCouponCodes->getValue() ? MeasurableSettings::COUPON_FULL : MeasurableSettings::COUPON_HASHED,
             'item_custom_params' => $settings->getItemCustomParamSlots(),
         ];
     }
@@ -75,7 +75,7 @@ class SiteConfig
 
     public function getCouponStorage(): string
     {
-        return $this->config['coupon_storage'] ?? MeasurableSettings::COUPON_FULL;
+        return $this->config['coupon_storage'] ?? MeasurableSettings::COUPON_HASHED;
     }
 
     /**

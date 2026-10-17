@@ -335,7 +335,7 @@ Read: `search_term`, items.
 
 ## What is never recorded
 
-`user_data`, emails, phone numbers, names, addresses and hashed identifiers are never read, nor any item field whose name suggests personal data. Single use coupon codes can identify a person: the website settings can store a hash of them, or nothing.
+`user_data` and the other event level fields outside the GA4 ecommerce parameters are never read. Search terms and lead sources holding an email address or a phone number are dropped. Coupon codes are stored as a hash unless the website settings store them as sent. Item dimensions are only recorded when you create them: choosing what they hold is the responsibility of the site owner and their DPO.
 
 ## Website settings
 
@@ -344,7 +344,7 @@ Administration, Websites, Ecommerce Enhanced (website administrators):
 - **The GA4 value includes tax and shipping:** for shops that send the grand total in `value`.
 - **Ecommerce steps shown in the Events report:** each step is a Matomo event with the category `Ecommerce`, a readable action (`Add to cart`) and the GA4 event name as the name (`add_to_cart`). Unchecked steps are still recorded in the Ecommerce Enhanced reports.
 - **Steps that do not count as an interaction:** viewing steps (`view_item_list`, `view_item`, `view_cart`, `view_promotion`, `view_search_results`) do not lower the bounce rate by default, as in GA4.
-- **Coupon codes:** store them, a hash of them, or nothing.
+- **Store coupon codes as sent:** unchecked by default, a hash of each code is stored, so single use and gift codes are never readable. Check it for shared promotional codes (`SUMMER10`) you want to read in the reports.
 - **Unit cost item parameter (Premium):** the item dimension that holds the unit cost of goods, for the profit reports.
 
 ## Item dimensions
@@ -355,7 +355,7 @@ Custom parameters of your products, for example `size`, `color` or `stock_status
 dataLayer.push({event: 'add_to_cart', ecommerce: {items: [{item_id: 'SKU_123', item_name: 'Organic tee', price: 30, quantity: 1, size: 'M'}]}});
 ```
 
-Up to 10 item dimensions per website. Renaming one keeps the values recorded before, deactivating one stops recording new values. Values are never read from fields that look personal (email, phone, name...).
+Up to 10 item dimensions per website. Renaming one keeps the values recorded before, deactivating one stops recording new values. Only the item dimensions you create are stored, whatever their name: what they collect is the choice of the site owner and their DPO.
 
 ## Reports
 
