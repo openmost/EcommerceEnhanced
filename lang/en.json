@@ -216,7 +216,14 @@
         "InstallMarketingCampaignsReporting": "Campaigns are shown under their name only. Install the free %1$sMarketing Campaigns Reporting%2$s plugin to read the source and medium of your campaigns (mtm_source, utm_source...), recommended for every Matomo.",
         "VisitorLogLeadSource": "Lead source",
         "VisitorLogFirstOrder": "First order of this customer",
-        "VisitorLogRepeatOrder": "Order %1$s of this customer"
+        "VisitorLogRepeatOrder": "Order %1$s of this customer",
+        "FunnelsTitle": "Funnels",
+        "FunnelsIntro": "Create the GA4 funnels in the Funnels plugin from the ecommerce events: the sales funnel of the ecommerce orders, the shopping behavior and the checkout behavior. Optional steps, such as the item list or the shipping info, are marked optional. A funnel that already exists is kept. The steps must be shown in the Events report (settings above) for Funnels to see them.",
+        "FunnelExists": "created",
+        "FunnelMissing": "not created yet",
+        "FunnelsCreate": "Create the missing funnels",
+        "FunnelsCreated": "The GA4 funnels have been created. Their reports are in Goals, Funnels after the next archiving.",
+        "FunnelsNotAvailable": "The Funnels plugin is not activated."
     },
     "OpenmostCommunication": {
         "Dismiss": "Dismiss",

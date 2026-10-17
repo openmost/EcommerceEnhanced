@@ -9,6 +9,8 @@
 
 namespace Piwik\Plugins\EcommerceEnhanced\tests\Integration;
 
+use Piwik\Plugins\EcommerceEnhanced\FunnelSetup;
+
 /**
  * Archives the shop of ShopTestCase and checks each report against the known history, for days, weeks, months
  * and ranges, with and without segment.
@@ -86,5 +88,16 @@ class ArchivingTest extends ShopTestCase
 
         $products = $this->column($this->api('EcommerceEnhanced.getProducts', 'month', '2025-01-01', ['segment' => 'eeItemBrand==Puma']), 'ee_items_purchased');
         $this->assertSame(1, $products['Socks']);
+    }
+
+    public function test_funnelSetup_createsTheGa4FunnelsOnce(): void
+    {
+        if (!FunnelSetup::isAvailable($this->idSite)) {
+            $this->markTestSkipped('The Funnels plugin is not activated.');
+        }
+
+        $this->assertSame(['Sales', 'Shopping behavior (GA4)', 'Checkout behavior (GA4)'], FunnelSetup::create($this->idSite));
+        $this->assertSame([true, true, true], array_column(FunnelSetup::getStatus($this->idSite), 'exists'));
+        $this->assertSame([], FunnelSetup::create($this->idSite), 'existing funnels are kept');
     }
 }

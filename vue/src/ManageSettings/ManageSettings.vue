@@ -32,6 +32,24 @@
         @confirm="save()"
       />
     </ContentBlock>
+
+    <ContentBlock
+      v-if="funnels.available"
+      :content-title="translate('EcommerceEnhanced_FunnelsTitle')"
+    >
+      <p>{{ translate('EcommerceEnhanced_FunnelsIntro') }}</p>
+      <ul class="ecommerceEnhancedFunnels">
+        <li v-for="funnel in funnels.funnels" :key="funnel.key">
+          {{ funnel.name }}:
+          {{ funnel.exists ? translate('EcommerceEnhanced_FunnelExists') : translate('EcommerceEnhanced_FunnelMissing') }}
+        </li>
+      </ul>
+      <button
+        class="btn"
+        :disabled="isCreatingFunnels || !hasMissingFunnel"
+        @click="createFunnels()"
+      >{{ translate('EcommerceEnhanced_FunnelsCreate') }}</button>
+    </ContentBlock>
   </div>
 </template>
 
@@ -57,11 +75,24 @@ interface SettingsSection {
   settings: Setting[];
 }
 
+interface FunnelStatus {
+  key: string;
+  name: string;
+  exists: boolean;
+}
+
+interface FunnelsSetup {
+  available: boolean;
+  funnels: FunnelStatus[];
+}
+
 interface ManageSettingsState {
   sections: SettingsSection[];
   settingValues: Record<string, unknown>;
   isLoading: boolean;
   isSaving: boolean;
+  funnels: FunnelsSetup;
+  isCreatingFunnels: boolean;
 }
 
 export default defineComponent({
@@ -83,7 +114,14 @@ export default defineComponent({
       settingValues: {},
       isLoading: true,
       isSaving: false,
+      funnels: { available: false, funnels: [] },
+      isCreatingFunnels: false,
     };
+  },
+  computed: {
+    hasMissingFunnel(): boolean {
+      return this.funnels.funnels.some((funnel: FunnelStatus) => !funnel.exists);
+    },
   },
   created() {
     AjaxHelper.fetch<SettingsSection[]>({
@@ -102,8 +140,36 @@ export default defineComponent({
     }).finally(() => {
       this.isLoading = false;
     });
+
+    this.loadFunnels();
   },
   methods: {
+    loadFunnels() {
+      AjaxHelper.fetch<FunnelsSetup>({
+        method: 'EcommerceEnhanced.getFunnelsSetup',
+        idSite: this.idSite,
+      }).then((setup: FunnelsSetup) => {
+        this.funnels = setup;
+      });
+    },
+    createFunnels() {
+      this.isCreatingFunnels = true;
+      AjaxHelper.post(
+        { method: 'EcommerceEnhanced.createFunnels', idSite: this.idSite },
+        {},
+      ).then(() => {
+        const id = NotificationsStore.show({
+          message: translate('EcommerceEnhanced_FunnelsCreated'),
+          context: 'success',
+          id: 'ecommerceEnhancedFunnels',
+          type: 'transient',
+        });
+        NotificationsStore.scrollToNotification(id);
+        this.loadFunnels();
+      }).finally(() => {
+        this.isCreatingFunnels = false;
+      });
+    },
     sectionTitle(pluginName: string): string {
       return pluginName === 'EcommerceEnhanced'
         ? translate('EcommerceEnhanced_SettingsSectionFree')

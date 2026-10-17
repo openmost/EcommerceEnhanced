@@ -343,6 +343,40 @@ class API extends \Piwik\Plugin\API
     }
 
     /**
+     * Whether the Funnels plugin is activated and which GA4 funnels already exist for the website.
+     *
+     * @return array{available: bool, funnels: array<int, array{key: string, name: string, exists: bool}>}
+     */
+    public function getFunnelsSetup($idSite)
+    {
+        Piwik::checkUserHasAdminAccess($idSite);
+
+        $available = FunnelSetup::isAvailable((int) $idSite);
+
+        return [
+            'available' => $available,
+            'funnels' => $available ? FunnelSetup::getStatus((int) $idSite) : [],
+        ];
+    }
+
+    /**
+     * Creates the GA4 sales, shopping behavior and checkout behavior funnels in the Funnels plugin, keeping the ones
+     * that already exist.
+     *
+     * @return array{created: string[]}
+     */
+    public function createFunnels($idSite)
+    {
+        Piwik::checkUserHasAdminAccess($idSite);
+
+        if (!FunnelSetup::isAvailable((int) $idSite)) {
+            throw new \Exception(Piwik::translate('EcommerceEnhanced_FunnelsNotAvailable'));
+        }
+
+        return ['created' => FunnelSetup::create((int) $idSite)];
+    }
+
+    /**
      * Adds a custom item parameter, the "Item" scope of the Custom Dimensions page. Its name is the parameter key
      * in the items of the dataLayer.
      *
