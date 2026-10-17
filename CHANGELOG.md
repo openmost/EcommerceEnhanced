@@ -7,7 +7,10 @@
 - Records brands, variants, item lists, promotions, coupons, payment types, shipping tiers, customer types, checkout steps, searches, wishlists, refunds and leads in its own log tables, covered by segments, GDPR tools and the raw data purge.
 - Item dimensions (size, color, stock status...) managed as an "Item" scope of the Custom Dimensions page.
 - Reports: buyers and revenue, shopping and checkout funnels, products, categories, brands, variants, item lists, promotions, product search terms, transactions, coupons, payment types, shipping tiers, customer types, affiliations, currencies, sales by source / medium. 24 segments.
-- Website settings on their own page, Administration, Websites, Ecommerce Enhanced.
+- Website settings on their own page, Administration, Websites, Ecommerce Enhanced, with a one-click creation of the GA4 sales, shopping and checkout funnels when the Funnels plugin is activated.
+- Visitor log: each ecommerce step shows its products, list, promotion, search term, coupon, payment, shipping, customer type and order rank.
+- Source / medium reports point to the free Marketing Campaigns Reporting plugin when it is not activated.
+- Oversized payloads: the tracker trims the items above 120 KB and reports how many were dropped, the server caps lists at 30 entries.
 - Personal data: `user_data` is never read, emails and phone numbers are dropped from search terms and lead fields, coupon codes are hashed unless the website stores them as sent, item dimensions only record what the site owner created.
 - Uninstalling keeps the data.
 - Translated into 12 languages.

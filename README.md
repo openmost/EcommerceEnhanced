@@ -32,6 +32,8 @@ One line in your tracking code, or one checkbox in Matomo Tag Manager, and it wo
 - Sales by source / medium, the way GA4 shows it: `google / organic`, `newsletter / email`, `(direct) / (none)`.
 - Buyers and revenue: purchasers, first time purchasers, revenue per user (ARPU) and per paying user (ARPPU), average order value and items per order, conversion rate and cart abandonment rate.
 - Every step also appears in the Events report (category "Ecommerce"), with viewing steps kept out of the bounce rate, as in GA4.
+- The visitor log shows the detail of each step: products, list, promotion, search term, coupon, payment, shipping and order rank of the customer.
+- One click creates the GA4 sales, shopping and checkout funnels in the Funnels plugin, when it is activated.
 
 **Native Matomo integration**
 
@@ -44,7 +46,7 @@ One line in your tracking code, or one checkbox in Matomo Tag Manager, and it wo
 Every Premium report is visible in the free edition with a preview, so you know what you get. Premium shows them with your data, from the data already collected: no new tracking, no history lost, no report to rebuild.
 
 - **Active users and buyers (Premium):** 1, 7 and 30 day active users and buyers (DAU, WAU, MAU) and the DAU / MAU stickiness ratio.
-- **Customers (Premium):** repeat purchase rate, time between purchases, retention cohorts by first purchase month, customer lifetime value and RFM segments.
+- **Customers (Premium):** repeat purchase rate, time between purchases, retention cohorts by first purchase month as a heatmap, customer lifetime value and RFM segments.
 - **Acquisition (Premium):** sales by first user source, time and visits from the first visit to the first purchase, abandoned carts by channel.
 - **Shopping behavior (Premium):** the shopping and checkout funnels split by device and by channel, and the lead pipeline from `generate_lead` to `close_convert_lead`.
 - **Merchandising (Premium):** products bought together (market basket analysis), most abandoned products, product profit and margin from your cost of goods, a report, a segment and a Custom Reports dimension for each of your item dimensions.

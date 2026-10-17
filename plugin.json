@@ -1,7 +1,7 @@
 {
   "name": "EcommerceEnhanced",
   "description": "GA4 ecommerce for Matomo: reads your GA4 dataLayer and records brands, variants, item lists, promotions, coupons, checkout steps and every shopping step, on top of the native Matomo ecommerce.",
-  "version": "6.0.0-dev",
+  "version": "6.0.0",
   "theme": false,
   "require": {
     "matomo": ">=6.0.0-b1,<7.0.0-b1",
