@@ -47,7 +47,7 @@ Every Premium report is visible in the free edition with a preview, so you know 
 - **Customers (Premium):** repeat purchase rate, time between purchases, retention cohorts by first purchase month, customer lifetime value and RFM segments.
 - **Acquisition (Premium):** sales by first user source, time and visits from the first visit to the first purchase, abandoned carts by channel.
 - **Shopping behavior (Premium):** the shopping and checkout funnels split by device and by channel, and the lead pipeline from `generate_lead` to `close_convert_lead`.
-- **Merchandising (Premium):** products bought together (market basket analysis), most abandoned products, product profit and margin from your cost of goods, a report for each of your item dimensions.
+- **Merchandising (Premium):** products bought together (market basket analysis), most abandoned products, product profit and margin from your cost of goods, a report, a segment and a Custom Reports dimension for each of your item dimensions.
 - **Orders (Premium):** refunds, refund rate by product and net revenue, discount depth by product, coupon and category, orders by basket size and value, revenue of foreign currency orders converted to your website currency.
 
 ### Why the GA4 format

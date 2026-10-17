@@ -169,7 +169,7 @@
         "TeaserProductProfit": "Product profit and margin",
         "TeaserProductProfitDescription": "Profit and margin by product, brand and category from the cost of goods you send or import.",
         "TeaserCustomItemParameters": "Reports by item dimension",
-        "TeaserCustomItemParametersDescription": "A report for each of your item dimensions (size, color, stock status...) with the products viewed, added to cart and bought for each value.",
+        "TeaserCustomItemParametersDescription": "A report, a segment and a Custom Reports dimension for each of your item dimensions (size, color, stock status...), with the products viewed, added to cart and bought for each value.",
         "TeaserRefunds": "Refunds and net revenue",
         "TeaserRefundsDescription": "Refunded amounts, refund rate by product and net revenue over time, with refunds sent from the dataLayer or from your back office.",
         "TeaserDiscountDepth": "Discount depth",
