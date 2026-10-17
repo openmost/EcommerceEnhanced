@@ -169,7 +169,7 @@
         "TeaserProductProfit": "Winst en marge per product",
         "TeaserProductProfitDescription": "Winst en marge per product, merk en categorie op basis van de inkoopkosten die u verstuurt of importeert.",
         "TeaserCustomItemParameters": "Rapporten per artikeldimensie",
-        "TeaserCustomItemParametersDescription": "Een rapport voor elk van uw artikeldimensies (maat, kleur, voorraadstatus...) met de producten die per waarde werden bekeken, aan de winkelwagen toegevoegd en gekocht.",
+        "TeaserCustomItemParametersDescription": "Een rapport, een segment en een Custom Reports-dimensie voor elk van uw artikeldimensies (maat, kleur, voorraadstatus...), met de bekeken, aan de winkelwagen toegevoegde en gekochte producten per waarde.",
         "TeaserRefunds": "Terugbetalingen en netto-inkomsten",
         "TeaserRefundsDescription": "Terugbetaalde bedragen, terugbetalingspercentage per product en netto-inkomsten in de tijd, met terugbetalingen verzonden vanuit de dataLayer of vanuit uw backoffice.",
         "TeaserDiscountDepth": "Kortingsdiepte",
@@ -212,7 +212,18 @@
         "ItemDimensionCreateTitle": "Een artikeldimensie configureren",
         "TransactionsDisabled": "De lijst met transacties is verborgen voor deze website, omdat het bezoekerslog is uitgeschakeld in de privacyinstellingen.",
         "SettingStoreCouponCodes": "Kortingscodes opslaan zoals verzonden",
-        "SettingStoreCouponCodesHelp": "Indien niet aangevinkt, wordt een hash van elke kortingscode opgeslagen: codes blijven in de rapporten van elkaar te onderscheiden maar zijn niet leesbaar, omdat eenmalige codes en cadeaucodes een persoon kunnen identificeren of kunnen worden ingewisseld. Vink dit aan als uw codes gedeelde promotiecodes zijn, zoals SUMMER10, die u in de rapporten wilt kunnen lezen. Geldt voor de bestellingen die vanaf nu worden gemeten."
+        "SettingStoreCouponCodesHelp": "Indien niet aangevinkt, wordt een hash van elke kortingscode opgeslagen: codes blijven in de rapporten van elkaar te onderscheiden maar zijn niet leesbaar, omdat eenmalige codes en cadeaucodes een persoon kunnen identificeren of kunnen worden ingewisseld. Vink dit aan als uw codes gedeelde promotiecodes zijn, zoals SUMMER10, die u in de rapporten wilt kunnen lezen. Geldt voor de bestellingen die vanaf nu worden gemeten.",
+        "InstallMarketingCampaignsReporting": "Campagnes worden alleen met hun naam getoond. Installeer de gratis plugin %1$sMarketing Campaigns Reporting%2$s om de bron en het medium van uw campagnes (mtm_source, utm_source...) te zien, aanbevolen voor elke Matomo.",
+        "VisitorLogLeadSource": "Leadbron",
+        "VisitorLogFirstOrder": "Eerste bestelling van deze klant",
+        "VisitorLogRepeatOrder": "Bestelling %1$s van deze klant",
+        "FunnelsTitle": "Trechters",
+        "FunnelsIntro": "Maak de GA4-trechters aan in de Funnels-plugin op basis van de e-commerce-events: de verkooptrechter van de e-commercebestellingen, het winkelgedrag en het afrekengedrag. Optionele stappen, zoals de artikellijst of de verzendgegevens, zijn als optioneel gemarkeerd. Een trechter die al bestaat blijft behouden. De stappen moeten in het Events-rapport worden getoond (instellingen hierboven) zodat Funnels ze ziet.",
+        "FunnelExists": "aangemaakt",
+        "FunnelMissing": "nog niet aangemaakt",
+        "FunnelsCreate": "Ontbrekende trechters aanmaken",
+        "FunnelsCreated": "De GA4-trechters zijn aangemaakt. Hun rapporten staan na de volgende archivering onder Doelen, Trechters.",
+        "FunnelsNotAvailable": "De Funnels-plugin is niet geactiveerd, of e-commerce is uitgeschakeld voor deze website."
     },
     "OpenmostCommunication": {
         "Dismiss": "Sluiten",

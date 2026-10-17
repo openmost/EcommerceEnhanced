@@ -169,7 +169,7 @@
         "TeaserProductProfit": "Profitto e margine dei prodotti",
         "TeaserProductProfitDescription": "Profitto e margine per prodotto, marchio e categoria, a partire dal costo del venduto che invii o importi.",
         "TeaserCustomItemParameters": "Report per dimensione articolo",
-        "TeaserCustomItemParametersDescription": "Un report per ciascuna delle tue dimensioni articolo (taglia, colore, disponibilità...) con i prodotti visualizzati, aggiunti al carrello e acquistati per ogni valore.",
+        "TeaserCustomItemParametersDescription": "Un report, un segmento e una dimensione Custom Reports per ciascuna delle vostre dimensioni articolo (taglia, colore, disponibilità...), con i prodotti visti, aggiunti al carrello e acquistati per ogni valore.",
         "TeaserRefunds": "Rimborsi e ricavo netto",
         "TeaserRefundsDescription": "Importi rimborsati, tasso di rimborso per prodotto e ricavo netto nel tempo, con rimborsi inviati dal dataLayer o dal tuo back office.",
         "TeaserDiscountDepth": "Profondità degli sconti",
@@ -212,7 +212,18 @@
         "ItemDimensionCreateTitle": "Configura una dimensione Articolo",
         "TransactionsDisabled": "L'elenco delle transazioni è nascosto per questo sito web, perché il log visite è disattivato nelle impostazioni della privacy.",
         "SettingStoreCouponCodes": "Memorizza i codici coupon così come inviati",
-        "SettingStoreCouponCodesHelp": "Se non selezionata, viene memorizzato un hash di ogni codice coupon: i codici restano distinti nei report ma non sono leggibili, poiché i codici monouso e i codici regalo possono identificare una persona o essere spesi. Selezionala se i tuoi codici sono codici promozionali condivisi, come SUMMER10, che vuoi leggere nei report. Si applica agli ordini tracciati da ora in poi."
+        "SettingStoreCouponCodesHelp": "Se non selezionata, viene memorizzato un hash di ogni codice coupon: i codici restano distinti nei report ma non sono leggibili, poiché i codici monouso e i codici regalo possono identificare una persona o essere spesi. Selezionala se i tuoi codici sono codici promozionali condivisi, come SUMMER10, che vuoi leggere nei report. Si applica agli ordini tracciati da ora in poi.",
+        "InstallMarketingCampaignsReporting": "Le campagne sono mostrate solo con il loro nome. Installate il plugin gratuito %1$sMarketing Campaigns Reporting%2$s per leggere la sorgente e il mezzo delle vostre campagne (mtm_source, utm_source...), consigliato per ogni Matomo.",
+        "VisitorLogLeadSource": "Fonte del lead",
+        "VisitorLogFirstOrder": "Primo ordine di questo cliente",
+        "VisitorLogRepeatOrder": "Ordine %1$s di questo cliente",
+        "FunnelsTitle": "Funnel",
+        "FunnelsIntro": "Create i funnel GA4 nel plugin Funnels a partire dagli eventi ecommerce: il funnel di vendita degli ordini ecommerce, il comportamento di acquisto e il comportamento al checkout. I passaggi facoltativi, come la lista articoli o le informazioni di spedizione, sono contrassegnati come facoltativi. Un funnel già esistente viene mantenuto. I passaggi devono essere mostrati nel report Eventi (impostazioni sopra) perché Funnels li veda.",
+        "FunnelExists": "creato",
+        "FunnelMissing": "non ancora creato",
+        "FunnelsCreate": "Crea i funnel mancanti",
+        "FunnelsCreated": "I funnel GA4 sono stati creati. I loro report si trovano in Obiettivi, Funnel dopo la prossima archiviazione.",
+        "FunnelsNotAvailable": "Il plugin Funnels non è attivato, oppure l'ecommerce è disattivato per questo sito."
     },
     "OpenmostCommunication": {
         "Dismiss": "Ignora",

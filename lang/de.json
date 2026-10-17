@@ -169,7 +169,7 @@
         "TeaserProductProfit": "Produktgewinn und Marge",
         "TeaserProductProfitDescription": "Gewinn und Marge nach Produkt, Marke und Kategorie, aus den Wareneinstandskosten, die Sie senden oder importieren.",
         "TeaserCustomItemParameters": "Berichte nach Artikeldimension",
-        "TeaserCustomItemParametersDescription": "Ein Bericht für jede Ihrer Artikeldimensionen (Größe, Farbe, Lagerstatus...) mit den angesehenen, in den Warenkorb gelegten und gekauften Produkten für jeden Wert.",
+        "TeaserCustomItemParametersDescription": "Ein Bericht, ein Segment und eine Custom-Reports-Dimension für jede Ihrer Artikeldimensionen (Größe, Farbe, Lagerstatus...), mit den angesehenen, in den Warenkorb gelegten und gekauften Produkten für jeden Wert.",
         "TeaserRefunds": "Erstattungen und Nettoumsatz",
         "TeaserRefundsDescription": "Erstattete Beträge, Erstattungsquote nach Produkt und Nettoumsatz im Zeitverlauf, mit Erstattungen aus dem dataLayer oder aus Ihrem Backoffice.",
         "TeaserDiscountDepth": "Rabatttiefe",
@@ -212,7 +212,18 @@
         "ItemDimensionCreateTitle": "Eine Artikeldimension konfigurieren",
         "TransactionsDisabled": "Die Transaktionsliste ist für diese Website ausgeblendet, da das Besucher-Log in den Datenschutzeinstellungen deaktiviert ist.",
         "SettingStoreCouponCodes": "Gutscheincodes wie gesendet speichern",
-        "SettingStoreCouponCodesHelp": "Wenn deaktiviert, wird ein Hash jedes Gutscheincodes gespeichert: Die Codes bleiben in den Berichten unterscheidbar, sind aber nicht lesbar, da Einmal- und Geschenkcodes eine Person identifizieren oder eingelöst werden können. Aktivieren Sie die Option, wenn Ihre Codes gemeinsam genutzte Aktionscodes wie SUMMER10 sind, die Sie in den Berichten lesen möchten. Gilt für die ab jetzt erfassten Bestellungen."
+        "SettingStoreCouponCodesHelp": "Wenn deaktiviert, wird ein Hash jedes Gutscheincodes gespeichert: Die Codes bleiben in den Berichten unterscheidbar, sind aber nicht lesbar, da Einmal- und Geschenkcodes eine Person identifizieren oder eingelöst werden können. Aktivieren Sie die Option, wenn Ihre Codes gemeinsam genutzte Aktionscodes wie SUMMER10 sind, die Sie in den Berichten lesen möchten. Gilt für die ab jetzt erfassten Bestellungen.",
+        "InstallMarketingCampaignsReporting": "Kampagnen werden nur mit ihrem Namen angezeigt. Installieren Sie das kostenlose Plugin %1$sMarketing Campaigns Reporting%2$s, um Quelle und Medium Ihrer Kampagnen (mtm_source, utm_source...) auszuwerten, empfohlen für jedes Matomo.",
+        "VisitorLogLeadSource": "Lead-Quelle",
+        "VisitorLogFirstOrder": "Erste Bestellung dieses Kunden",
+        "VisitorLogRepeatOrder": "Bestellung %1$s dieses Kunden",
+        "FunnelsTitle": "Trichter",
+        "FunnelsIntro": "Erstellen Sie die GA4-Trichter im Funnels-Plugin aus den E-Commerce-Ereignissen: den Verkaufstrichter der E-Commerce-Bestellungen, das Einkaufsverhalten und das Checkout-Verhalten. Optionale Schritte wie die Artikelliste oder die Versandinformationen sind als optional markiert. Ein bereits vorhandener Trichter bleibt erhalten. Die Schritte müssen im Ereignisbericht angezeigt werden (Einstellungen oben), damit Funnels sie sieht.",
+        "FunnelExists": "erstellt",
+        "FunnelMissing": "noch nicht erstellt",
+        "FunnelsCreate": "Fehlende Trichter erstellen",
+        "FunnelsCreated": "Die GA4-Trichter wurden erstellt. Ihre Berichte befinden sich nach der nächsten Archivierung unter Ziele, Trichter.",
+        "FunnelsNotAvailable": "Das Funnels-Plugin ist nicht aktiviert oder E-Commerce ist für diese Website deaktiviert."
     },
     "OpenmostCommunication": {
         "Dismiss": "Ausblenden",

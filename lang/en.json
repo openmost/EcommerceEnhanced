@@ -223,7 +223,7 @@
         "FunnelMissing": "not created yet",
         "FunnelsCreate": "Create the missing funnels",
         "FunnelsCreated": "The GA4 funnels have been created. Their reports are in Goals, Funnels after the next archiving.",
-        "FunnelsNotAvailable": "The Funnels plugin is not activated."
+        "FunnelsNotAvailable": "The Funnels plugin is not activated, or ecommerce is disabled for this website."
     },
     "OpenmostCommunication": {
         "Dismiss": "Dismiss",

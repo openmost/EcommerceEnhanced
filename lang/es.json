@@ -169,7 +169,7 @@
         "TeaserProductProfit": "Beneficio y margen por producto",
         "TeaserProductProfitDescription": "Beneficio y margen por producto, marca y categoría a partir del coste de los productos que envía o importa.",
         "TeaserCustomItemParameters": "Informes por dimensión de artículo",
-        "TeaserCustomItemParametersDescription": "Un informe para cada una de sus dimensiones de artículo (talla, color, estado del stock...) con los productos vistos, añadidos al carrito y comprados para cada valor.",
+        "TeaserCustomItemParametersDescription": "Un informe, un segmento y una dimensión de Custom Reports para cada una de sus dimensiones de artículo (talla, color, estado del stock...), con los productos vistos, añadidos al carrito y comprados para cada valor.",
         "TeaserRefunds": "Reembolsos e ingresos netos",
         "TeaserRefundsDescription": "Importes reembolsados, tasa de reembolso por producto e ingresos netos a lo largo del tiempo, con reembolsos enviados desde el dataLayer o desde su back office.",
         "TeaserDiscountDepth": "Profundidad de descuento",
@@ -212,7 +212,18 @@
         "ItemDimensionCreateTitle": "Configurar una dimensión de artículo",
         "TransactionsDisabled": "La lista de transacciones está oculta para este sitio web, ya que el registro de visitas está desactivado en la configuración de privacidad.",
         "SettingStoreCouponCodes": "Guardar los códigos de cupón tal como se envían",
-        "SettingStoreCouponCodesHelp": "Si no se marca, se guarda un hash de cada código de cupón: los códigos siguen siendo distintos en los informes pero no se pueden leer, ya que los códigos de un solo uso y de regalo pueden identificar a una persona o canjearse. Márquelo si sus códigos son códigos promocionales compartidos, como SUMMER10, que desea leer en los informes. Se aplica a los pedidos registrados a partir de ahora."
+        "SettingStoreCouponCodesHelp": "Si no se marca, se guarda un hash de cada código de cupón: los códigos siguen siendo distintos en los informes pero no se pueden leer, ya que los códigos de un solo uso y de regalo pueden identificar a una persona o canjearse. Márquelo si sus códigos son códigos promocionales compartidos, como SUMMER10, que desea leer en los informes. Se aplica a los pedidos registrados a partir de ahora.",
+        "InstallMarketingCampaignsReporting": "Las campañas solo se muestran por su nombre. Instale el plugin gratuito %1$sMarketing Campaigns Reporting%2$s para leer la fuente y el medio de sus campañas (mtm_source, utm_source...), recomendado para todo Matomo.",
+        "VisitorLogLeadSource": "Fuente del lead",
+        "VisitorLogFirstOrder": "Primer pedido de este cliente",
+        "VisitorLogRepeatOrder": "Pedido %1$s de este cliente",
+        "FunnelsTitle": "Embudos",
+        "FunnelsIntro": "Cree los embudos GA4 en el plugin Funnels a partir de los eventos de ecommerce: el embudo de ventas de los pedidos ecommerce, el comportamiento de compra y el comportamiento en el pago. Los pasos opcionales, como la lista de artículos o la información de envío, se marcan como opcionales. Un embudo que ya existe se conserva. Los pasos deben mostrarse en el informe de Eventos (ajustes de arriba) para que Funnels los vea.",
+        "FunnelExists": "creado",
+        "FunnelMissing": "aún no creado",
+        "FunnelsCreate": "Crear los embudos que faltan",
+        "FunnelsCreated": "Los embudos GA4 se han creado. Sus informes están en Objetivos, Embudos tras el próximo archivado.",
+        "FunnelsNotAvailable": "El plugin Funnels no está activado, o el ecommerce está desactivado para este sitio."
     },
     "OpenmostCommunication": {
         "Dismiss": "Descartar",

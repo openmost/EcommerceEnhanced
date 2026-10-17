@@ -169,7 +169,7 @@
         "TeaserProductProfit": "Bénéfice et marge par produit",
         "TeaserProductProfitDescription": "Bénéfice et marge par produit, marque et catégorie, à partir du coût de revient que vous envoyez ou importez.",
         "TeaserCustomItemParameters": "Rapports par dimension d'article",
-        "TeaserCustomItemParametersDescription": "Un rapport pour chacune de vos dimensions d'article (taille, couleur, état du stock...) avec les produits vus, ajoutés au panier et achetés pour chaque valeur.",
+        "TeaserCustomItemParametersDescription": "Un rapport, un segment et une dimension Custom Reports pour chacune de vos dimensions d'article (taille, couleur, état du stock...), avec les produits vus, ajoutés au panier et achetés pour chaque valeur.",
         "TeaserRefunds": "Remboursements et revenu net",
         "TeaserRefundsDescription": "Montants remboursés, taux de remboursement par produit et revenu net dans le temps, avec des remboursements envoyés depuis le dataLayer ou depuis votre back-office.",
         "TeaserDiscountDepth": "Niveau de remise",
@@ -212,7 +212,18 @@
         "ItemDimensionCreateTitle": "Configurer une dimension d'article",
         "TransactionsDisabled": "La liste des transactions est masquée pour ce site web, car le log des visites est désactivé dans les paramètres de confidentialité.",
         "SettingStoreCouponCodes": "Enregistrer les codes promo tels qu'envoyés",
-        "SettingStoreCouponCodesHelp": "Si la case est décochée, un hachage de chaque code promo est enregistré : les codes restent distincts dans les rapports mais ne sont pas lisibles, car les codes à usage unique et les cartes cadeaux peuvent identifier une personne ou être dépensés. Cochez-la si vos codes sont des codes promotionnels partagés, comme SUMMER10, que vous voulez lire dans les rapports. S'applique aux commandes suivies à partir de maintenant."
+        "SettingStoreCouponCodesHelp": "Si la case est décochée, un hachage de chaque code promo est enregistré : les codes restent distincts dans les rapports mais ne sont pas lisibles, car les codes à usage unique et les cartes cadeaux peuvent identifier une personne ou être dépensés. Cochez-la si vos codes sont des codes promotionnels partagés, comme SUMMER10, que vous voulez lire dans les rapports. S'applique aux commandes suivies à partir de maintenant.",
+        "InstallMarketingCampaignsReporting": "Les campagnes ne sont affichées que par leur nom. Installez le plugin gratuit %1$sMarketing Campaigns Reporting%2$s pour lire la source et le support de vos campagnes (mtm_source, utm_source...), recommandé pour tout Matomo.",
+        "VisitorLogLeadSource": "Source du lead",
+        "VisitorLogFirstOrder": "Première commande de ce client",
+        "VisitorLogRepeatOrder": "Commande n°%1$s de ce client",
+        "FunnelsTitle": "Entonnoirs",
+        "FunnelsIntro": "Créez les entonnoirs GA4 dans le plugin Funnels à partir des événements ecommerce : l'entonnoir de vente des commandes ecommerce, le comportement d'achat et le comportement au paiement. Les étapes facultatives, comme la liste d'articles ou les informations de livraison, sont marquées facultatives. Un entonnoir qui existe déjà est conservé. Les étapes doivent être affichées dans le rapport Événements (réglages ci-dessus) pour que Funnels les voie.",
+        "FunnelExists": "créé",
+        "FunnelMissing": "pas encore créé",
+        "FunnelsCreate": "Créer les entonnoirs manquants",
+        "FunnelsCreated": "Les entonnoirs GA4 ont été créés. Leurs rapports sont dans Objectifs, Entonnoirs après le prochain archivage.",
+        "FunnelsNotAvailable": "Le plugin Funnels n'est pas activé, ou l'ecommerce est désactivé pour ce site."
     },
     "OpenmostCommunication": {
         "Dismiss": "Masquer",

@@ -169,7 +169,7 @@
         "TeaserProductProfit": "產品利潤與利潤率",
         "TeaserProductProfitDescription": "根據你傳送或匯入的商品成本，依產品、品牌與分類劃分的利潤與利潤率。",
         "TeaserCustomItemParameters": "依商品維度劃分的報表",
-        "TeaserCustomItemParametersDescription": "為每個商品維度（尺寸、顏色、庫存狀態等）提供一份報表，顯示每個值對應的被瀏覽、加入購物車與購買的產品。",
+        "TeaserCustomItemParametersDescription": "為每個商品維度(尺寸、顏色、庫存狀態等)提供一個報表、一個區隔和一個 Custom Reports 維度,並依每個值顯示瀏覽、加入購物車和購買的商品。",
         "TeaserRefunds": "退款與淨收益",
         "TeaserRefundsDescription": "退款金額、依產品劃分的退款率以及淨收益的發展趨勢，退款資料可從 dataLayer 或你的後台傳送。",
         "TeaserDiscountDepth": "折扣深度",
@@ -212,7 +212,18 @@
         "ItemDimensionCreateTitle": "設定商品維度",
         "TransactionsDisabled": "由於隱私設定中已停用訪客紀錄，此網站的交易清單已隱藏。",
         "SettingStoreCouponCodes": "依原樣儲存優惠碼",
-        "SettingStoreCouponCodesHelp": "不勾選時，會儲存每個優惠碼的雜湊值：由於一次性優惠碼與禮物卡代碼可能識別出個人或遭到盜用，報表中仍可區分各個代碼，但無法讀取。如果你的代碼是 SUMMER10 這類共用的促銷代碼，且想在報表中查看，請勾選此項。適用於之後追蹤的訂單。"
+        "SettingStoreCouponCodesHelp": "不勾選時，會儲存每個優惠碼的雜湊值：由於一次性優惠碼與禮物卡代碼可能識別出個人或遭到盜用，報表中仍可區分各個代碼，但無法讀取。如果你的代碼是 SUMMER10 這類共用的促銷代碼，且想在報表中查看，請勾選此項。適用於之後追蹤的訂單。",
+        "InstallMarketingCampaignsReporting": "廣告活動僅以名稱顯示。安裝免費的 %1$sMarketing Campaigns Reporting%2$s 外掛以查看廣告活動的來源和媒介(mtm_source、utm_source 等),建議每個 Matomo 都安裝。",
+        "VisitorLogLeadSource": "潛在客戶來源",
+        "VisitorLogFirstOrder": "此客戶的首筆訂單",
+        "VisitorLogRepeatOrder": "此客戶的第 %1$s 筆訂單",
+        "FunnelsTitle": "漏斗",
+        "FunnelsIntro": "根據電子商務事件在 Funnels 外掛中建立 GA4 漏斗:電子商務訂單的銷售漏斗、購物行為和結帳行為。選用步驟(如商品清單或運送資訊)會標記為選用。已存在的漏斗會保留。這些步驟必須顯示在事件報表中(見上方設定),Funnels 才能辨識。",
+        "FunnelExists": "已建立",
+        "FunnelMissing": "尚未建立",
+        "FunnelsCreate": "建立缺少的漏斗",
+        "FunnelsCreated": "GA4 漏斗已建立。下次封存後,其報表位於目標 > 漏斗。",
+        "FunnelsNotAvailable": "Funnels 外掛未啟用,或此網站已停用電子商務。"
     },
     "OpenmostCommunication": {
         "Dismiss": "關閉",

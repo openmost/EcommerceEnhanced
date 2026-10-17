@@ -169,7 +169,7 @@
         "TeaserProductProfit": "产品利润和利润率",
         "TeaserProductProfitDescription": "根据您发送或导入的商品成本，按产品、品牌和类别统计的利润和利润率。",
         "TeaserCustomItemParameters": "按商品维度统计的报表",
-        "TeaserCustomItemParametersDescription": "为每个商品维度（尺码、颜色、库存状态等）生成一份报表，显示每个值对应的被浏览、加入购物车和购买的产品。",
+        "TeaserCustomItemParametersDescription": "为每个商品维度(尺码、颜色、库存状态等)提供一个报告、一个细分和一个 Custom Reports 维度,并按每个值显示浏览、加入购物车和购买的商品。",
         "TeaserRefunds": "退款和净收益",
         "TeaserRefundsDescription": "退款金额、按产品统计的退款率以及净收益趋势，退款数据可从 dataLayer 或您的后台发送。",
         "TeaserDiscountDepth": "折扣力度",
@@ -212,7 +212,18 @@
         "ItemDimensionCreateTitle": "配置商品维度",
         "TransactionsDisabled": "由于隐私设置中已禁用访客日志，此网站的交易列表已隐藏。",
         "SettingStoreCouponCodes": "按原样存储优惠券代码",
-        "SettingStoreCouponCodesHelp": "不勾选时，将存储每个优惠券代码的哈希值：由于一次性代码和礼品码可能识别出个人或被盗用，报表中各代码仍可区分，但无法读取。如果您的代码是 SUMMER10 这类公开的促销代码，并希望在报表中查看，请勾选此项。适用于此后跟踪的订单。"
+        "SettingStoreCouponCodesHelp": "不勾选时，将存储每个优惠券代码的哈希值：由于一次性代码和礼品码可能识别出个人或被盗用，报表中各代码仍可区分，但无法读取。如果您的代码是 SUMMER10 这类公开的促销代码，并希望在报表中查看，请勾选此项。适用于此后跟踪的订单。",
+        "InstallMarketingCampaignsReporting": "广告活动仅按名称显示。安装免费的 %1$sMarketing Campaigns Reporting%2$s 插件以查看广告活动的来源和媒介(mtm_source、utm_source 等),建议每个 Matomo 都安装。",
+        "VisitorLogLeadSource": "线索来源",
+        "VisitorLogFirstOrder": "该客户的首个订单",
+        "VisitorLogRepeatOrder": "该客户的第 %1$s 个订单",
+        "FunnelsTitle": "漏斗",
+        "FunnelsIntro": "根据电子商务事件在 Funnels 插件中创建 GA4 漏斗:电子商务订单的销售漏斗、购物行为和结账行为。可选步骤(如商品列表或配送信息)被标记为可选。已存在的漏斗会保留。这些步骤必须显示在事件报告中(见上方设置),Funnels 才能识别。",
+        "FunnelExists": "已创建",
+        "FunnelMissing": "尚未创建",
+        "FunnelsCreate": "创建缺失的漏斗",
+        "FunnelsCreated": "GA4 漏斗已创建。下次归档后,其报告位于目标 > 漏斗。",
+        "FunnelsNotAvailable": "Funnels 插件未启用,或此网站已禁用电子商务。"
     },
     "OpenmostCommunication": {
         "Dismiss": "关闭",

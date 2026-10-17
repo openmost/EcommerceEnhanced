@@ -169,7 +169,7 @@
         "TeaserProductProfit": "Zysk i marża produktów",
         "TeaserProductProfitDescription": "Zysk i marża według produktu, marki i kategorii na podstawie przesyłanych lub importowanych kosztów towarów.",
         "TeaserCustomItemParameters": "Raporty według wymiaru produktu",
-        "TeaserCustomItemParametersDescription": "Raport dla każdego wymiaru produktu (rozmiar, kolor, stan magazynowy...) z produktami wyświetlonymi, dodanymi do koszyka i kupionymi dla każdej wartości.",
+        "TeaserCustomItemParametersDescription": "Raport, segment i wymiar Custom Reports dla każdego z Twoich wymiarów produktu (rozmiar, kolor, stan magazynowy...), z produktami wyświetlonymi, dodanymi do koszyka i kupionymi dla każdej wartości.",
         "TeaserRefunds": "Zwroty i przychody netto",
         "TeaserRefundsDescription": "Zwrócone kwoty, wskaźnik zwrotów według produktu i przychody netto w czasie, ze zwrotami przesyłanymi z dataLayer lub z Twojego zaplecza sklepu.",
         "TeaserDiscountDepth": "Głębokość rabatów",
@@ -212,7 +212,18 @@
         "ItemDimensionCreateTitle": "Skonfiguruj wymiar produktu",
         "TransactionsDisabled": "Lista transakcji jest ukryta dla tej strony, ponieważ log odwiedzin jest wyłączony w ustawieniach prywatności.",
         "SettingStoreCouponCodes": "Zapisuj kody kuponów w przesłanej postaci",
-        "SettingStoreCouponCodesHelp": "Gdy pole jest odznaczone, zapisywany jest skrót (hash) każdego kodu kuponu: kody pozostają rozróżnialne w raportach, ale nie można ich odczytać, ponieważ kody jednorazowe i podarunkowe mogą identyfikować osobę lub zostać wykorzystane. Zaznacz je, jeśli Twoje kody to wspólne kody promocyjne, takie jak SUMMER10, które chcesz odczytywać w raportach. Dotyczy zamówień śledzonych od teraz."
+        "SettingStoreCouponCodesHelp": "Gdy pole jest odznaczone, zapisywany jest skrót (hash) każdego kodu kuponu: kody pozostają rozróżnialne w raportach, ale nie można ich odczytać, ponieważ kody jednorazowe i podarunkowe mogą identyfikować osobę lub zostać wykorzystane. Zaznacz je, jeśli Twoje kody to wspólne kody promocyjne, takie jak SUMMER10, które chcesz odczytywać w raportach. Dotyczy zamówień śledzonych od teraz.",
+        "InstallMarketingCampaignsReporting": "Kampanie są pokazywane tylko pod swoją nazwą. Zainstaluj darmową wtyczkę %1$sMarketing Campaigns Reporting%2$s, aby odczytać źródło i medium kampanii (mtm_source, utm_source...), zalecaną dla każdego Matomo.",
+        "VisitorLogLeadSource": "Źródło leada",
+        "VisitorLogFirstOrder": "Pierwsze zamówienie tego klienta",
+        "VisitorLogRepeatOrder": "Zamówienie %1$s tego klienta",
+        "FunnelsTitle": "Lejki",
+        "FunnelsIntro": "Utwórz lejki GA4 we wtyczce Funnels na podstawie zdarzeń e-commerce: lejek sprzedaży zamówień e-commerce, zachowania zakupowe i zachowania przy płatności. Kroki opcjonalne, takie jak lista produktów czy informacje o wysyłce, są oznaczone jako opcjonalne. Istniejący lejek jest zachowywany. Kroki muszą być pokazane w raporcie Zdarzenia (ustawienia powyżej), aby Funnels je widział.",
+        "FunnelExists": "utworzony",
+        "FunnelMissing": "jeszcze nie utworzony",
+        "FunnelsCreate": "Utwórz brakujące lejki",
+        "FunnelsCreated": "Lejki GA4 zostały utworzone. Ich raporty znajdują się w Cele, Lejki po następnej archiwizacji.",
+        "FunnelsNotAvailable": "Wtyczka Funnels nie jest aktywna lub e-commerce jest wyłączony dla tej witryny."
     },
     "OpenmostCommunication": {
         "Dismiss": "Odrzuć",

@@ -169,7 +169,7 @@
         "TeaserProductProfit": "製品の利益と利益率",
         "TeaserProductProfitDescription": "送信またはインポートした売上原価に基づく、製品、ブランド、カテゴリ別の利益と利益率。",
         "TeaserCustomItemParameters": "アイテムディメンション別のレポート",
-        "TeaserCustomItemParametersDescription": "各アイテムディメンション (サイズ、色、在庫状況など) のレポート。値ごとに閲覧、カートに追加、購入された製品を表示します。",
+        "TeaserCustomItemParametersDescription": "各アイテムディメンション(サイズ、色、在庫状況など)ごとにレポート、セグメント、Custom Reports ディメンションを提供し、値ごとに閲覧、カート追加、購入された商品を表示します。",
         "TeaserRefunds": "払い戻しと純収益",
         "TeaserRefundsDescription": "dataLayer またはバックオフィスから送信された払い戻しに基づく、払い戻し額、製品別の払い戻し率、純収益の推移。",
         "TeaserDiscountDepth": "割引率の分析",
@@ -212,7 +212,18 @@
         "ItemDimensionCreateTitle": "アイテムディメンションを設定",
         "TransactionsDisabled": "プライバシー設定でビジターログが無効になっているため、このウェブサイトではトランザクションの一覧は表示されません。",
         "SettingStoreCouponCodes": "クーポンコードを送信されたとおりに保存",
-        "SettingStoreCouponCodesHelp": "オフの場合、各クーポンコードのハッシュが保存されます: 1 回限りのコードやギフトコードは個人の特定や不正利用につながる可能性があるため、レポート上でコードは区別されますが読み取ることはできません。SUMMER10 のような共通のプロモーションコードを使用していて、レポートでコードを読みたい場合はオンにしてください。今後トラッキングされる注文に適用されます。"
+        "SettingStoreCouponCodesHelp": "オフの場合、各クーポンコードのハッシュが保存されます: 1 回限りのコードやギフトコードは個人の特定や不正利用につながる可能性があるため、レポート上でコードは区別されますが読み取ることはできません。SUMMER10 のような共通のプロモーションコードを使用していて、レポートでコードを読みたい場合はオンにしてください。今後トラッキングされる注文に適用されます。",
+        "InstallMarketingCampaignsReporting": "キャンペーンは名前でのみ表示されます。キャンペーンの参照元とメディア(mtm_source、utm_source など)を確認するには、無料の %1$sMarketing Campaigns Reporting%2$s プラグインをインストールしてください。すべての Matomo に推奨されます。",
+        "VisitorLogLeadSource": "リードソース",
+        "VisitorLogFirstOrder": "この顧客の初回注文",
+        "VisitorLogRepeatOrder": "この顧客の %1$s 回目の注文",
+        "FunnelsTitle": "ファネル",
+        "FunnelsIntro": "eコマースイベントから Funnels プラグインに GA4 ファネルを作成します: eコマース注文の販売ファネル、ショッピング行動、チェックアウト行動。アイテムリストや配送情報などの任意のステップは任意として設定されます。既存のファネルはそのまま保持されます。Funnels がステップを認識するには、ステップがイベントレポートに表示されている必要があります(上の設定)。",
+        "FunnelExists": "作成済み",
+        "FunnelMissing": "未作成",
+        "FunnelsCreate": "不足しているファネルを作成",
+        "FunnelsCreated": "GA4 ファネルが作成されました。次回のアーカイブ処理後、目標 > ファネルでレポートを確認できます。",
+        "FunnelsNotAvailable": "Funnels プラグインが有効になっていないか、このサイトで eコマースが無効になっています。"
     },
     "OpenmostCommunication": {
         "Dismiss": "閉じる",
