@@ -61,7 +61,7 @@ abstract class ShopTestCase extends IntegrationTestCase
 
     protected function trackShop(): void
     {
-        $shoes = self::TRAIL_SHOE + ['quantity' => 2, 'custom' => ['size' => 'M']];
+        $shoes = self::TRAIL_SHOE + ['quantity' => 2, 'custom' => ['size' => 'M', 'item_cost' => '4']];
         $socks = self::SOCKS + ['quantity' => 1];
         $hoodie = self::HOODIE + ['quantity' => 1];
 

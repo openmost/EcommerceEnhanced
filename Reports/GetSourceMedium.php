@@ -16,6 +16,8 @@ class GetSourceMedium extends Base
 {
     protected $labelTranslationKey = 'EcommerceEnhanced_SourceMedium';
 
+    protected $usesCampaignSourceMedium = true;
+
     protected $metricNames = [
         Metrics::VISITS,
         Metrics::ORDERS,

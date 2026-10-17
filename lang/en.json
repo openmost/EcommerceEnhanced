@@ -212,7 +212,8 @@
         "ItemDimensionCreateTitle": "Configure an Item dimension",
         "TransactionsDisabled": "The list of transactions is hidden for this website, as the visitor log is disabled in the privacy settings.",
         "SettingStoreCouponCodes": "Store coupon codes as sent",
-        "SettingStoreCouponCodesHelp": "Unchecked, a hash of each coupon code is stored: codes stay distinct in the reports but cannot be read, as single use and gift codes can identify a person or be spent. Check it if your codes are shared promotional codes, such as SUMMER10, you want to read in the reports. Applies to the orders tracked from now on."
+        "SettingStoreCouponCodesHelp": "Unchecked, a hash of each coupon code is stored: codes stay distinct in the reports but cannot be read, as single use and gift codes can identify a person or be spent. Check it if your codes are shared promotional codes, such as SUMMER10, you want to read in the reports. Applies to the orders tracked from now on.",
+        "InstallMarketingCampaignsReporting": "Campaigns are shown under their name only. Install the free %1$sMarketing Campaigns Reporting%2$s plugin to read the source and medium of your campaigns (mtm_source, utm_source...), recommended for every Matomo."
     },
     "OpenmostCommunication": {
         "Dismiss": "Dismiss",

@@ -10,6 +10,7 @@
 namespace Piwik\Plugins\EcommerceEnhanced\Reports;
 
 use Piwik\Piwik;
+use Piwik\Plugin\Manager;
 use Piwik\Plugin\Report;
 use Piwik\Plugin\ViewDataTable;
 use Piwik\Plugins\CoreVisualizations\Visualizations\HtmlTable;
@@ -18,6 +19,7 @@ use Piwik\Plugins\CoreVisualizations\Visualizations\JqplotGraph\Pie;
 use Piwik\Plugins\EcommerceEnhanced\Metrics;
 use Piwik\Request;
 use Piwik\Site;
+use Piwik\Url;
 
 /**
  * A report of the Ecommerce category, available on sites with ecommerce enabled.
@@ -59,6 +61,13 @@ abstract class Base extends Report
      * @var bool
      */
     protected $showTotalsRow = true;
+
+    /**
+     * Source / medium reports: campaign source and medium come from MarketingCampaignsReporting.
+     *
+     * @var bool
+     */
+    protected $usesCampaignSourceMedium = false;
 
     protected function init()
     {
@@ -112,6 +121,13 @@ abstract class Base extends Report
             $view->config->show_pagination_control = false;
         } elseif ($view->isViewDataTableId(HtmlTable::ID)) {
             $view->config->show_totals_row = $this->showTotalsRow;
+        }
+
+        if ($this->usesCampaignSourceMedium && !Manager::getInstance()->isPluginActivated('MarketingCampaignsReporting')) {
+            $view->config->show_footer_message = Piwik::translate('EcommerceEnhanced_InstallMarketingCampaignsReporting', [
+                '<a href="' . Url::getCurrentUrlWithoutQueryString() . '?' . Url::getQueryStringFromParameters(['module' => 'Marketplace', 'action' => 'pluginDetails', 'pluginName' => 'MarketingCampaignsReporting']) . '" target="_blank" rel="noreferrer noopener">',
+                '</a>',
+            ]);
         }
 
         // Stored money metrics are not processed metrics, only "all" formats them with the site currency
