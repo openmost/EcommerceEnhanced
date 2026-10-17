@@ -215,7 +215,8 @@
         "ItemDimensionHowToTitle": "How to send this item dimension",
         "ItemDimensionHowTo": "Add the parameter to each item of your GA4 ecommerce pushes, with the name of the dimension as key. Ecommerce Enhanced records it for product views, carts, orders and refunds.",
         "ItemDimensionCreateTitle": "Configure an Item dimension",
-        "ItemDimensionPersonal": "\"%1$s\" looks like personal data (email, phone, name, address, customer...): Ecommerce Enhanced never records such item parameters. Choose another name."
+        "ItemDimensionPersonal": "\"%1$s\" looks like personal data (email, phone, name, address, customer...): Ecommerce Enhanced never records such item parameters. Choose another name.",
+        "TransactionsDisabled": "The list of transactions is hidden for this website, as the visitor log is disabled in the privacy settings."
     },
     "OpenmostCommunication": {
         "Dismiss": "Dismiss",

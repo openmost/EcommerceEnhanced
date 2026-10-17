@@ -83,7 +83,7 @@ class PayloadTest extends TestCase
 
     public function testItemsAreCapped()
     {
-        $data = Payload::fromArray(EventType::VIEW_ITEM_LIST, ['items' => array_fill(0, Payload::MAX_ITEMS + 5, ['item_id' => 'A'])]);
+        $data = Payload::fromArray(EventType::ADD_TO_CART, ['items' => array_fill(0, Payload::MAX_ITEMS + 5, ['item_id' => 'A'])]);
 
         $this->assertCount(Payload::MAX_ITEMS, $data['items']);
         $this->assertSame(5, $data['event']['dropped_items']);
@@ -140,5 +140,35 @@ class PayloadTest extends TestCase
         ]])['items'];
 
         $this->assertSame(64.2, Payload::getItemsTotal($items));
+    }
+
+    public function testFreeTextWithPersonalDataIsDropped()
+    {
+        $event = Payload::fromArray(EventType::VIEW_SEARCH_RESULTS, ['search_term' => 'john.doe@mail.com'])['event'];
+        $this->assertNull($event['search_term']);
+
+        $event = Payload::fromArray(EventType::GENERATE_LEAD, ['lead_source' => 'call +33 6 12 34 56 78', 'lead_status' => '06 12 34 56 78'])['event'];
+        $this->assertNull($event['lead_source']);
+        $this->assertNull($event['lead_status']);
+
+        $event = Payload::fromArray(EventType::VIEW_SEARCH_RESULTS, ['search_term' => 'trail shoes 42'])['event'];
+        $this->assertSame('trail shoes 42', $event['search_term']);
+
+        $item = Payload::fromArray(EventType::ADD_TO_CART, ['items' => [['item_id' => 'A', 'custom' => ['note' => 'me@x.io', 'size' => 'M']]]])['items'][0];
+        $this->assertSame(['size' => 'M'], $item['custom']);
+    }
+
+    public function testListStepsKeepThirtyItems()
+    {
+        $items = [];
+        for ($i = 0; $i < 50; $i++) {
+            $items[] = ['item_id' => 'SKU' . $i];
+        }
+
+        $data = Payload::fromArray(EventType::VIEW_ITEM_LIST, ['items' => $items]);
+        $this->assertCount(Payload::MAX_LIST_ITEMS, $data['items']);
+        $this->assertSame(20, $data['event']['dropped_items']);
+
+        $this->assertCount(50, Payload::fromArray(EventType::ADD_TO_CART, ['items' => $items])['items']);
     }
 }

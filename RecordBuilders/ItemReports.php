@@ -33,8 +33,9 @@ class ItemReports extends Base
     {
         $records = [];
         foreach ($this->getSortColumns() as $name => $sortColumn) {
+            $isCatalog = in_array($name, [Records::PRODUCTS, Records::BRANDS, Records::VARIANTS, Records::CATEGORIES], true);
             $records[] = Record::make(Record::TYPE_BLOB, $name)
-                ->setMaxRowsInTable(Records::MAX_ROWS)
+                ->setMaxRowsInTable($isCatalog ? Records::MAX_ITEM_ROWS : Records::MAX_ROWS)
                 ->setColumnToSortByBeforeTruncation($sortColumn);
         }
 

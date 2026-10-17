@@ -55,6 +55,11 @@ abstract class Base extends Report
      */
     protected $defaultView = null;
 
+    /**
+     * @var bool
+     */
+    protected $showTotalsRow = true;
+
     protected function init()
     {
         $this->module = 'EcommerceEnhanced';
@@ -106,7 +111,7 @@ abstract class Base extends Report
             $view->config->show_limit_control = false;
             $view->config->show_pagination_control = false;
         } elseif ($view->isViewDataTableId(HtmlTable::ID)) {
-            $view->config->show_totals_row = true;
+            $view->config->show_totals_row = $this->showTotalsRow;
         }
 
         // Stored money metrics are not processed metrics, only "all" formats them with the site currency

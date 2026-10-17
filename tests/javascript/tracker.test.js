@@ -1,5 +1,6 @@
 /**
  * Tests of tracker.js, run with: node --test plugins/EcommerceEnhanced/tests/javascript/
+ * The minified build: TRACKER_FILE=tracker.min.js node --test plugins/EcommerceEnhanced/tests/javascript/
  *
  * tracker.js is loaded in a sandbox with a fake Matomo tracker that records every call.
  */
@@ -13,7 +14,7 @@ const vm = require('node:vm');
 // Objects built inside the sandbox have other prototypes, compare their JSON form
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
-const source = fs.readFileSync(path.join(__dirname, '..', '..', 'tracker.js'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '..', '..', process.env.TRACKER_FILE || 'tracker.js'), 'utf8');
 
 function createStorage() {
     const data = {};

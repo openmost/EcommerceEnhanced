@@ -59,7 +59,7 @@ class AcquisitionReports extends Base
     public static function getSourceMediumSql(string $logTable): string
     {
         $hasCampaignColumns = Manager::getInstance()->isPluginActivated('MarketingCampaignsReporting');
-        $campaignSource = $hasCampaignColumns ? "COALESCE(NULLIF({t}.campaign_source, ''), LOWER({t}.referer_name))" : 'LOWER({t}.referer_name)';
+        $campaignSource = $hasCampaignColumns ? "COALESCE(NULLIF(LOWER({t}.campaign_source), ''), LOWER({t}.referer_name))" : 'LOWER({t}.referer_name)';
         $campaignMedium = $hasCampaignColumns ? "COALESCE(NULLIF(LOWER({t}.campaign_medium), ''), 'campaign')" : "'campaign'";
 
         $sql = "CONCAT(

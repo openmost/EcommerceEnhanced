@@ -82,9 +82,16 @@ class Ratio extends ProcessedMetric
 
     public function compute(Row $row)
     {
+        $denominator = $this->getMetric($row, $this->denominator);
+
+        // Unique visitors are not processed for years and ranges by default: no value rather than a wrong zero
+        if ($denominator === false || $denominator === null || $denominator === '') {
+            return false;
+        }
+
         $precision = $this->type === Dimension::TYPE_PERCENT ? 4 : 2;
 
-        return Piwik::getQuotientSafe($this->getMetric($row, $this->numerator), $this->getMetric($row, $this->denominator), $precision);
+        return Piwik::getQuotientSafe($this->getMetric($row, $this->numerator), $denominator, $precision);
     }
 
     public function getDependentMetrics()

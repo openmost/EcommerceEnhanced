@@ -21,7 +21,8 @@
     var EVENT_CATEGORY = 'Ecommerce';
     var MAX_ITEMS = 200;
     var MAX_LIST_ITEMS = 30;
-    var MAX_CUSTOM_PARAMS = 10;
+    // Unknown item keys sent per item: the server keeps the configured item dimensions among them, up to 10
+    var MAX_CUSTOM_PARAMS = 30;
     var MAX_REMEMBERED = 200;
     var MAX_TRANSACTIONS = 50;
     var DUPLICATE_WINDOW_MS = 1000;
@@ -120,22 +121,41 @@
 
     var entityDecoder = null;
 
+    // Without the DOM, or when a Trusted Types policy forbids innerHTML: the entities shops actually emit
+    function decodeEntitiesWithoutDom(value) {
+        var named = {amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' '};
+
+        return value.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, function (entity, code) {
+            if (code.charAt(0) === '#') {
+                var number = code.charAt(1).toLowerCase() === 'x' ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
+
+                return number > 0 && number < 0x110000 ? String.fromCodePoint(number) : entity;
+            }
+
+            return hasOwn(named, code.toLowerCase()) ? named[code.toLowerCase()] : entity;
+        });
+    }
+
     function decodeEntities(value) {
         if (value.indexOf('&') === -1) {
             return value;
         }
 
-        if (!entityDecoder && 'undefined' !== typeof document && document.createElement) {
-            entityDecoder = document.createElement('textarea');
+        try {
+            if (!entityDecoder && 'undefined' !== typeof document && document.createElement) {
+                entityDecoder = document.createElement('textarea');
+            }
+
+            if (entityDecoder) {
+                entityDecoder.innerHTML = value.replace(/</g, '&lt;');
+
+                return entityDecoder.value;
+            }
+        } catch (e) {
+            entityDecoder = null;
         }
 
-        if (!entityDecoder) {
-            return value.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-        }
-
-        entityDecoder.innerHTML = value.replace(/</g, '&lt;');
-
-        return entityDecoder.value;
+        return decodeEntitiesWithoutDom(value);
     }
 
     function toText(value, max) {
@@ -749,13 +769,18 @@
      * it is later added to cart and bought, as in GA4.
      */
 
+    // Maps keyed by item id use a prefix: an item id such as __proto__ must stay an ordinary key
+    function itemKey(item) {
+        return 'i:' + item.item_id;
+    }
+
     function rememberSelection(tracker, data) {
         var remembered = load(tracker, 'sel', {});
         var keys = [], key;
 
         for (var i = 0; i < data.items.length; i++) {
             var item = data.items[i];
-            remembered[item.item_id] = {
+            remembered[itemKey(item)] = {
                 item_list_id: item.item_list_id,
                 item_list_name: item.item_list_name,
                 promotion_id: item.promotion_id,
@@ -789,7 +814,7 @@
 
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
-            var selection = remembered[item.item_id];
+            var selection = hasOwn(remembered, itemKey(item)) ? remembered[itemKey(item)] : null;
             if (!selection || item.attribution === 1) {
                 continue;
             }
@@ -860,13 +885,14 @@
 
         for (i = 0; i < items.length; i++) {
             var item = items[i];
-            if (!hasOwn(merged, item.item_id)) {
-                merged[item.item_id] = {item: item, quantity: 0, amount: 0};
-                order.push(item.item_id);
+            var key = itemKey(item);
+            if (!hasOwn(merged, key)) {
+                merged[key] = {item: item, quantity: 0, amount: 0};
+                order.push(key);
             }
 
-            merged[item.item_id].quantity += item.quantity;
-            merged[item.item_id].amount += (item.price || 0) * item.quantity;
+            merged[key].quantity += item.quantity;
+            merged[key].amount += (item.price || 0) * item.quantity;
         }
 
         tracker.clearEcommerceCart();
@@ -956,15 +982,24 @@
         save(tracker, 'checkout', choices);
     }
 
-    function isNewTransaction(transactionId) {
+    // Same consent rule as the other storage: without cookie consent the list lives in the page only
+    function isNewTransaction(tracker, transactionId) {
         var key = 'mtm_ee_tx';
         var hash = hashString(transactionId);
-        var list = [];
-
+        var persistent = false;
         try {
-            list = JSON.parse(window.localStorage.getItem(key) || '[]') || [];
+            persistent = !!window.localStorage && (!tracker.areCookiesEnabled || tracker.areCookiesEnabled());
         } catch (e) {
-            list = memory[key] || [];
+            persistent = false;
+        }
+
+        var list = memory[key] || [];
+        if (persistent) {
+            try {
+                list = JSON.parse(window.localStorage.getItem(key) || '[]') || [];
+            } catch (e) {
+                list = memory[key] || [];
+            }
         }
 
         for (var i = 0; i < list.length; i++) {
@@ -977,17 +1012,19 @@
         list = list.slice(-MAX_TRANSACTIONS);
         memory[key] = list;
 
-        try {
-            window.localStorage.setItem(key, JSON.stringify(list));
-        } catch (e) {
-            // the memory copy still prevents a resend on this page
+        if (persistent) {
+            try {
+                window.localStorage.setItem(key, JSON.stringify(list));
+            } catch (e) {
+                // the memory copy still prevents a resend on this page
+            }
         }
 
         return true;
     }
 
     function trackPurchase(tracker, data) {
-        if (!data.transaction_id || !isNewTransaction(tracker.getSiteId() + '|' + data.transaction_id)) {
+        if (!data.transaction_id || !isNewTransaction(tracker, tracker.getSiteId() + '|' + data.transaction_id)) {
             return;
         }
 

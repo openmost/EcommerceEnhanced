@@ -38,6 +38,8 @@ class GetCategories extends Base
         $this->documentation = Piwik::translate('EcommerceEnhanced_BrandsDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_Merchandising';
         $this->order = 2;
+        // A product counts in each of its categories: a total would add it once per level
+        $this->showTotalsRow = false;
         $this->dimension = new ProductCategory();
     }
 }

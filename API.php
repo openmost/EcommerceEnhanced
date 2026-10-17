@@ -93,6 +93,11 @@ class API extends \Piwik\Plugin\API
     {
         Piwik::checkUserHasViewAccess($idSite);
 
+        // A list of orders is row level data: hidden with the visitor log when an administrator disabled it
+        if (!\Piwik\Plugins\Live\Live::isVisitorLogEnabled((int) $idSite)) {
+            throw new \Exception(Piwik::translate('EcommerceEnhanced_TransactionsDisabled'));
+        }
+
         $idSite = (int) $idSite;
         $timezone = Site::getTimezoneFor($idSite);
         $range = Period\Factory::build($period, $date, $timezone);
@@ -247,6 +252,10 @@ class API extends \Piwik\Plugin\API
                     $row->renameColumn($record, $metric);
                 }
 
+                if ((int) $row->getColumn(Metrics::UNIQUE_VISITORS) === 0 && (int) $row->getColumn(Metrics::VISITS) > 0) {
+                    $row->deleteColumn(Metrics::UNIQUE_VISITORS);
+                }
+
                 $cartVisits = (int) $row->getColumn(Metrics::CART_VISITS);
                 $convertedVisits = (int) $row->getColumn(Metrics::CONVERTED_VISITS);
                 $row->setColumn(Metrics::CART_ABANDONMENT_RATE, $cartVisits === 0 ? 0 : round(1 - $convertedVisits / $cartVisits, 4));
@@ -316,6 +325,13 @@ class API extends \Piwik\Plugin\API
         }
 
         Cache::deleteCacheWebsiteAttributes($idSite);
+
+        /**
+         * Triggered after the website settings of Ecommerce Enhanced and Premium are saved on their page.
+         *
+         * @param int $idSite
+         */
+        Piwik::postEvent('EcommerceEnhanced.siteSettingsUpdated', [$idSite]);
 
         return true;
     }

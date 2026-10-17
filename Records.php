@@ -62,4 +62,10 @@ class Records
     public const NOT_SET = '(not set)';
 
     public const MAX_ROWS = 500;
+
+    /**
+     * Products, brands, variants and categories: a shop catalog is large, a product often bought but rarely viewed
+     * must not end in "Others".
+     */
+    public const MAX_ITEM_ROWS = 5000;
 }
