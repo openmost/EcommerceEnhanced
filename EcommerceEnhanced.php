@@ -30,6 +30,9 @@ class EcommerceEnhanced extends \Piwik\Plugin
             'Widget.addWidgetConfigs' => 'addPremiumTeasers',
             'AssetManager.getStylesheetFiles' => 'getStylesheetFiles',
             'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
+            'Template.beforeContent' => 'renderOpenmostCommunication',
+            'Template.afterEventsReport' => 'renderOpenmostCommunicationAfterEvents',
+            'Widget.filterWidgets' => 'addOpenmostCommunicationWidgets',
         ];
     }
 
@@ -38,9 +41,12 @@ class EcommerceEnhanced extends \Piwik\Plugin
         (new Schema())->install();
     }
 
+    /**
+     * Uninstalling keeps the data: the tables and the log_conversion columns stay, a later install reuses them.
+     * They are only dropped by hand, see the README.
+     */
     public function uninstall()
     {
-        (new Schema())->uninstall();
     }
 
     /**
@@ -128,5 +134,20 @@ class EcommerceEnhanced extends \Piwik\Plugin
         if ($settings instanceof MeasurableSettings && !empty($idSite)) {
             Cache::deleteCacheWebsiteAttributes($idSite);
         }
+    }
+
+    public function renderOpenmostCommunication(&$out, $layout, $module = '', $action = '')
+    {
+        OpenmostCommunication::beforeContent($out, (string) $layout, (string) $module, (string) $action, $this->getPluginName());
+    }
+
+    public function addOpenmostCommunicationWidgets($list)
+    {
+        OpenmostCommunication::filterWidgets($list, $this->getPluginName());
+    }
+
+    public function renderOpenmostCommunicationAfterEvents(&$out, $dataTable = null)
+    {
+        OpenmostCommunication::afterEventsReport($out, $this->getPluginName());
     }
 }

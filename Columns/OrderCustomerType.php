@@ -26,7 +26,7 @@ class OrderCustomerType extends OrderConversionDimension
     protected $payloadKey = 'customer_type';
     protected $nameSingular = 'EcommerceEnhanced_OrderCustomerType';
     protected $type = self::TYPE_ENUM;
-    protected $acceptValues = 'new, returning';
+    protected $acceptValues = 'new, returning, or empty for orders without customer type';
 
     public function __construct()
     {

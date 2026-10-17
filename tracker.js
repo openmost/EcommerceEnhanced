@@ -1047,18 +1047,6 @@
             return;
         }
 
-        if (name === 'view_item' && data.items.length && tracker.getNumTrackedPageViews && tracker.getNumTrackedPageViews() === 0) {
-            var item = data.items[0];
-            var categories = [];
-            for (var level = 1; level <= 5; level++) {
-                var category = item[level === 1 ? 'item_category' : 'item_category' + level];
-                if (category) {
-                    categories.push(category);
-                }
-            }
-            tracker.setEcommerceView(item.item_id, item.item_name || '', categories.length ? categories : '', item.price === null ? false : item.price);
-        }
-
         sendEvent(tracker, name, data, true);
 
         if (name === 'add_to_cart' || name === 'remove_from_cart') {
@@ -1143,7 +1131,11 @@
             /**
              * Starts reading the dataLayer: entries already pushed are replayed, later pushes are read as they come.
              *
-             * @param {{dataLayerName?: string}} [options]
+             * In Matomo Tag Manager ({tagManager: true}) the container data layer is read instead: it holds the _mtm
+             * pushes, and the dataLayer pushes when the container synchronises the Google Tag Manager data layer.
+             * Reading one source only means a push is never counted twice.
+             *
+             * @param {{dataLayerName?: string, tagManager?: boolean}} [options]
              */
             enable: function (options) {
                 if (configs.enabled) {
@@ -1155,6 +1147,17 @@
                 }
 
                 configs.enabled = true;
+
+                var tagManager = isObject(options) && options.tagManager && window.MatomoTagManager && window.MatomoTagManager.dataLayer;
+                if (tagManager && typeof tagManager.getAllEvents === 'function' && typeof tagManager.on === 'function') {
+                    var events = tagManager.getAllEvents();
+                    for (var e = 0; e < events.length; e++) {
+                        handleEntry(events[e]);
+                    }
+
+                    tagManager.on(handleEntry);
+                    return;
+                }
 
                 var dataLayer = window[configs.dataLayerName] = window[configs.dataLayerName] || [];
                 for (var i = 0; i < dataLayer.length; i++) {

@@ -57,7 +57,7 @@ GA4 ecommerce is the most widely used ecommerce dataLayer format. Most shop plat
 Official GA4 references:
 
 - [Measure ecommerce](https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm)
-- [Recommended events reference](https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag)
+- [Recommended events reference](https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm): every event and parameter Ecommerce Enhanced reads
 
 ## Installation
 
@@ -76,6 +76,17 @@ The tracker replays the ecommerce events already in the dataLayer, then reads ev
 ```js
 _paq.push(['EcommerceEnhanced::enable', {dataLayerName: 'myDataLayer'}]);
 ```
+
+### With Matomo Tag Manager
+
+In your container, edit the "Matomo Configuration" variable, check "Read the GA4 ecommerce dataLayer (Ecommerce Enhanced)" and publish a new version. Also check "Register as default tracker", so ecommerce events reach the Matomo tracker of the container.
+
+Ecommerce events can then be pushed with either syntax:
+
+- `_mtm.push({event: 'purchase', ecommerce: {...}})`, the Matomo Tag Manager data layer, works as is.
+- `dataLayer.push({event: 'purchase', ecommerce: {...}})`, the GA4 syntax most shop extensions emit (recommended): in the container settings, check "Actively synchronise from the Google Tag Manager data layer" and leave "Ignore Google Tag Manager data layer" unchecked. The container then copies every dataLayer push into its own data layer, where Ecommerce Enhanced reads it.
+
+In Tag Manager, Ecommerce Enhanced reads the container data layer only, so a push synchronised from the dataLayer is never counted twice.
 
 ### Without a dataLayer
 
@@ -359,9 +370,11 @@ Every stored field is a segment, also available in Custom Reports:
 
 For example `eeStep==add_to_cart;eeStep!=purchase` selects the visits that added to cart without buying.
 
-## Deactivating the plugin
+## Deactivating and uninstalling the plugin
 
-The native Matomo ecommerce keeps working: carts and orders are always sent as native requests. While the plugin is deactivated its data is kept, but GDPR deletions and the deletion of old raw data no longer cover it. Uninstall the plugin to delete its data.
+The native Matomo ecommerce keeps working: carts and orders are always sent as native requests. While the plugin is deactivated its data is kept, but GDPR deletions and the deletion of old raw data no longer cover it.
+
+Uninstalling the plugin keeps its data as well: the `log_ee_order_item`, `log_ee_event` and `log_ee_event_item` tables and the `ee_*` columns of `log_conversion` stay in the database, and installing the plugin again reuses them. Matomo itself deletes the website settings of a plugin when it is uninstalled. To delete the data for good, drop the three tables and the six `ee_*` columns of `log_conversion` by hand after uninstalling.
 
 ## Large databases
 

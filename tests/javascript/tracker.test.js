@@ -24,7 +24,7 @@ function createStorage() {
     };
 }
 
-function load({pageViews = 1, dataLayer} = {}) {
+function load({pageViews = 1, dataLayer, tagManagerEvents} = {}) {
     const calls = [];
     const plugins = {};
     let pending = null;
@@ -66,6 +66,14 @@ function load({pageViews = 1, dataLayer} = {}) {
         },
     };
     if (dataLayer) window.dataLayer = dataLayer;
+    if (tagManagerEvents) {
+        const callbacks = [];
+        window.MatomoTagManager = {dataLayer: {
+            getAllEvents: () => tagManagerEvents,
+            on: (callback) => callbacks.push(callback),
+            push: (value) => { tagManagerEvents.push(value); callbacks.forEach((callback) => callback(value)); },
+        }};
+    }
     window.window = window;
 
     const context = vm.createContext({window, Matomo: window.Matomo, JSON, Math, Date, Object, String, isFinite, isNaN, parseFloat, encodeURIComponent, decodeURIComponent, setTimeout});
@@ -219,11 +227,11 @@ test('a purchase without transaction id is never sent as an order', () => {
     assert.strictEqual(calls.filter((c) => c[0] === 'order').length, 0);
 });
 
-test('a view_item read before the first page view sets the native product view', () => {
+test('never sets the page level product view, the server adds it to the view_item request only', () => {
     const {ee, calls} = load({pageViews: 0});
     ee.track('view_item', {items: [{item_id: 'A', item_name: 'Lamp', item_category: 'Home/Lights', price: 49}]});
 
-    assert.deepStrictEqual(plain(calls.find((c) => c[0] === 'view')), ['view', 'A', 'Lamp', ['Home', 'Lights'], 49]);
+    assert.strictEqual(calls.filter((c) => c[0] === 'view').length, 0);
 });
 
 test('drops the same push sent twice in a row by two triggers', () => {
@@ -232,4 +240,14 @@ test('drops the same push sent twice in a row by two triggers', () => {
     ee.push({event: 'view_item', ecommerce: {items: [{item_id: 'A'}]}});
 
     assert.strictEqual(calls.filter((c) => c[0] === 'request').length, 1);
+});
+
+test('in Tag Manager, reads the container data layer only, so a synchronised push is not counted twice', () => {
+    const viewItem = {event: 'view_item', ecommerce: {currency: 'EUR', items: [{item_id: 'A', price: 5}]}};
+    const {ee, calls, window} = load({dataLayer: [viewItem], tagManagerEvents: [viewItem]});
+    ee.enable({tagManager: true});
+    window.MatomoTagManager.dataLayer.push({event: 'add_to_wishlist', ecommerce: {currency: 'EUR', items: [{item_id: 'A', price: 5}]}});
+
+    const names = calls.filter((c) => c[0] === 'request').map((c) => c[1].eex_e);
+    assert.deepStrictEqual(names, ['view_item', 'add_to_wishlist']);
 });

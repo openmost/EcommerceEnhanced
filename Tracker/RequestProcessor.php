@@ -100,12 +100,48 @@ class RequestProcessor extends Tracker\RequestProcessor
             throw new InvalidRequestParameterException(sprintf('Invalid non-unique idsite/idorder combination (%d, %s), conversion was not inserted.', $request->getIdSite(), $rawOrderId));
         }
 
+        if ($kind === self::KIND_EVENT) {
+            self::setProductView($request, $type === EventType::VIEW_ITEM ? ($data['items'][0] ?? null) : null);
+        }
+
         $request->setMetadata(self::METADATA, 'request', [
             'kind' => $kind,
             'type' => $type,
             'data' => $data,
             'rawOrderId' => $rawOrderId,
         ]);
+    }
+
+    /**
+     * The native product view is read from the _pk* parameters of any request. The JS tracker keeps the ones of
+     * setEcommerceView for every later request of the page, so an ecommerce step would count a product view each
+     * time. Only view_item carries one, built from its first item; the other steps carry none.
+     *
+     * @param array<string, mixed>|null $item
+     */
+    private static function setProductView(Request $request, ?array $item): void
+    {
+        foreach (['_pks', '_pkn', '_pkc', '_pkp'] as $name) {
+            $request->setParam($name, null);
+        }
+
+        if ($item === null) {
+            return;
+        }
+
+        $categories = [];
+        foreach (['item_category', 'item_category2', 'item_category3', 'item_category4', 'item_category5'] as $key) {
+            if (!empty($item[$key])) {
+                $categories[] = $item[$key];
+            }
+        }
+
+        $request->setParam('_pks', $item['item_id']);
+        $request->setParam('_pkn', (string) ($item['item_name'] ?? ''));
+        $request->setParam('_pkc', empty($categories) ? '' : json_encode($categories));
+        if (isset($item['price'])) {
+            $request->setParam('_pkp', $item['price']);
+        }
     }
 
     public function afterRequestProcessed(VisitProperties $visitProperties, Request $request)

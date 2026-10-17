@@ -39,11 +39,11 @@ class AcquisitionReports extends Base
         $logAggregator = $archiveProcessor->getLogAggregator();
         $table = new DataTable();
 
-        $this->addRows($table, $logAggregator, 'log_visit', $this->getSourceMedium('log_visit'), [
+        $this->addRows($table, $logAggregator, 'log_visit', self::getSourceMediumSql('log_visit'), [
             Metrics::VISITS => 'COUNT(*)',
         ], '1 = 1', [], 'visit_last_action_time');
 
-        $this->addRows($table, $logAggregator, 'log_conversion', $this->getSourceMedium('log_conversion'), [
+        $this->addRows($table, $logAggregator, 'log_conversion', self::getSourceMediumSql('log_conversion'), [
             Metrics::CONVERTED_VISITS => 'COUNT(DISTINCT log_conversion.idvisit)',
             Metrics::ORDERS => 'COUNT(*)',
             Metrics::REVENUE => 'ROUND(SUM(log_conversion.revenue), 2)',
@@ -54,9 +54,9 @@ class AcquisitionReports extends Base
 
     /**
      * SQL label "source / medium". Campaign source and medium come from MarketingCampaignsReporting when it is
-     * installed; without it Matomo only keeps the campaign name, used as the source.
+     * installed; without it Matomo only keeps the campaign name, used as the source. Premium reuses it.
      */
-    private function getSourceMedium(string $logTable): string
+    public static function getSourceMediumSql(string $logTable): string
     {
         $hasCampaignColumns = Manager::getInstance()->isPluginActivated('MarketingCampaignsReporting');
         $campaignSource = $hasCampaignColumns ? "COALESCE(NULLIF({t}.campaign_source, ''), LOWER({t}.referer_name))" : 'LOWER({t}.referer_name)';

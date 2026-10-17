@@ -10,6 +10,7 @@
 namespace Piwik\Plugins\EcommerceEnhanced;
 
 use Piwik\Archive;
+use Piwik\Archive\DataTableFactory;
 use Piwik\DataTable;
 use Piwik\Date;
 use Piwik\Db;
@@ -112,6 +113,9 @@ class API extends \Piwik\Plugin\API
         ];
 
         $table = new DataTable();
+        // As an archived table does, so money is formatted with the site currency
+        $table->setMetadata(DataTableFactory::TABLE_METADATA_SITE_INDEX, new Site($idSite));
+        $table->setMetadata(DataTableFactory::TABLE_METADATA_PERIOD_INDEX, $range);
         foreach (Db::fetchAll($query['sql'], $query['bind']) as $order) {
             $table->addRowFromSimpleArray([
                 'label' => $order['idorder'],

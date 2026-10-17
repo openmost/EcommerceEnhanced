@@ -17,10 +17,10 @@
             if (config.enableEcommerceEnhanced) {
                 var win = parameters.window;
                 if (win.Matomo && win.Matomo.EcommerceEnhanced) {
-                    win.Matomo.EcommerceEnhanced.enable();
+                    win.Matomo.EcommerceEnhanced.enable({tagManager: true});
                 } else {
                     win._paq = win._paq || [];
-                    win._paq.push(['EcommerceEnhanced::enable']);
+                    win._paq.push(['EcommerceEnhanced::enable', {tagManager: true}]);
                 }
             }
 

@@ -113,12 +113,6 @@ class Schema
             INDEX `index_idvisit` (`idvisit`)');
     }
 
-    public function uninstall(): void
-    {
-        foreach (self::getTables() as $table) {
-            Db::query(sprintf('DROP TABLE IF EXISTS `%s`', Common::prefixTable($table)));
-        }
-    }
 
     private function getItemColumnsSql(): string
     {

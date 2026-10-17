@@ -83,6 +83,10 @@ class Precomputed extends ProcessedMetric
             return $formatter->getPrettyMoney($value, Common::getRequestVar('idSite', 0, 'int'));
         }
 
+        if ($this->type === Dimension::TYPE_NUMBER) {
+            return $formatter->getPrettyNumber($value, 2);
+        }
+
         return $formatter->getPrettyPercentFromQuotient($value);
     }
 }

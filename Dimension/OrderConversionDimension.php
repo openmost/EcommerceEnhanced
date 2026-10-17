@@ -45,6 +45,13 @@ abstract class OrderConversionDimension extends ConversionDimension
         }
     }
 
+    /**
+     * Uninstalling the plugin keeps its data: the column stays in log_conversion, a later install reuses it.
+     */
+    public function uninstall()
+    {
+    }
+
     public function onEcommerceOrderConversion(Request $request, Visitor $visitor, $action, GoalManager $goalManager)
     {
         return $this->getValue($request);

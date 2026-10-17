@@ -25,7 +25,7 @@
         "SettingItemCustomParamName": "Parameter name",
         "SettingItemCustomParamsTooMany": "At most %1$s custom item parameters can be recorded.",
         "SettingItemCustomParamsInvalid": "\"%1$s\" is not a valid parameter name: use letters, digits and underscores, starting with a letter, 40 characters at most.",
-        "DeactivatedWarning": "Ecommerce Enhanced is deactivated. Its data is kept, but while the plugin is deactivated, GDPR deletions and the deletion of old raw data no longer cover it. Activate it again, or uninstall it to delete its data.",
+        "DeactivatedWarning": "Ecommerce Enhanced is deactivated. Its data is kept, but while the plugin is deactivated, GDPR deletions and the deletion of old raw data no longer cover it. Activate it again to cover it.",
         "ItemBrand": "Product brand",
         "ItemBrandPlural": "Product brands",
         "ItemVariant": "Product variant",
@@ -128,7 +128,7 @@
         "Step_add_payment_info": "Payment info",
         "Step_purchase": "Purchase",
         "TagManagerOptionTitle": "Read the GA4 ecommerce dataLayer (Ecommerce Enhanced)",
-        "TagManagerOptionDescription": "Records the GA4, gtag and Universal Analytics ecommerce events your shop pushes to window.dataLayer: product views, carts, checkout steps, orders and refunds. The tracker must be registered as the default tracker.",
+        "TagManagerOptionDescription": "Records the GA4, gtag and Universal Analytics ecommerce events pushed to the container data layer (_mtm): product views, carts, checkout steps, orders and refunds. For pushes to window.dataLayer, check \"Actively synchronise from the Google Tag Manager data layer\" in the container settings. The tracker must be registered as the default tracker.",
         "SourceMedium": "Source / medium",
         "SalesBySourceMedium": "Sales by source / medium",
         "SourceMediumDocumentation": "Visits, orders and revenue by source and medium, as in GA4: google / organic, example.com / referral, newsletter / email, (direct) / (none). Campaign source and medium are read from the Marketing Campaigns Reporting plugin when it is installed, otherwise the campaign name is used as the source.",
@@ -203,5 +203,16 @@
         "Transactions": "Transactions",
         "TransactionId": "Transaction",
         "TransactionsDocumentation": "Every order of the period, most recent first, with its revenue, subtotal, tax, shipping, discount and items, and the coupon, payment type, shipping tier, customer type and currency sent with the purchase. At most 500 orders are listed, as in the Ecommerce log."
+    },
+    "OpenmostCommunication": {
+        "Dismiss": "Dismiss",
+        "WidgetName": "Openmost: AI chatbot tracking setup",
+        "AIChatbotsTitle": "Need help setting up AI chatbot tracking?",
+        "AIChatbotsBody": "As an official Matomo Implementation Partner, Openmost can configure AI chatbot tracking for you, on Matomo On-Premise or Cloud.",
+        "AIChatbotsCta": "Get it set up for me",
+        "TrackingPlanTitle": "Events need to be set up manually",
+        "TrackingPlanBody": "Events measure clicks, downloads, form submissions or video plays, once they are tracked. As an official Matomo Implementation Partner, Openmost designs and implements a tracking plan that fits your site.",
+        "TrackingPlanCta": "Build my tracking plan",
+        "EventsEnhancedLink": "Get more out of your events with Events Enhanced"
     }
 }
