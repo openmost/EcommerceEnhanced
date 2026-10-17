@@ -173,7 +173,7 @@ class VisitorDetails extends VisitorDetailsAbstract
             'affiliation' => 'EcommerceEnhanced_OrderAffiliation',
             'customerType' => 'EcommerceEnhanced_OrderCustomerType',
             'leadSource' => 'EcommerceEnhanced_VisitorLogLeadSource',
-            'currency' => 'EcommerceEnhanced_OrderCurrency',
+            'currency' => 'SitesManager_Currency',
         ];
         foreach ($labels as $key => $translationKey) {
             if (isset($detail[$key]) && $detail[$key] !== '') {
@@ -187,7 +187,8 @@ class VisitorDetails extends VisitorDetailsAbstract
                 : Piwik::translate('EcommerceEnhanced_VisitorLogRepeatOrder', [$detail['orderRank']]);
         }
 
-        return [[20, implode("\n", $lines)]];
+        // Matomo appends the entries to the page URL line
+        return [[20, "\n" . implode("\n", $lines)]];
     }
 
     /**
