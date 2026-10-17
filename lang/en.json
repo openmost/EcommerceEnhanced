@@ -173,8 +173,8 @@
         "TeaserAbandonedProductsDescription": "Products left in abandoned carts, with the quantity and the value lost.",
         "TeaserProductProfit": "Product profit and margin",
         "TeaserProductProfitDescription": "Profit and margin by product, brand and category from the cost of goods you send or import.",
-        "TeaserCustomItemParameters": "Custom item parameters",
-        "TeaserCustomItemParametersDescription": "Reports, segments and Custom Reports dimensions for your custom item parameters, such as size, color or stock status.",
+        "TeaserCustomItemParameters": "Reports by item dimension",
+        "TeaserCustomItemParametersDescription": "A report for each of your item dimensions (size, color, stock status...) with the products viewed, added to cart and bought for each value.",
         "TeaserRefunds": "Refunds and net revenue",
         "TeaserRefundsDescription": "Refunded amounts, refund rate by product and net revenue over time, with refunds sent from the dataLayer or from your back office.",
         "TeaserDiscountDepth": "Discount depth",
@@ -208,7 +208,14 @@
         "SettingsPageIntro": "How this website sends its GA4 ecommerce data and how Matomo records it. Changes apply to the data tracked from now on.",
         "SettingsSectionFree": "Collection",
         "SettingsSectionPremium": "Premium reports",
-        "SettingsSaved": "The Ecommerce Enhanced settings have been saved."
+        "SettingsSaved": "The Ecommerce Enhanced settings have been saved.",
+        "ItemScope": "Item",
+        "ItemDimensionExists": "An item dimension named \"%1$s\" already exists.",
+        "ItemDimensionNotFound": "This item dimension does not exist.",
+        "ItemDimensionHowToTitle": "How to send this item dimension",
+        "ItemDimensionHowTo": "Add the parameter to each item of your GA4 ecommerce pushes, with the name of the dimension as key. Ecommerce Enhanced records it for product views, carts, orders and refunds.",
+        "ItemDimensionCreateTitle": "Configure an Item dimension",
+        "ItemDimensionPersonal": "\"%1$s\" looks like personal data (email, phone, name, address, customer...): Ecommerce Enhanced never records such item parameters. Choose another name."
     },
     "OpenmostCommunication": {
         "Dismiss": "Dismiss",
@@ -220,5 +227,10 @@
         "TrackingPlanBody": "Events measure clicks, downloads, form submissions or video plays, once they are tracked. As an official Matomo Implementation Partner, Openmost designs and implements a tracking plan that fits your site.",
         "TrackingPlanCta": "Build my tracking plan",
         "EventsEnhancedLink": "Get more out of your events with Events Enhanced"
+    },
+    "CustomDimensions": {
+        "ScopeTitleItem": "Item Dimensions (Ecommerce Enhanced)",
+        "ScopeDescriptionItem": "Custom Dimensions in scope 'Item' are custom parameters of the products in your GA4 ecommerce dataLayer, such as size, color or stock status, recorded by Ecommerce Enhanced for each product viewed, added to cart, bought and refunded.",
+        "ScopeDescriptionItemMoreInfo": "The name of the dimension is the parameter key in your items. Renaming a dimension keeps the values recorded before, deactivating it stops recording new values."
     }
 }

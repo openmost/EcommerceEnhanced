@@ -25,6 +25,12 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
     public MeasurableSetting $nonInteractionTypes;
     public MeasurableSetting $couponStorage;
     public MeasurableSetting $itemCustomParams;
+    public MeasurableSetting $itemCustomParamMeta;
+
+    /**
+     * Settings edited as the "Item" scope of the Custom Dimensions page, not on the settings page.
+     */
+    public const ITEM_DIMENSION_SETTINGS = ['item_custom_params', 'item_custom_param_meta'];
 
     protected function init()
     {
@@ -94,7 +100,41 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
             };
         });
 
+        // slot => {description, active}, JSON so the names list keeps the format the tracker cache reads
+        $this->itemCustomParamMeta = $this->makeSetting('item_custom_param_meta', '{}', FieldConfig::TYPE_STRING, function (FieldConfig $field) {
+            $field->title = Piwik::translate('EcommerceEnhanced_SettingItemCustomParams');
+            $field->uiControl = FieldConfig::UI_CONTROL_TEXT;
+        });
+
         SettingsPage::applyVisibility($this, (int) $this->idSite);
+    }
+
+    /**
+     * Every custom item parameter, active or not, as shown in the "Item" scope of Custom Dimensions.
+     *
+     * @return array<int, array{slot: int, name: string, description: string, active: bool}>
+     */
+    public function getItemDimensions(): array
+    {
+        $meta = json_decode((string) $this->itemCustomParamMeta->getValue(), true);
+        $meta = is_array($meta) ? $meta : [];
+
+        $dimensions = [];
+        foreach (array_values((array) $this->itemCustomParams->getValue()) as $index => $name) {
+            if ($index >= Payload::MAX_CUSTOM_PARAMS || !is_string($name) || $name === '') {
+                continue;
+            }
+
+            $slot = $index + 1;
+            $dimensions[] = [
+                'slot' => $slot,
+                'name' => $name,
+                'description' => (string) ($meta[$slot]['description'] ?? ''),
+                'active' => (bool) ($meta[$slot]['active'] ?? true),
+            ];
+        }
+
+        return $dimensions;
     }
 
     /**
@@ -106,9 +146,9 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
     public function getItemCustomParamSlots(): array
     {
         $slots = [];
-        foreach (array_values((array) $this->itemCustomParams->getValue()) as $index => $name) {
-            if ($index < Payload::MAX_CUSTOM_PARAMS && is_string($name) && $name !== '') {
-                $slots[$name] = $index + 1;
+        foreach ($this->getItemDimensions() as $dimension) {
+            if ($dimension['active']) {
+                $slots[$dimension['name']] = $dimension['slot'];
             }
         }
 

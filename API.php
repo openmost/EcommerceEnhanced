@@ -321,6 +321,40 @@ class API extends \Piwik\Plugin\API
     }
 
     /**
+     * Adds a custom item parameter, the "Item" scope of the Custom Dimensions page. Its name is the parameter key
+     * in the items of the dataLayer.
+     *
+     * @return int id of the item dimension in the Custom Dimensions page
+     */
+    public function addItemDimension($idSite, $name, $description = '', $active = '1')
+    {
+        return ItemDimensions::create((int) $idSite, (string) $name, (string) $description, self::toBool($active));
+    }
+
+    /**
+     * Renames, describes, activates or deactivates a custom item parameter. Renaming keeps the values recorded
+     * before, deactivating stops recording new ones.
+     */
+    public function updateItemDimension($idSite, $idDimension, $name, $description = null, $active = '1')
+    {
+        if (!ItemDimensions::isItemDimensionId($idDimension)) {
+            throw new \Exception(Piwik::translate('EcommerceEnhanced_ItemDimensionNotFound'));
+        }
+
+        ItemDimensions::update((int) $idSite, (int) $idDimension - ItemDimensions::ID_OFFSET, (string) $name, $description, self::toBool($active));
+
+        return true;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private static function toBool($value): bool
+    {
+        return !in_array($value, [false, 0, '0', 'false', ''], true);
+    }
+
+    /**
      * @return DataTable|DataTable\Map
      */
     private function getRecord(string $record, $idSite, $period, $date, $segment)

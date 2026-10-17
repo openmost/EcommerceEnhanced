@@ -15,25 +15,30 @@ use Piwik\Settings\Measurable\MeasurableSettings as BaseMeasurableSettings;
 
 /**
  * The website settings of Ecommerce Enhanced, and of Premium when activated, are edited on their own page under
- * Websites in the administration, not in the website form: they are only writable while this page loads them.
+ * Websites in the administration, the custom item parameters as the "Item" scope of Custom Dimensions. None of them
+ * appears in the website form: a setting is only writable while one of these two pages loads it.
  */
 class SettingsPage
 {
     public const PREMIUM_SETTINGS_CLASS = 'Piwik\Plugins\EcommerceEnhancedPremium\MeasurableSettings';
 
-    /**
-     * @var bool
-     */
-    private static $editing = false;
+    private const MODE_PAGE = 'page';
+    private const MODE_ITEM_DIMENSIONS = 'item_dimensions';
 
     /**
-     * Called at the end of init() by each settings class: hidden from the website form, writable on this page.
+     * @var string|null
+     */
+    private static $mode = null;
+
+    /**
+     * Called at the end of init() by each settings class.
      */
     public static function applyVisibility(BaseMeasurableSettings $settings, int $idSite): void
     {
-        $writable = self::$editing && !empty($idSite) && Piwik::isUserHasAdminAccess($idSite);
+        $isAdmin = self::$mode !== null && !empty($idSite) && Piwik::isUserHasAdminAccess($idSite);
         foreach ($settings->getSettingsWritableByCurrentUser() as $setting) {
-            $setting->setIsWritableByCurrentUser($writable);
+            $isItemDimension = in_array($setting->getName(), MeasurableSettings::ITEM_DIMENSION_SETTINGS, true);
+            $setting->setIsWritableByCurrentUser($isAdmin && self::$mode === ($isItemDimension ? self::MODE_ITEM_DIMENSIONS : self::MODE_PAGE));
         }
     }
 
@@ -42,17 +47,37 @@ class SettingsPage
      */
     public static function load(int $idSite): array
     {
-        self::$editing = true;
-        try {
+        return self::withMode(self::MODE_PAGE, function () use ($idSite) {
             $sections = ['EcommerceEnhanced' => new MeasurableSettings($idSite)];
             if (Manager::getInstance()->isPluginActivated(PremiumTeasers::PREMIUM_PLUGIN) && class_exists(self::PREMIUM_SETTINGS_CLASS)) {
                 $class = self::PREMIUM_SETTINGS_CLASS;
                 $sections[PremiumTeasers::PREMIUM_PLUGIN] = new $class($idSite);
             }
-        } finally {
-            self::$editing = false;
-        }
 
-        return $sections;
+            return $sections;
+        });
+    }
+
+    /**
+     * The settings with only the custom item parameters writable, for the "Item" scope of Custom Dimensions.
+     */
+    public static function loadItemDimensions(int $idSite): MeasurableSettings
+    {
+        return self::withMode(self::MODE_ITEM_DIMENSIONS, function () use ($idSite) {
+            return new MeasurableSettings($idSite);
+        });
+    }
+
+    /**
+     * @return mixed
+     */
+    private static function withMode(string $mode, callable $build)
+    {
+        self::$mode = $mode;
+        try {
+            return $build();
+        } finally {
+            self::$mode = null;
+        }
     }
 }

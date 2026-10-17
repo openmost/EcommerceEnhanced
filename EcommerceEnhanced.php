@@ -29,6 +29,9 @@ class EcommerceEnhanced extends \Piwik\Plugin
             'TagManager.filterVariables' => 'replaceMatomoConfigurationVariable',
             'Widget.addWidgetConfigs' => 'addPremiumTeasers',
             'AssetManager.getStylesheetFiles' => 'getStylesheetFiles',
+            'AssetManager.getJavaScriptFiles' => 'getJavaScriptFiles',
+            'API.CustomDimensions.getAvailableScopes.end' => 'addItemDimensionScope',
+            'API.CustomDimensions.getConfiguredCustomDimensions.end' => 'addItemDimensions',
             'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
             'Template.beforeContent' => 'renderOpenmostCommunication',
             'Template.afterEventsReport' => 'renderOpenmostCommunicationAfterEvents',
@@ -122,6 +125,14 @@ class EcommerceEnhanced extends \Piwik\Plugin
     }
 
     /**
+     * @param string[] $jsFiles
+     */
+    public function getJavaScriptFiles(&$jsFiles)
+    {
+        $jsFiles[] = 'plugins/EcommerceEnhanced/javascripts/itemDimensions.js';
+    }
+
+    /**
      * @param string[] $translationKeys
      */
     public function getClientSideTranslationKeys(&$translationKeys)
@@ -134,6 +145,12 @@ class EcommerceEnhanced extends \Piwik\Plugin
         $translationKeys[] = 'EcommerceEnhanced_SettingsSaved';
         $translationKeys[] = 'EcommerceEnhanced_PremiumLinkText';
         $translationKeys[] = 'EcommerceEnhanced_PremiumText';
+        $translationKeys[] = 'EcommerceEnhanced_ItemDimensionHowToTitle';
+        $translationKeys[] = 'EcommerceEnhanced_ItemDimensionCreateTitle';
+        $translationKeys[] = 'EcommerceEnhanced_ItemDimensionHowTo';
+        $translationKeys[] = 'CustomDimensions_ScopeTitleItem';
+        $translationKeys[] = 'CustomDimensions_ScopeDescriptionItem';
+        $translationKeys[] = 'CustomDimensions_ScopeDescriptionItemMoreInfo';
     }
 
     public function onMeasurableSettingsUpdated($settings, $idSite)
@@ -157,4 +174,15 @@ class EcommerceEnhanced extends \Piwik\Plugin
     {
         OpenmostCommunication::afterEventsReport($out, $this->getPluginName());
     }
+
+    public function addItemDimensionScope(&$scopes, $info)
+    {
+        ItemDimensions::addScope($scopes, $info);
+    }
+
+    public function addItemDimensions(&$dimensions, $info)
+    {
+        ItemDimensions::addDimensions($dimensions, $info);
+    }
+
 }
