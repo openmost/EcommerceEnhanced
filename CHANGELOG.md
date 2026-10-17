@@ -10,6 +10,8 @@
 - Website settings on their own page, Administration, Websites, Ecommerce Enhanced.
 - Personal data: `user_data` is never read, emails and phone numbers are dropped from search terms and lead fields, coupon codes are hashed unless the website stores them as sent, item dimensions only record what the site owner created.
 - Uninstalling keeps the data.
+- Translated into 12 languages.
+- Tests: unit (tracker, payload) and archiving integration tests, `./console tests:run plugins/EcommerceEnhanced`.
 
 Development notes:
 - `tracker.min.js` is the file Matomo merges into `matomo.js`. Rebuild it after any change to `tracker.js`, from the Matomo directory: `node_modules/.bin/terser plugins/EcommerceEnhanced/tracker.js -c -m --comments false -o plugins/EcommerceEnhanced/tracker.min.js`, then add the license line back at the top and run the JS tests on it: `TRACKER_FILE=tracker.min.js node --test plugins/EcommerceEnhanced/tests/javascript/`.
