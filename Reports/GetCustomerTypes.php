@@ -34,7 +34,7 @@ class GetCustomerTypes extends Base
         $this->name = Piwik::translate('EcommerceEnhanced_OrderCustomerTypePlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_CustomerTypesDocumentation');
         $this->subcategoryId = 'EcommerceEnhanced_Customers';
-        $this->order = 3;
+        $this->order = 6;
         $this->defaultView = Pie::ID;
         $this->dimension = new OrderCustomerType();
     }
