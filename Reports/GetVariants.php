@@ -37,7 +37,8 @@ class GetVariants extends Base
         $this->action = 'getVariants';
         $this->name = Piwik::translate('EcommerceEnhanced_ItemVariantPlural');
         $this->documentation = Piwik::translate('EcommerceEnhanced_VariantsDocumentation');
-        $this->subcategoryId = 'EcommerceEnhanced_Merchandising';
+        $this->subcategoryId = 'Goals_Products';
         $this->order = 4;
+        $this->inProductsSwitcher = true;
     }
 }
