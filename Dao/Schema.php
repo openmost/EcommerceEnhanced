@@ -12,6 +12,8 @@ namespace Piwik\Plugins\EcommerceEnhanced\Dao;
 use Piwik\Common;
 use Piwik\Db;
 use Piwik\DbHelper;
+use Piwik\Option;
+use Piwik\Plugins\EcommerceEnhanced\Tracker\Payload;
 
 /**
  * Own tables of the plugin. Native ecommerce tables are never altered, the only change to a core table is the
@@ -23,7 +25,24 @@ class Schema
     public const TABLE_EVENT = 'log_ee_event';
     public const TABLE_EVENT_ITEM = 'log_ee_event_item';
 
-    public const CUSTOM_SLOTS = 10;
+    /**
+     * Item dimension columns (custom1, custom2...) created at install. More are added from the command line with
+     * customdimensions:add-custom-dimension --scope=item (Commands/AddCustomDimension), as for the visit and action
+     * scopes: altering the item tables can take long.
+     */
+    public const DEFAULT_CUSTOM_SLOTS = 10;
+
+    /**
+     * The tracker reads 30 extra item fields at most, a slot past them would never get a value.
+     */
+    public const MAX_CUSTOM_SLOTS = Payload::MAX_RECEIVED_CUSTOM_PARAMS;
+
+    private const OPTION_CUSTOM_SLOTS = 'EcommerceEnhanced_itemDimensionSlots';
+
+    /**
+     * Tables holding an item dimension column per slot.
+     */
+    private const CUSTOM_SLOT_TABLES = [self::TABLE_ORDER_ITEM, self::TABLE_EVENT_ITEM];
 
     /**
      * Columns referencing log_action, declared to the unused action purge.
@@ -37,6 +56,43 @@ class Schema
         'idaction_category4',
         'idaction_category5',
     ];
+
+    /**
+     * Number of item dimension columns installed, read on every tracking request: the option is autoloaded.
+     */
+    public static function getCustomSlots(): int
+    {
+        $slots = Option::get(self::OPTION_CUSTOM_SLOTS);
+
+        return $slots === false ? self::DEFAULT_CUSTOM_SLOTS : (int) $slots;
+    }
+
+    /**
+     * Adds item dimension columns to the item tables, a schema change that may take long on a large database.
+     *
+     * @return int the number of slots now available
+     */
+    public function addCustomSlots(int $count): int
+    {
+        $current = self::getCustomSlots();
+        $target = $current + $count;
+        if ($count < 1 || $target > self::MAX_CUSTOM_SLOTS) {
+            throw new \InvalidArgumentException(sprintf('Between 1 and %d item dimensions can be added, %d are installed out of %d.', self::MAX_CUSTOM_SLOTS - $current, $current, self::MAX_CUSTOM_SLOTS));
+        }
+
+        foreach (self::CUSTOM_SLOT_TABLES as $table) {
+            $columns = [];
+            for ($slot = $current + 1; $slot <= $target; $slot++) {
+                $columns[] = sprintf('ADD COLUMN `custom%d` VARCHAR(100) NULL', $slot);
+            }
+
+            Db::exec(sprintf('ALTER TABLE %s %s', Common::prefixTable($table), implode(', ', $columns)));
+        }
+
+        Option::set(self::OPTION_CUSTOM_SLOTS, $target, 1);
+
+        return $target;
+    }
 
     public static function getTables(): array
     {
@@ -143,7 +199,7 @@ class Schema
             '`creative_slot` VARCHAR(100) NULL',
         ];
 
-        for ($slot = 1; $slot <= self::CUSTOM_SLOTS; $slot++) {
+        for ($slot = 1; $slot <= self::getCustomSlots(); $slot++) {
             $columns[] = sprintf('`custom%d` VARCHAR(100) NULL', $slot);
         }
 

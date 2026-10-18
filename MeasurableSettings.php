@@ -10,7 +10,7 @@
 namespace Piwik\Plugins\EcommerceEnhanced;
 
 use Piwik\Piwik;
-use Piwik\Plugins\EcommerceEnhanced\Tracker\Payload;
+use Piwik\Plugins\EcommerceEnhanced\Dao\Schema;
 use Piwik\Settings\FieldConfig;
 use Piwik\Settings\Measurable\MeasurableSetting;
 
@@ -65,7 +65,7 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
 
         $this->itemCustomParams = $this->makeSetting('item_custom_params', [], FieldConfig::TYPE_ARRAY, function (FieldConfig $field) {
             $field->title = Piwik::translate('EcommerceEnhanced_SettingItemCustomParams');
-            $field->inlineHelp = Piwik::translate('EcommerceEnhanced_SettingItemCustomParamsHelp', [Payload::MAX_CUSTOM_PARAMS]);
+            $field->inlineHelp = Piwik::translate('EcommerceEnhanced_SettingItemCustomParamsHelp', [Schema::getCustomSlots()]);
             $field->uiControl = FieldConfig::UI_CONTROL_FIELD_ARRAY;
             $arrayField = new FieldConfig\ArrayField(Piwik::translate('EcommerceEnhanced_SettingItemCustomParamName'), FieldConfig::UI_CONTROL_TEXT);
             $field->uiControlAttributes['field'] = $arrayField->toArray();
@@ -82,8 +82,8 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
             };
             $field->validate = function ($value) {
                 $names = array_filter(array_map('trim', (array) $value), 'strlen');
-                if (count($names) > Payload::MAX_CUSTOM_PARAMS) {
-                    throw new \Exception(Piwik::translate('EcommerceEnhanced_SettingItemCustomParamsTooMany', [Payload::MAX_CUSTOM_PARAMS]));
+                if (count($names) > Schema::getCustomSlots()) {
+                    throw new \Exception(Piwik::translate('EcommerceEnhanced_SettingItemCustomParamsTooMany', [Schema::getCustomSlots()]));
                 }
 
                 foreach ($names as $name) {
@@ -94,7 +94,7 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
             };
         });
 
-        // slot => {description, active}, JSON so the names list keeps the format the tracker cache reads
+        // slot => {label, description, active}, JSON so the dataLayer keys list keeps the format the tracker cache reads
         $this->itemCustomParamMeta = $this->makeSetting('item_custom_param_meta', '{}', FieldConfig::TYPE_STRING, function (FieldConfig $field) {
             $field->title = Piwik::translate('EcommerceEnhanced_SettingItemCustomParams');
             $field->uiControl = FieldConfig::UI_CONTROL_TEXT;
@@ -104,9 +104,10 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
     }
 
     /**
-     * Every custom item parameter, active or not, as shown in the "Item" scope of Custom Dimensions.
+     * Every custom item parameter, active or not, as shown in the "Item" scope of Custom Dimensions: the name
+     * displayed in reports, free text, and the dataLayer key the tracker reads, which never changes with the name.
      *
-     * @return array<int, array{slot: int, name: string, description: string, active: bool}>
+     * @return array<int, array{slot: int, name: string, parameter: string, description: string, active: bool}>
      */
     public function getItemDimensions(): array
     {
@@ -114,15 +115,17 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
         $meta = is_array($meta) ? $meta : [];
 
         $dimensions = [];
-        foreach (array_values((array) $this->itemCustomParams->getValue()) as $index => $name) {
-            if ($index >= Payload::MAX_CUSTOM_PARAMS || !is_string($name) || $name === '') {
+        foreach (array_values((array) $this->itemCustomParams->getValue()) as $index => $parameter) {
+            if ($index >= Schema::getCustomSlots() || !is_string($parameter) || $parameter === '') {
                 continue;
             }
 
             $slot = $index + 1;
+            $label = trim((string) ($meta[$slot]['label'] ?? ''));
             $dimensions[] = [
                 'slot' => $slot,
-                'name' => $name,
+                'name' => $label === '' ? $parameter : $label,
+                'parameter' => $parameter,
                 'description' => (string) ($meta[$slot]['description'] ?? ''),
                 'active' => (bool) ($meta[$slot]['active'] ?? true),
             ];
@@ -132,8 +135,8 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
     }
 
     /**
-     * Custom item parameter names mapped to their storage slot (1 based). The slot is the position in the list,
-     * so names must only be appended: reordering would give stored values another meaning.
+     * Custom item parameter dataLayer keys mapped to their storage slot (1 based). The slot is the position in the
+     * list, so keys must only be appended: reordering would give stored values another meaning.
      *
      * @return array<string, int>
      */
@@ -142,7 +145,7 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
         $slots = [];
         foreach ($this->getItemDimensions() as $dimension) {
             if ($dimension['active']) {
-                $slots[$dimension['name']] = $dimension['slot'];
+                $slots[$dimension['parameter']] = $dimension['slot'];
             }
         }
 

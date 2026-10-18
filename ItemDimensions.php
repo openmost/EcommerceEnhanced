@@ -11,13 +11,15 @@ namespace Piwik\Plugins\EcommerceEnhanced;
 
 use Piwik\API\Request;
 use Piwik\Piwik;
-use Piwik\Plugins\EcommerceEnhanced\Tracker\Payload;
+use Piwik\Plugins\EcommerceEnhanced\Dao\Schema;
 use Piwik\Site;
 use Piwik\Tracker\Cache;
 
 /**
  * The custom item parameters (size, color, stock status...) are managed as a third "Item" scope of the Custom
- * Dimensions page. The scope is added to what the page reads, its form posts to EcommerceEnhanced.addItemDimension
+ * Dimensions page, a Premium feature: without Premium the scope and its dimensions are shown locked, they can be seen
+ * but not created nor edited. Each one has a dataLayer key, set when it is created, and a name displayed in
+ * the reports, edited as the name of any Custom Dimension. The scope is added to what the page reads, its form posts to EcommerceEnhanced.addItemDimension
  * and updateItemDimension (see javascripts/itemDimensions.js), saved to the website settings: Custom Dimensions
  * and the plugins listening to it never see an item dimension. Only the page sees the scope: the other readers of the configured
  * dimensions (report menus, MCP...) call the API internally and get the core dimensions only.
@@ -31,10 +33,15 @@ class ItemDimensions
      */
     public const ID_OFFSET = 900000;
 
+    public static function isAvailable(): bool
+    {
+        return PremiumTeasers::isPremiumActivated();
+    }
+
 
     public static function isItemDimensionId($idDimension): bool
     {
-        return is_numeric($idDimension) && (int) $idDimension > self::ID_OFFSET && (int) $idDimension <= self::ID_OFFSET + Payload::MAX_CUSTOM_PARAMS;
+        return is_numeric($idDimension) && (int) $idDimension > self::ID_OFFSET && (int) $idDimension <= self::ID_OFFSET + Schema::MAX_CUSTOM_SLOTS;
     }
 
     /**
@@ -52,9 +59,9 @@ class ItemDimensions
         $scopes[] = [
             'value' => self::SCOPE,
             'name' => Piwik::translate('EcommerceEnhanced_ItemScope'),
-            'numSlotsAvailable' => Payload::MAX_CUSTOM_PARAMS,
+            'numSlotsAvailable' => Schema::getCustomSlots(),
             'numSlotsUsed' => $used,
-            'numSlotsLeft' => Payload::MAX_CUSTOM_PARAMS - $used,
+            'numSlotsLeft' => max(0, Schema::getCustomSlots() - $used),
             'supportsExtractions' => false,
         ];
     }
@@ -75,6 +82,7 @@ class ItemDimensions
                 'idcustomdimension' => self::ID_OFFSET + $dimension['slot'],
                 'idsite' => $idSite,
                 'name' => $dimension['name'],
+                'item_parameter' => $dimension['parameter'],
                 'description' => $dimension['description'],
                 'index' => $dimension['slot'],
                 'scope' => self::SCOPE,
@@ -85,21 +93,25 @@ class ItemDimensions
         }
     }
 
-    public static function create(int $idSite, string $name, string $description, bool $active): int
+    /**
+     * @param string $parameter the dataLayer key, the name when empty and a valid key, as before names were free
+     */
+    public static function create(int $idSite, string $name, string $parameter, string $description, bool $active): int
     {
         Piwik::checkUserHasAdminAccess($idSite);
+        self::checkIsAvailable();
 
         $settings = SettingsPage::loadItemDimensions($idSite);
-        $names = array_column($settings->getItemDimensions(), 'name');
-        if (count($names) >= Payload::MAX_CUSTOM_PARAMS) {
-            throw new \Exception(Piwik::translate('EcommerceEnhanced_SettingItemCustomParamsTooMany', [Payload::MAX_CUSTOM_PARAMS]));
+        $parameters = array_column($settings->getItemDimensions(), 'parameter');
+        if (count($parameters) >= Schema::getCustomSlots()) {
+            throw new \Exception(Piwik::translate('EcommerceEnhanced_SettingItemCustomParamsTooMany', [Schema::getCustomSlots()]));
         }
 
-        $name = self::validateName($name, $names);
-        $names[] = $name;
-        $slot = count($names);
+        $parameter = self::validateParameter(trim($parameter) === '' ? $name : $parameter, $parameters);
+        $parameters[] = $parameter;
+        $slot = count($parameters);
 
-        self::save($idSite, $settings, $names, $slot, $description, $active);
+        self::save($idSite, $settings, $parameters, $slot, self::validateName($name), $description, $active);
 
         /**
          * Triggered when an item dimension is added, so reports built on it can archive the past periods: the
@@ -114,60 +126,83 @@ class ItemDimensions
     }
 
     /**
-     * Renaming keeps the slot, so the values recorded before stay with the dimension, as for a Custom Dimension.
+     * Renaming changes the name displayed only, the dataLayer key stays unless a new one is given. Either way the
+     * slot is kept, so the values recorded before stay with the dimension, as for a Custom Dimension.
      *
      * @param string|null $description null keeps the current one
+     * @param string|null $parameter null or empty keeps the current dataLayer key
      */
-    public static function update(int $idSite, int $slot, string $name, $description, bool $active): void
+    public static function update(int $idSite, int $slot, string $name, $description, bool $active, $parameter = null): void
     {
         Piwik::checkUserHasAdminAccess($idSite);
+        self::checkIsAvailable();
 
         $settings = SettingsPage::loadItemDimensions($idSite);
         $dimensions = $settings->getItemDimensions();
-        $names = array_column($dimensions, 'name');
-        if (!isset($names[$slot - 1])) {
+        $parameters = array_column($dimensions, 'parameter');
+        if (!isset($parameters[$slot - 1])) {
             throw new \Exception(Piwik::translate('EcommerceEnhanced_ItemDimensionNotFound'));
         }
 
-        $others = $names;
-        unset($others[$slot - 1]);
-        $names[$slot - 1] = self::validateName($name, array_values($others));
+        if ($parameter !== null && trim((string) $parameter) !== '') {
+            $others = $parameters;
+            unset($others[$slot - 1]);
+            $parameters[$slot - 1] = self::validateParameter((string) $parameter, array_values($others));
+        }
+
         $description = $description === null ? $dimensions[$slot - 1]['description'] : (string) $description;
 
-        self::save($idSite, $settings, $names, $slot, $description, $active);
+        self::save($idSite, $settings, $parameters, $slot, self::validateName($name), $description, $active);
     }
 
     /**
-     * @param string[] $names
+     * @param string[] $parameters dataLayer keys by slot
      */
-    private static function save(int $idSite, MeasurableSettings $settings, array $names, int $slot, string $description, bool $active): void
+    private static function save(int $idSite, MeasurableSettings $settings, array $parameters, int $slot, string $name, string $description, bool $active): void
     {
         $meta = json_decode((string) $settings->itemCustomParamMeta->getValue(), true);
         $meta = is_array($meta) ? $meta : [];
-        $meta[$slot] = ['description' => mb_substr(trim($description), 0, 255), 'active' => $active];
+        $meta[$slot] = ['label' => $name, 'description' => mb_substr(trim($description), 0, 255), 'active' => $active];
 
-        $settings->itemCustomParams->setValue($names);
+        $settings->itemCustomParams->setValue($parameters);
         $settings->itemCustomParamMeta->setValue(json_encode($meta));
         $settings->save();
 
         Cache::deleteCacheWebsiteAttributes($idSite);
     }
 
-    /**
-     * @param string[] $otherNames
-     */
-    private static function validateName(string $name, array $otherNames): string
+    private static function validateName(string $name): string
     {
         $name = trim($name);
-        if (!preg_match('/^[A-Za-z][A-Za-z0-9_]{0,39}$/', $name)) {
-            throw new \Exception(Piwik::translate('EcommerceEnhanced_SettingItemCustomParamsInvalid', [$name]));
-        }
-
-        if (in_array($name, $otherNames, true)) {
-            throw new \Exception(Piwik::translate('EcommerceEnhanced_ItemDimensionExists', [$name]));
+        if ($name === '' || mb_strlen($name) > 100) {
+            throw new \Exception(Piwik::translate('EcommerceEnhanced_ItemDimensionNameInvalid'));
         }
 
         return $name;
+    }
+
+    /**
+     * @param string[] $otherParameters
+     */
+    private static function validateParameter(string $parameter, array $otherParameters): string
+    {
+        $parameter = trim($parameter);
+        if (!preg_match('/^[A-Za-z][A-Za-z0-9_]{0,39}$/', $parameter)) {
+            throw new \Exception(Piwik::translate('EcommerceEnhanced_SettingItemCustomParamsInvalid', [$parameter]));
+        }
+
+        if (in_array($parameter, $otherParameters, true)) {
+            throw new \Exception(Piwik::translate('EcommerceEnhanced_ItemDimensionExists', [$parameter]));
+        }
+
+        return $parameter;
+    }
+
+    private static function checkIsAvailable(): void
+    {
+        if (!self::isAvailable()) {
+            throw new \Exception(Piwik::translate('EcommerceEnhanced_PremiumDimensionInCustomReport'));
+        }
     }
 
     /**
