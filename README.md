@@ -14,9 +14,9 @@ One line in your tracking code, or one checkbox in Matomo Tag Manager, and it wo
 
 - Reads GA4 dataLayer pushes, `gtag()` calls and legacy Universal Analytics Enhanced Ecommerce, from any CMS or extension (GTM4WP, Google Analytics for WooCommerce, Shopify, Magento, PrestaShop, Elevar, Stape...).
 - Works without Tag Manager (`_paq.push(['EcommerceEnhanced::enable'])`), with a checkbox in the Matomo Tag Manager "Matomo Configuration" variable, or from JavaScript with `_paq.push(['EcommerceEnhanced::track', ...])`.
-- Every GA4 ecommerce event: item list views and clicks, product views, wishlist, adds and removals from cart, cart views, checkout, shipping and payment steps, purchases, refunds, promotion views and clicks, product searches and leads.
+- Every GA4 ecommerce event: item list views and clicks, product views, wishlist, adds and removals from cart, cart views, checkout, shipping and payment steps, purchases, refunds, promotion views and clicks.
 - Native Matomo carts and orders are still sent, so the Ecommerce reports, goals and abandoned carts you know keep working, even if you deactivate the plugin.
-- Variants kept apart, even when they share a SKU, with brand, list, promotion, coupon, discount and up to 10 item dimensions per product line (size, color, stock status...), managed as an "Item" scope next to the visit and action scopes of Custom Dimensions.
+- Variants kept apart, even when they share a SKU, with brand, list, promotion, coupon and discount per product line.
 - Item lists and promotions remembered from the click to the order, as GA4 attributes them.
 - Duplicate orders blocked, even when the confirmation page is reloaded or order ids are anonymised.
 - Privacy by design: emails, phone numbers, addresses and hashed identifiers are never read, coupon codes can be hashed or skipped.
@@ -24,20 +24,19 @@ One line in your tracking code, or one checkbox in Matomo Tag Manager, and it wo
 **Reports GA4 users expect**
 
 - Shopping behavior and checkout behavior funnels, with step and abandonment rates, without the Funnels plugin.
-- Product performance, brands, variants and product categories: views, adds to cart, purchases, item revenue, cart to view and purchase to view rates.
+- Product performance, and Product Categories, Product Brands and Product Variants in the dimension switcher of the native Products report, next to Product Name, SKU and Category: views, adds to cart, purchases, item revenue, cart to view and purchase to view rates.
 - Item lists and promotions: views, clicks, click rate, and the items added to cart and bought after them.
-- Product search terms: what visitors searched and what they viewed, added and bought next.
 - Order details: orders, revenue and average order value by coupon, payment type, shipping tier, customer type (new or returning), affiliation and currency.
 - Transactions: every order with its revenue, tax, shipping, items, coupon, payment and shipping choices.
 - Sales by source / medium, the way GA4 shows it: `google / organic`, `newsletter / email`, `(direct) / (none)`.
 - Buyers and revenue: purchasers, first time purchasers, revenue per user (ARPU) and per paying user (ARPPU), average order value and items per order, conversion rate and cart abandonment rate.
 - Every step also appears in the Events report (category "Ecommerce"), with viewing steps kept out of the bounce rate, as in GA4.
-- The visitor log shows the detail of each step: products, list, promotion, search term, coupon, payment, shipping and order rank of the customer.
-- One click creates the GA4 sales, shopping and checkout funnels in the Funnels plugin, when it is activated.
+- The visitor log shows the detail of each step: products, list, promotion, coupon, payment, shipping and order rank of the customer.
+- One click creates the funnels of the Funnels plugin, when it is activated: the sales funnel of the ecommerce orders, and the Purchase journey and Checkout journey of GA4.
 
 **Native Matomo integration**
 
-- 24 new segments (`eeItemBrand`, `eeOrderCoupon`, `eeStep`, `eePromotionName`...), for example "visits that added to cart without buying": `eeStep==add_to_cart;eeStep!=purchase`.
+- 23 new segments (`eeItemBrand`, `eeOrderCoupon`, `eeStep`, `eePromotionName`...), for example "visits that added to cart without buying": `eeStep==add_to_cart;eeStep!=purchase`.
 - Every field available in Custom Reports, the segment editor, the API, scheduled reports and dashboards.
 - GDPR tools (data subject export and deletion) and the deletion of old raw data cover every stored row.
 
@@ -46,10 +45,11 @@ One line in your tracking code, or one checkbox in Matomo Tag Manager, and it wo
 Every Premium report is visible in the free edition with a preview, so you know what you get. Premium shows them with your data, from the data already collected: no new tracking, no history lost, no report to rebuild.
 
 - **Active users and buyers (Premium):** 1, 7 and 30 day active users and buyers (DAU, WAU, MAU) and the DAU / MAU stickiness ratio.
-- **Customers (Premium):** repeat purchase rate, time between purchases, retention cohorts by first purchase month as a heatmap, customer lifetime value and RFM segments.
+- **Customers (Premium):** repeat purchase rate, time between purchases, retention cohorts by day, week or month of the first purchase as a heatmap, customer lifetime value and RFM segments.
 - **Acquisition (Premium):** sales by first user source, time and visits from the first visit to the first purchase, abandoned carts by channel.
-- **Shopping behavior (Premium):** the shopping and checkout funnels split by device and by channel, and the lead pipeline from `generate_lead` to `close_convert_lead`.
-- **Merchandising (Premium):** products bought together (market basket analysis), most abandoned products, product profit and margin from your cost of goods, a report, a segment and a Custom Reports dimension for each of your item dimensions.
+- **Shopping behavior (Premium):** the shopping and checkout funnels split by device and by channel.
+- **Item dimensions (Premium):** your own product parameters (size, color, stock status...), configured as an "Item" scope of Custom Dimensions, each with a report in the Products dimension switcher, a segment and a Custom Reports dimension.
+- **Merchandising (Premium):** products bought together (market basket analysis), most abandoned products, product profit and margin from your cost of goods.
 - **Orders (Premium):** refunds, refund rate by product and net revenue, discount depth by product, coupon and category, orders by basket size and value, revenue of foreign currency orders converted to your website currency.
 
 ### Why the GA4 format
@@ -132,7 +132,7 @@ Every `items` entry can carry these fields. `item_id` or `item_name` is required
 | `item_list_id`, `item_list_name`, `index` | list the item was shown or selected in, and its position |
 | `promotion_id`, `promotion_name`, `creative_name`, `creative_slot` | promotion the item came from |
 | `affiliation`, `location_id`, `item_group_id` | supplier or store, physical location, parent product |
-| any other field | item dimension, recorded when a dimension of that name exists in the Item scope of Custom Dimensions (up to 10) |
+| any other field | item dimension (Premium), recorded when an item dimension with this dataLayer key exists, see [Item dimensions](#item-dimensions-premium) |
 
 Item list and promotion fields set on the event apply to the items that lack them. When an item is selected in a list or a promotion (`select_item`, `select_promotion`), it keeps that list or promotion when it is later added to cart and bought.
 
@@ -314,20 +314,9 @@ dataLayer.push({
 
 Read: `promotion_id`, `promotion_name`, `creative_name`, `creative_slot`, items. `select_promotion` has the same shape, and the promotion is remembered for its items.
 
-### view_search_results
+### Search results
 
-```js
-dataLayer.push({
-  event: 'view_search_results',
-  ecommerce: {search_term: 'tee', items: [/* products listed */]}
-});
-```
-
-Read: `search_term`, items.
-
-### Leads
-
-`generate_lead`, `qualify_lead`, `working_lead`, `close_convert_lead`, `close_unconvert_lead` and `disqualify_lead` are recorded with `currency`, `value`, `lead_source` and `lead_status` (or `unconvert_lead_reason`, `disqualified_lead_reason`). Their parameters can sit at the root of the push.
+A page of search results is an item list: send it as `view_item_list` with a list of its own, for example `item_list_id: 'search_results'` and `item_list_name: 'Search results'`. It then appears in the item list reports, and the products clicked or bought from it are attributed to it. The terms searched are already in the Site Search reports of Matomo.
 
 ### Other formats
 
@@ -337,38 +326,64 @@ Read: `search_term`, items.
 
 ## What is never recorded
 
-`user_data` and the other event level fields outside the GA4 ecommerce parameters are never read. Search terms and lead sources holding an email address or a phone number are dropped. Coupon codes are stored as a hash unless the website settings store them as sent. Item dimensions are only recorded when you create them: choosing what they hold is the responsibility of the site owner and their DPO.
+`user_data` and the other event level fields outside the GA4 ecommerce parameters are never read. Coupon codes are stored as a hash unless "Keep coupon codes readable" is turned on in the website settings. Item dimensions are only recorded when you create them: choosing what they hold is the responsibility of the site owner and their DPO.
 
 ## Website settings
 
 Administration, Websites, Ecommerce Enhanced (website administrators):
 
 - **The GA4 value includes tax and shipping:** for shops that send the grand total in `value`.
-- **Ecommerce steps shown in the Events report:** each step is a Matomo event with the category `Ecommerce`, a readable action (`Add to cart`) and the GA4 event name as the name (`add_to_cart`). Unchecked steps are still recorded in the Ecommerce Enhanced reports.
-- **Steps that do not count as an interaction:** viewing steps (`view_item_list`, `view_item`, `view_cart`, `view_promotion`, `view_search_results`) do not lower the bounce rate by default, as in GA4.
-- **Store coupon codes as sent:** unchecked by default, a hash of each code is stored, so single use and gift codes are never readable. Check it for shared promotional codes (`SUMMER10`) you want to read in the reports.
+- **Ecommerce steps:** a table with one line per step, its event category (`Ecommerce`), event action (`Add to cart`) and event name (the GA4 event name, `add_to_cart`), and two switches:
+  - **Shown in the Events report:** the step is also a Matomo event. Switched off, it is still recorded in the Ecommerce Enhanced reports.
+  - **Non-interaction:** the step keeps the visit alive but does not count as an action, so it does not lower the bounce rate. Viewing steps (`view_item_list`, `view_item`, `view_cart`, `view_promotion`) are switched on by default, as in GA4.
+- **Keep coupon codes readable (do not hash them):** off by default, each code is hashed before it is stored, so single use and gift codes are never readable. Turn it on for shared promotional codes (`SUMMER10`) you want to read in the reports.
 - **Unit cost item parameter (Premium):** the item dimension that holds the unit cost of goods, for the profit reports.
 
-## Item dimensions
+The same page creates the funnels of the Funnels plugin, when it is activated: the sales funnel of the ecommerce orders, and the Purchase journey and Checkout journey of GA4, named in the language of the user who creates them. A funnel that already exists is kept, recognised by its steps. A sales funnel configured by hand is never replaced: when it differs from the complete template, an "Update the sales funnel configuration" button applies the template. The steps must be shown in the Events report for Funnels to see them.
 
-Custom parameters of your products, for example `size`, `color` or `stock_status`, are configured in Administration, Websites, Custom Dimensions, in the "Item" scope that Ecommerce Enhanced adds next to the visit and action scopes. The name of an item dimension is the parameter key in the items of your dataLayer:
+## Item dimensions (Premium)
+
+Custom parameters of your products, for example a size, a color or a stock status, are configured with Ecommerce Enhanced Premium in Administration, Websites, Custom Dimensions, in the "Item" scope added next to the visit and action scopes. Each item dimension has:
+
+- a **dataLayer key**, set when it is created: the key of the parameter in the items of your dataLayer, for example `color`;
+- a **name**, the label displayed in the reports, for example "Product Color", which can be changed at any time without touching the tracking.
 
 ```js
-dataLayer.push({event: 'add_to_cart', ecommerce: {items: [{item_id: 'SKU_123', item_name: 'Organic tee', price: 30, quantity: 1, size: 'M'}]}});
+dataLayer.push({
+  event: 'add_to_cart',
+  ecommerce: {
+    items: [{
+      item_id: 'SKU_123',
+      item_name: 'Organic tee',
+      price: 30,
+      quantity: 1,
+      color: 'Red'
+    }]
+  }
+});
 ```
 
-Up to 10 item dimensions per website. Renaming one keeps the values recorded before, deactivating one stops recording new values. Only the item dimensions you create are stored, whatever their name: what they collect is the choice of the site owner and their DPO.
+Add the parameter the same way to the items of every ecommerce event (`view_item`, `begin_checkout`, `purchase`...). Each item dimension then has a report in the dimension switcher of the Products report, a segment (`eeItemDimension1`...) and a Custom Reports dimension.
+
+10 item dimensions are available per website. More can be added from the command line, up to 30, as for the visit and action scopes:
+
+```bash
+./console customdimensions:add-custom-dimension --scope=item --count=5
+```
+
+Renaming an item dimension keeps the values recorded before, deactivating it stops recording new values. Only the item dimensions you create are stored, whatever their key: what they collect is the choice of the site owner and their DPO. Without Premium, the item dimensions already created are kept and still recorded, and they are listed marked "Premium" in the segment editor and in Custom Reports.
 
 ## Reports
 
 In the Ecommerce menu, in the order a shop owner reads them (Premium in italics):
 
 - **Overview:** buyers and revenue (purchasers, first time purchasers, ARPU, ARPPU, average order value, items per order, conversion rate, cart abandonment rate) as sparklines and over time; *refunds and net revenue*; *daily, weekly and monthly active users and buyers*.
-- **Merchandising:** products, product categories, brands and variants with views, wishlist and cart adds, purchases, item revenue and rates; *one report per item dimension*; item lists, promotions and product search terms; *products bought together*; *profit and margin by product, category and brand*.
+- **Products:** the native report, with Product Categories, Product Brands, Product Variants and *one report per item dimension* added to its dimension switcher, after Product Name, SKU and Category.
+- **Merchandising:** product performance with views, wishlist and cart adds, purchases, item revenue and rates; item lists and promotions; *products bought together*; *profit and margin by product, category and brand*.
 - **Sales:** sales by source / medium, next to the native sales by channel, campaign, page and location; *sales by first user channel and source / medium*.
-- **Shopping behavior:** the shopping and checkout funnels with step and abandonment rates; *the same journey by device type and by channel*; *abandoned carts by channel and source / medium, most abandoned products*; *lead pipeline and leads by source*.
+- **Shopping behavior:** the shopping and checkout funnels with step and abandonment rates; *the same journey by device type and by channel*; *abandoned carts by channel and source / medium, most abandoned products*.
 - **Order details:** transactions (every order with its revenue split and GA4 details); *orders by basket size and by order value*; payment types and shipping tiers (pies); coupons and *discount depth by coupon, product and category*; *refunds over time and refunded products*; affiliations and order currencies.
-- **Customers:** *repeat purchases*; new and returning customers; *time to first purchase*; *retention cohorts*; *lifetime value by channel*; *RFM segments*.
+- **Customers:** *repeat purchases*, with the *retention cohorts* by day, week or month right below; new and returning customers; *time to first purchase*; *lifetime value by channel*; *RFM segments*.
 
 Premium reports appear as locked cards, in the place of the report, until Ecommerce Enhanced Premium is activated.
 
@@ -378,7 +393,8 @@ Every stored field is a segment, also available in Custom Reports:
 
 - order: `eeOrderCoupon`, `eeOrderPaymentType`, `eeOrderShippingTier`, `eeOrderCustomerType`, `eeOrderCurrency`, `eeOrderAffiliation`;
 - cart and order lines: `eeItemBrand`, `eeItemVariant`, `eeItemListId`, `eeItemListName`, `eeItemCoupon`, `eeItemDiscount`, `eeItemAffiliation`, `eeItemLocationId`;
-- shopping steps: `eeStep` (GA4 event name), `eeListId`, `eeListName`, `eeCheckoutStep`, `eeCheckoutOption`, `eeSearchTerm`, `eePromotionId`, `eePromotionName`, `eePromotionCreativeName`, `eePromotionCreativeSlot`.
+- shopping steps: `eeStep` (GA4 event name), `eeListId`, `eeListName`, `eeCheckoutStep`, `eeCheckoutOption`, `eePromotionId`, `eePromotionName`, `eePromotionCreativeName`, `eePromotionCreativeSlot`;
+- item dimensions (Premium): `eeItemDimension1`, `eeItemDimension2`...
 
 For example `eeStep==add_to_cart;eeStep!=purchase` selects the visits that added to cart without buying.
 
