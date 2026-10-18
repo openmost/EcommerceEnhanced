@@ -21,7 +21,6 @@ class Records
     public const CATEGORIES = 'EcommerceEnhanced_categories';
     public const ITEM_LISTS = 'EcommerceEnhanced_itemLists';
     public const PROMOTIONS = 'EcommerceEnhanced_promotions';
-    public const SEARCH_TERMS = 'EcommerceEnhanced_searchTerms';
 
     public const COUPONS = 'EcommerceEnhanced_coupons';
     public const PAYMENT_TYPES = 'EcommerceEnhanced_paymentTypes';

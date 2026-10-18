@@ -21,7 +21,7 @@ use Piwik\Tests\Framework\TestCase\IntegrationTestCase;
  * - Visitor A, from Google, 2025-01-06: list, product view, cart, order O1 (2 trail shoes at 10, 1 socks at 5,
  *   coupon SUMMER10, revenue 25).
  * - Visitor B, direct, 2025-01-06: views and adds a hoodie, leaves the cart (abandoned).
- * - Visitor A, 2025-01-08: searches "shoes", orders O2 (1 hoodie at 30, revenue 30): a repeat order 2 days later.
+ * - Visitor A, 2025-01-08: orders O2 (1 hoodie at 30, revenue 30): a repeat order 2 days later.
  * - Visitor C, direct, 2025-01-08: views the trail shoe.
  * - Visitor A, 2025-01-09: refunds O1 in full, the refund is sent twice.
  */
@@ -80,7 +80,6 @@ abstract class ShopTestCase extends IntegrationTestCase
         ]);
 
         $this->visit(self::VISITOR_A, '2025-01-08 10:00:00', '', [
-            ['event', 'view_search_results', ['search_term' => 'shoes', 'items' => [self::TRAIL_SHOE]]],
             ['order', 'O2', ['currency' => 'EUR', 'value' => 30, 'payment_type' => 'PayPal', 'items' => [$hoodie]]],
         ]);
 

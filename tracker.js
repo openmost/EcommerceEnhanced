@@ -47,25 +47,17 @@
         purchase: 'Purchase',
         refund: 'Refund',
         view_promotion: 'View promotion',
-        select_promotion: 'Select promotion',
-        view_search_results: 'View search results',
-        generate_lead: 'Generate lead',
-        qualify_lead: 'Qualify lead',
-        working_lead: 'Working lead',
-        close_convert_lead: 'Close convert lead',
-        close_unconvert_lead: 'Close unconvert lead',
-        disqualify_lead: 'Disqualify lead'
+        select_promotion: 'Select promotion'
     };
 
     var EVENT_ALIASES = {
-        search: 'view_search_results',
         set_checkout_option: 'checkout_progress'
     };
 
     var EVENT_STRINGS = {
         transaction_id: 100, coupon: 255, payment_type: 100, shipping_tier: 100, affiliation: 100,
         checkout_option: 100, item_list_id: 100, item_list_name: 100, promotion_id: 100, promotion_name: 100,
-        creative_name: 100, creative_slot: 100, search_term: 100, lead_source: 100, lead_status: 100
+        creative_name: 100, creative_slot: 100
     };
 
     var ITEM_STRINGS = {
@@ -476,10 +468,6 @@
             }
         }
 
-        if (fields.lead_status === null) {
-            fields.lead_status = toText(firstDefined(params.unconvert_lead_reason, params.disqualified_lead_reason), 100);
-        }
-
         if (fields.coupon !== null) {
             var codes = fields.coupon.split(',');
             var cleaned = [];
@@ -508,11 +496,7 @@
             fields.checkout_step = {begin_checkout: 1, add_shipping_info: 2, add_payment_info: 3}[name] || null;
         }
 
-        if (name === 'view_search_results' && fields.search_term === null) {
-            fields.search_term = toText(params.search_query, 100);
-        }
-
-        var isList = name === 'view_item_list' || name === 'view_promotion' || name === 'view_search_results';
+        var isList = name === 'view_item_list' || name === 'view_promotion';
         var normalized = normalizeItems(params.items, fields, isList ? MAX_LIST_ITEMS : MAX_ITEMS);
 
         fields.items = normalized.items;
@@ -713,7 +697,7 @@
             return [buildEvent(name, entry.eventModel, SOURCE_GTAG)];
         }
 
-        // Lead events and some custom setups carry their parameters at the root of the push
+        // Some custom setups carry their parameters at the root of the push
         return [buildEvent(name, entry, SOURCE_GA4)];
     }
 

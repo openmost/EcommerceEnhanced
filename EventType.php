@@ -30,13 +30,6 @@ class EventType
     public const REFUND = 13;
     public const VIEW_PROMOTION = 14;
     public const SELECT_PROMOTION = 15;
-    public const VIEW_SEARCH_RESULTS = 16;
-    public const GENERATE_LEAD = 17;
-    public const QUALIFY_LEAD = 18;
-    public const WORKING_LEAD = 19;
-    public const CLOSE_CONVERT_LEAD = 20;
-    public const CLOSE_UNCONVERT_LEAD = 21;
-    public const DISQUALIFY_LEAD = 22;
 
     public const EVENT_CATEGORY = 'Ecommerce';
 
@@ -60,13 +53,6 @@ class EventType
         self::REFUND => ['refund', 'Refund'],
         self::VIEW_PROMOTION => ['view_promotion', 'View promotion'],
         self::SELECT_PROMOTION => ['select_promotion', 'Select promotion'],
-        self::VIEW_SEARCH_RESULTS => ['view_search_results', 'View search results'],
-        self::GENERATE_LEAD => ['generate_lead', 'Generate lead'],
-        self::QUALIFY_LEAD => ['qualify_lead', 'Qualify lead'],
-        self::WORKING_LEAD => ['working_lead', 'Working lead'],
-        self::CLOSE_CONVERT_LEAD => ['close_convert_lead', 'Close convert lead'],
-        self::CLOSE_UNCONVERT_LEAD => ['close_unconvert_lead', 'Close unconvert lead'],
-        self::DISQUALIFY_LEAD => ['disqualify_lead', 'Disqualify lead'],
     ];
 
     /**
@@ -77,7 +63,6 @@ class EventType
         self::VIEW_ITEM,
         self::VIEW_CART,
         self::VIEW_PROMOTION,
-        self::VIEW_SEARCH_RESULTS,
     ];
 
     /**

@@ -19,7 +19,7 @@ use Piwik\Tracker\GoalManager;
 
 /**
  * The GA4 detail of each ecommerce step in the visitor log and in Live.getLastVisitsDetails: products with brand,
- * variant and quantity, list, promotion, search term or lead of the "Ecommerce" events, and coupon, payment,
+ * variant and quantity, list or promotion of the "Ecommerce" events, and coupon, payment,
  * shipping, customer type, currency and rank of the native orders. Steps are matched to their event or order by
  * time, event name and order id.
  */
@@ -38,14 +38,11 @@ class VisitorDetails extends VisitorDetailsAbstract
         'list_name' => 'listName',
         'promotion_name' => 'promotionName',
         'creative_name' => 'creativeName',
-        'search_term' => 'searchTerm',
         'checkout_option' => 'checkoutOption',
         'coupon' => 'coupon',
         'payment_type' => 'paymentType',
         'shipping_tier' => 'shippingTier',
         'affiliation' => 'affiliation',
-        'lead_source' => 'leadSource',
-        'lead_status' => 'leadStatus',
     ];
 
     public function provideActionsForVisitIds(&$actions, $idVisits)
@@ -165,14 +162,12 @@ class VisitorDetails extends VisitorDetailsAbstract
         $labels = [
             'listName' => 'EcommerceEnhanced_ListName',
             'promotionName' => 'EcommerceEnhanced_PromotionName',
-            'searchTerm' => 'EcommerceEnhanced_SearchTerm',
             'checkoutOption' => 'EcommerceEnhanced_CheckoutOption',
             'coupon' => 'EcommerceEnhanced_OrderCoupon',
             'paymentType' => 'EcommerceEnhanced_OrderPaymentType',
             'shippingTier' => 'EcommerceEnhanced_OrderShippingTier',
             'affiliation' => 'EcommerceEnhanced_OrderAffiliation',
             'customerType' => 'EcommerceEnhanced_OrderCustomerType',
-            'leadSource' => 'EcommerceEnhanced_VisitorLogLeadSource',
             'currency' => 'SitesManager_Currency',
         ];
         foreach ($labels as $key => $translationKey) {
