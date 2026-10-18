@@ -10,25 +10,32 @@
 namespace Piwik\Plugins\EcommerceEnhanced;
 
 use Piwik\API\Request;
+use Piwik\Piwik;
 use Piwik\Plugin\Manager;
 use Piwik\Site;
 
 /**
  * The GA4 funnels created in the Funnels plugin in one click, from the "Ecommerce" events: the sales funnel of the
- * ecommerce order goal, and the shopping and checkout behavior funnels. A funnel that already exists is kept.
+ * ecommerce order goal, and the GA4 purchase and checkout journeys. An existing journey is kept, recognised by its steps
+ * so that a renamed one is not created twice. An existing sales funnel is never replaced without the user asking.
  * The steps must be shown in the Events report (website settings) for Funnels to see them.
  */
 class FunnelSetup
 {
     public const PLUGIN = 'Funnels';
 
+    public const STATE_MISSING = 'missing';
+    public const STATE_EXISTS = 'exists';
+    public const STATE_OUTDATED = 'outdated';
+
     private const SALES = 'sales';
 
     /**
-     * key => [name, steps: [step name, GA4 event, required]]. Names are data stored in Funnels, kept in English.
+     * key => [name translation key, steps: [step name, GA4 event, required]]. Funnel names are translated in the
+     * language of the user creating them, as GA4 does. Step names follow the "Ecommerce" event actions, in English.
      */
     private const FUNNELS = [
-        self::SALES => ['Sales', [
+        self::SALES => ['EcommerceEnhanced_FunnelSales', [
             ['View item list', 'view_item_list', false],
             ['Select item', 'select_item', false],
             ['View item', 'view_item', true],
@@ -38,13 +45,13 @@ class FunnelSetup
             ['Add shipping info', 'add_shipping_info', false],
             ['Add payment info', 'add_payment_info', false],
         ]],
-        'shopping' => ['Shopping behavior (GA4)', [
+        'purchase' => ['EcommerceEnhanced_FunnelPurchaseJourney', [
             ['Product view', 'view_item', true],
             ['Add to cart', 'add_to_cart', true],
             ['Checkout', 'begin_checkout', true],
             ['Purchase', 'purchase', true],
         ]],
-        'checkout' => ['Checkout behavior (GA4)', [
+        'checkout' => ['EcommerceEnhanced_FunnelCheckoutJourney', [
             ['Begin checkout', 'begin_checkout', true],
             ['Add shipping info', 'add_shipping_info', true],
             ['Add payment info', 'add_payment_info', true],
@@ -61,16 +68,24 @@ class FunnelSetup
     }
 
     /**
-     * @return array<int, array{key: string, name: string, exists: bool}>
+     * @return array<int, array{key: string, name: string, state: string}>
      */
     public static function getStatus(int $idSite): array
     {
-        $existing = self::getExistingNames($idSite);
-        $hasSalesFunnel = self::hasSalesFunnel($idSite);
+        $signatures = array_map([self::class, 'signature'], self::getActivatedNonGoalFunnelSteps($idSite));
+        $salesSteps = self::getSalesFunnelSteps($idSite);
 
         $status = [];
-        foreach (self::FUNNELS as $key => [$name]) {
-            $status[] = ['key' => $key, 'name' => $name, 'exists' => $key === self::SALES ? $hasSalesFunnel : in_array($name, $existing, true)];
+        foreach (self::FUNNELS as $key => [$nameKey, $definition]) {
+            $template = self::signature(self::buildSteps($definition));
+            if ($key === self::SALES) {
+                $state = $salesSteps === null ? self::STATE_MISSING
+                    : (self::signature($salesSteps) === $template ? self::STATE_EXISTS : self::STATE_OUTDATED);
+            } else {
+                $state = in_array($template, $signatures, true) ? self::STATE_EXISTS : self::STATE_MISSING;
+            }
+
+            $status[] = ['key' => $key, 'name' => Piwik::translate($nameKey), 'state' => $state];
         }
 
         return $status;
@@ -83,13 +98,13 @@ class FunnelSetup
     {
         $created = [];
         foreach (self::getStatus($idSite) as $funnel) {
-            if ($funnel['exists']) {
+            if ($funnel['state'] !== self::STATE_MISSING) {
                 continue;
             }
 
             $steps = self::buildSteps(self::FUNNELS[$funnel['key']][1]);
             if ($funnel['key'] === self::SALES) {
-                Request::processRequest('Funnels.setGoalFunnel', ['idSite' => $idSite, 'idGoal' => 0, 'isActivated' => 1, 'steps' => $steps], []);
+                self::saveSalesFunnel($idSite, $steps);
             } else {
                 Request::processRequest('Funnels.saveNonGoalFunnel', ['idSite' => $idSite, 'idFunnel' => 0, 'funnelName' => $funnel['name'], 'steps' => $steps], []);
             }
@@ -98,6 +113,22 @@ class FunnelSetup
         }
 
         return $created;
+    }
+
+    /**
+     * Replaces the steps of the existing sales funnel by the complete template, on the user's explicit request.
+     */
+    public static function updateSalesFunnel(int $idSite): void
+    {
+        self::saveSalesFunnel($idSite, self::buildSteps(self::FUNNELS[self::SALES][1]));
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $steps
+     */
+    private static function saveSalesFunnel(int $idSite, array $steps): void
+    {
+        Request::processRequest('Funnels.setGoalFunnel', ['idSite' => $idSite, 'idGoal' => 0, 'isActivated' => 1, 'steps' => $steps], []);
     }
 
     /**
@@ -121,25 +152,46 @@ class FunnelSetup
     }
 
     /**
-     * @return string[]
+     * What makes a funnel the template one: its step patterns and whether they are required, not the names, which the
+     * user may translate or rename.
+     *
+     * @param array<int, array<string, mixed>> $steps
      */
-    private static function getExistingNames(int $idSite): array
+    private static function signature(array $steps): string
+    {
+        return implode('|', array_map(function ($step) {
+            return ($step['pattern_type'] ?? '') . ':' . ($step['pattern'] ?? '') . ':' . (empty($step['required']) ? 0 : 1);
+        }, array_values($steps)));
+    }
+
+    /**
+     * @return array<int, array<int, array<string, mixed>>>
+     */
+    private static function getActivatedNonGoalFunnelSteps(int $idSite): array
     {
         $funnels = Request::processRequest('Funnels.getAllActivatedFunnelsForSite', ['idSite' => $idSite, 'filter_limit' => -1], []);
 
-        return array_map(function ($funnel) {
-            return (string) ($funnel['name'] ?? '');
-        }, is_array($funnels) ? $funnels : []);
+        $steps = [];
+        foreach (is_array($funnels) ? $funnels : [] as $funnel) {
+            if (!empty($funnel['isNonGoalFunnel']) && !empty($funnel['steps'])) {
+                $steps[] = $funnel['steps'];
+            }
+        }
+
+        return $steps;
     }
 
-    private static function hasSalesFunnel(int $idSite): bool
+    /**
+     * @return array<int, array<string, mixed>>|null the steps of the activated sales funnel, null when not configured
+     */
+    private static function getSalesFunnelSteps(int $idSite): ?array
     {
         try {
             $funnel = Request::processRequest('Funnels.getGoalFunnel', ['idSite' => $idSite, 'idGoal' => 0], []);
         } catch (\Exception $e) {
-            return false;
+            return null;
         }
 
-        return !empty($funnel) && !empty($funnel['steps']);
+        return !empty($funnel['activated']) && !empty($funnel['steps']) ? $funnel['steps'] : null;
     }
 }

@@ -335,7 +335,7 @@ class API extends \Piwik\Plugin\API
     /**
      * Whether the Funnels plugin is activated and which GA4 funnels already exist for the website.
      *
-     * @return array{available: bool, funnels: array<int, array{key: string, name: string, exists: bool}>}
+     * @return array{available: bool, funnels: array<int, array{key: string, name: string, state: string}>}
      */
     public function getFunnelsSetup($idSite)
     {
@@ -350,8 +350,8 @@ class API extends \Piwik\Plugin\API
     }
 
     /**
-     * Creates the GA4 sales, shopping behavior and checkout behavior funnels in the Funnels plugin, keeping the ones
-     * that already exist.
+     * Creates the sales funnel and the GA4 purchase and checkout journeys in the Funnels plugin, keeping the ones that
+     * already exist.
      *
      * @return array{created: string[]}
      */
@@ -367,27 +367,47 @@ class API extends \Piwik\Plugin\API
     }
 
     /**
-     * Adds a custom item parameter, the "Item" scope of the Custom Dimensions page. Its name is the parameter key
-     * in the items of the dataLayer.
-     *
-     * @return int id of the item dimension in the Custom Dimensions page
+     * Replaces the steps of the existing sales funnel by the complete ecommerce template.
      */
-    public function addItemDimension($idSite, $name, $description = '', $active = '1')
+    public function updateSalesFunnel($idSite)
     {
-        return ItemDimensions::create((int) $idSite, (string) $name, (string) $description, self::toBool($active));
+        Piwik::checkUserHasAdminAccess($idSite);
+
+        if (!FunnelSetup::isAvailable((int) $idSite)) {
+            throw new \Exception(Piwik::translate('EcommerceEnhanced_FunnelsNotAvailable'));
+        }
+
+        FunnelSetup::updateSalesFunnel((int) $idSite);
+
+        return true;
     }
 
     /**
-     * Renames, describes, activates or deactivates a custom item parameter. Renaming keeps the values recorded
-     * before, deactivating stops recording new ones.
+     * Adds a custom item parameter, the "Item" scope of the Custom Dimensions page, with Premium. itemParameter is
+     * the key in the items of the dataLayer, name the label displayed in the reports.
+     *
+     * @param string $itemParameter the dataLayer key, the name when empty
+     * @return int id of the item dimension in the Custom Dimensions page
      */
-    public function updateItemDimension($idSite, $idDimension, $name, $description = null, $active = '1')
+    public function addItemDimension($idSite, $name, $description = '', $active = '1', $itemParameter = '')
+    {
+        return ItemDimensions::create((int) $idSite, (string) $name, (string) $itemParameter, (string) $description, self::toBool($active));
+    }
+
+    /**
+     * Renames, describes, activates or deactivates a custom item parameter. Renaming changes the label only and
+     * keeps the values recorded before, a new itemParameter changes the dataLayer key read from now on,
+     * deactivating stops recording new values.
+     *
+     * @param string|null $itemParameter the dataLayer key, null keeps the current one
+     */
+    public function updateItemDimension($idSite, $idDimension, $name, $description = null, $active = '1', $itemParameter = null)
     {
         if (!ItemDimensions::isItemDimensionId($idDimension)) {
             throw new \Exception(Piwik::translate('EcommerceEnhanced_ItemDimensionNotFound'));
         }
 
-        ItemDimensions::update((int) $idSite, (int) $idDimension - ItemDimensions::ID_OFFSET, (string) $name, $description, self::toBool($active));
+        ItemDimensions::update((int) $idSite, (int) $idDimension - ItemDimensions::ID_OFFSET, (string) $name, $description, self::toBool($active), $itemParameter);
 
         return true;
     }
