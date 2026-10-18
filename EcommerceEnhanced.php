@@ -14,6 +14,7 @@ use Piwik\Container\StaticContainer;
 use Piwik\Notification;
 use Piwik\Piwik;
 use Piwik\Plugins\EcommerceEnhanced\Dao\Schema;
+use Piwik\Plugins\EcommerceEnhanced\Dimension\PremiumItemDimension;
 use Piwik\Plugins\EcommerceEnhanced\Tracker\SiteConfig;
 use Piwik\Tracker\Cache;
 
@@ -36,6 +37,11 @@ class EcommerceEnhanced extends \Piwik\Plugin
             'Template.beforeContent' => 'renderOpenmostCommunication',
             'Template.afterEventsReport' => 'renderOpenmostCommunicationAfterEvents',
             'Widget.filterWidgets' => 'addOpenmostCommunicationWidgets',
+            'Dimension.addDimensions' => 'addPremiumItemDimensions',
+            'Console.filterCommands' => 'replaceAddCustomDimensionCommand',
+            'Template.jsGlobalVariables' => 'addJsGlobalVariables',
+            'API.CustomReports.addCustomReport' => 'refusePremiumDimensionsInCustomReport',
+            'API.CustomReports.updateCustomReport' => 'refusePremiumDimensionsInCustomReport',
         ];
     }
 
@@ -102,6 +108,77 @@ class EcommerceEnhanced extends \Piwik\Plugin
         foreach ($variables as $index => $variable) {
             if ($variable->getId() === TagManager\MatomoConfigurationVariable::ID && !$variable instanceof TagManager\MatomoConfigurationVariable) {
                 $variables[$index] = StaticContainer::get(TagManager\MatomoConfigurationVariable::class);
+            }
+        }
+    }
+
+    /**
+     * While Premium is not activated, its item dimensions are listed marked "Premium" in the segment editor and in
+     * Custom Reports.
+     *
+     * @param \Piwik\Columns\Dimension[] $instances
+     */
+    public function addPremiumItemDimensions(&$instances)
+    {
+        $idSite = Common::getRequestVar('idSite', 0, 'int');
+        if (empty($idSite) || PremiumTeasers::isPremiumActivated()) {
+            return;
+        }
+
+        foreach ((new MeasurableSettings($idSite))->getItemDimensions() as $dimension) {
+            if ($dimension['active']) {
+                $instances[] = new PremiumItemDimension($dimension['slot'], $dimension['name']);
+            }
+        }
+    }
+
+    /**
+     * Whether the Item scope of the Custom Dimensions page is locked, Premium not being activated.
+     *
+     * @param string $out
+     */
+    public function addJsGlobalVariables(&$out)
+    {
+        $out .= 'piwik.ecommerceEnhancedItemDimensionsLocked = ' . (ItemDimensions::isAvailable() ? 'false' : 'true') . ";\n";
+        $out .= 'piwik.ecommerceEnhancedPremiumUrl = ' . json_encode(PremiumTeasers::URL) . ";\n";
+    }
+
+    /**
+     * customdimensions:add-custom-dimension also takes the "item" scope: our subclass replaces the command of
+     * Custom Dimensions, and is dropped when Custom Dimensions is not there, as its Item scope page is not either.
+     *
+     * @param string[] $commands
+     */
+    public function replaceAddCustomDimensionCommand(&$commands)
+    {
+        $core = array_search('Piwik\\Plugins\\CustomDimensions\\Commands\\AddCustomDimension', $commands, true);
+        $ours = array_search(Commands\AddCustomDimension::class, $commands, true);
+        if ($ours === false) {
+            return;
+        }
+
+        if ($core === false) {
+            unset($commands[$ours]);
+            return;
+        }
+
+        unset($commands[$core]);
+    }
+
+    /**
+     * A custom report cannot be saved with a Premium item dimension while Premium is not activated.
+     *
+     * @param array<string, mixed> $parameters
+     */
+    public function refusePremiumDimensionsInCustomReport(&$parameters)
+    {
+        if (PremiumTeasers::isPremiumActivated()) {
+            return;
+        }
+
+        foreach ((array) ($parameters['dimensionIds'] ?? []) as $dimensionId) {
+            if (is_string($dimensionId) && strpos($dimensionId, PremiumItemDimension::ID_PREFIX) === 0) {
+                throw new \Exception(Piwik::translate('EcommerceEnhanced_PremiumDimensionInCustomReport'));
             }
         }
     }

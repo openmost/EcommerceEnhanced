@@ -308,7 +308,7 @@ class LogWriter
                 $row[$column] = $item[$key];
             }
 
-            for ($slot = 1; $slot <= Schema::CUSTOM_SLOTS; $slot++) {
+            for ($slot = 1, $slots = Schema::getCustomSlots(); $slot <= $slots; $slot++) {
                 $row['custom' . $slot] = null;
             }
 
