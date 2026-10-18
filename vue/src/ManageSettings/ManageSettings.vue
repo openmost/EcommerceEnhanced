@@ -20,7 +20,64 @@
         <h3 v-if="sections.length > 1">{{ sectionTitle(section.pluginName) }}</h3>
         <GroupedSettings
           :group-name="section.pluginName"
-          :settings="section.settings"
+          :settings="settingsAround(section, true)"
+          :all-setting-values="settingValues"
+          @change="settingValues[`${section.pluginName}.${$event.name}`] = $event.value"
+        />
+
+        <div v-if="hasEventSteps(section)" class="ecommerceEnhancedEventSteps">
+          <h3>{{ translate('EcommerceEnhanced_EventStepsTitle') }}</h3>
+          <table class="entityTable">
+            <thead>
+              <tr>
+                <th>{{ translate('Events_EventCategory') }}</th>
+                <th>{{ translate('Events_EventAction') }}</th>
+                <th>{{ translate('Events_EventName') }}</th>
+                <th>{{ translate('EcommerceEnhanced_EventStepsTracked') }}</th>
+                <th>{{ translate('EcommerceEnhanced_EventStepsNonInteraction') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(label, name) in eventStepLabels(section)" :key="name">
+                <td>{{ EVENT_CATEGORY }}</td>
+                <td>{{ label }}</td>
+                <td><code>{{ name }}</code></td>
+                <td>
+                  <div class="switch">
+                    <label>
+                      <input
+                        type="checkbox"
+                        :checked="isStepIn('events_report_types', name)"
+                        @change="onStepChange('events_report_types', name, $event)"
+                      />
+                      <span class="lever" />
+                    </label>
+                  </div>
+                </td>
+                <td>
+                  <div class="switch">
+                    <label>
+                      <input
+                        type="checkbox"
+                        :checked="isStepIn('non_interaction_types', name)"
+                        @change="onStepChange('non_interaction_types', name, $event)"
+                      />
+                      <span class="lever" />
+                    </label>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="form-help">{{ translate('EcommerceEnhanced_SettingEventsReportTypesHelp') }}</p>
+          <p class="form-help">
+            {{ translate('EcommerceEnhanced_SettingNonInteractionTypesHelp') }}
+          </p>
+        </div>
+
+        <GroupedSettings
+          :group-name="section.pluginName"
+          :settings="settingsAround(section, false)"
           :all-setting-values="settingValues"
           @change="settingValues[`${section.pluginName}.${$event.name}`] = $event.value"
         />
@@ -39,16 +96,29 @@
     >
       <p>{{ translate('EcommerceEnhanced_FunnelsIntro') }}</p>
       <ul class="ecommerceEnhancedFunnels">
-        <li v-for="funnel in funnels.funnels" :key="funnel.key">
-          {{ funnel.name }}:
-          {{ funnel.exists ? translate('EcommerceEnhanced_FunnelExists') : translate('EcommerceEnhanced_FunnelMissing') }}
+        <li
+          v-for="funnel in funnels.funnels"
+          :key="funnel.key"
+          :class="`ecommerceEnhancedFunnel-${funnel.state}`"
+        >
+          <span :class="stateIcon(funnel.state)" />
+          <strong>{{ funnel.name }}</strong>
+          <span class="ecommerceEnhancedFunnelState">{{ stateLabel(funnel.state) }}</span>
         </li>
       </ul>
-      <button
-        class="btn"
-        :disabled="isCreatingFunnels || !hasMissingFunnel"
-        @click="createFunnels()"
-      >{{ translate('EcommerceEnhanced_FunnelsCreate') }}</button>
+      <div class="ecommerceEnhancedFunnelsActions">
+        <button
+          class="btn"
+          :disabled="isCreatingFunnels || !hasMissingFunnel"
+          @click="createFunnels()"
+        >{{ translate('EcommerceEnhanced_FunnelsCreate') }}</button>
+        <button
+          v-if="isSalesFunnelOutdated"
+          class="btn"
+          :disabled="isCreatingFunnels"
+          @click="updateSalesFunnel()"
+        >{{ translate('EcommerceEnhanced_FunnelsUpdateSales') }}</button>
+      </div>
     </ContentBlock>
   </div>
 </template>
@@ -67,7 +137,17 @@ import { GroupedSettings, SaveButton } from 'CorePluginsAdmin';
 interface Setting {
   name: string;
   value: unknown;
+  availableValues?: Record<string, string>;
 }
+
+// The two step lists of the free plugin, edited together as the switches of one table
+const EVENTS_SETTING = 'events_report_types';
+const NON_INTERACTION_SETTING = 'non_interaction_types';
+const STEP_SETTINGS = [EVENTS_SETTING, NON_INTERACTION_SETTING];
+const STEPS_PLUGIN = 'EcommerceEnhanced';
+
+// The category of every step tracked as an event, EventType::EVENT_CATEGORY
+const EVENT_CATEGORY = 'Ecommerce';
 
 interface SettingsSection {
   pluginName: string;
@@ -78,7 +158,7 @@ interface SettingsSection {
 interface FunnelStatus {
   key: string;
   name: string;
-  exists: boolean;
+  state: 'missing' | 'exists' | 'outdated';
 }
 
 interface FunnelsSetup {
@@ -118,9 +198,15 @@ export default defineComponent({
       isCreatingFunnels: false,
     };
   },
+  setup() {
+    return { EVENT_CATEGORY };
+  },
   computed: {
     hasMissingFunnel(): boolean {
-      return this.funnels.funnels.some((funnel: FunnelStatus) => !funnel.exists);
+      return this.funnels.funnels.some((funnel: FunnelStatus) => funnel.state === 'missing');
+    },
+    isSalesFunnelOutdated(): boolean {
+      return this.funnels.funnels.some((funnel: FunnelStatus) => funnel.key === 'sales' && funnel.state === 'outdated');
     },
   },
   created() {
@@ -131,7 +217,16 @@ export default defineComponent({
       const settingValues: Record<string, unknown> = {};
       sections.forEach((section: SettingsSection) => {
         section.settings.forEach((setting: Setting) => {
-          settingValues[`${section.pluginName}.${setting.name}`] = setting.value;
+          // A value no longer offered, such as a retired step, would make Matomo refuse the save
+          let { value } = setting;
+          const available = setting.availableValues;
+          if (Array.isArray(value) && available && !Array.isArray(available)) {
+            value = value.filter(
+              (entry: string) => Object.prototype.hasOwnProperty.call(available, entry),
+            );
+          }
+
+          settingValues[`${section.pluginName}.${setting.name}`] = value;
         });
       });
 
@@ -144,6 +239,45 @@ export default defineComponent({
     this.loadFunnels();
   },
   methods: {
+    hasEventSteps(section: SettingsSection): boolean {
+      return section.pluginName === STEPS_PLUGIN
+        && section.settings.some((setting: Setting) => setting.name === EVENTS_SETTING);
+    },
+    // The settings before the step table (before is true) or after it, without the step lists
+    settingsAround(section: SettingsSection, before: boolean): Setting[] {
+      const position = section.settings.findIndex(
+        (setting: Setting) => setting.name === EVENTS_SETTING,
+      );
+      if (position === -1) {
+        return before ? section.settings : [];
+      }
+
+      return section.settings.filter((setting: Setting, index: number) => (
+        !STEP_SETTINGS.includes(setting.name) && (before ? index < position : index > position)
+      ));
+    },
+    eventStepLabels(section: SettingsSection): Record<string, string> {
+      const setting = section.settings.find((s: Setting) => s.name === EVENTS_SETTING);
+      return setting?.availableValues || {};
+    },
+    stepValues(settingName: string): string[] {
+      const value = this.settingValues[`${STEPS_PLUGIN}.${settingName}`];
+      return Array.isArray(value) ? value as string[] : [];
+    },
+    isStepIn(settingName: string, step: string): boolean {
+      return this.stepValues(settingName).includes(step);
+    },
+    onStepChange(settingName: string, step: string, event: Event) {
+      this.toggleStep(settingName, step, (event.target as HTMLInputElement).checked);
+    },
+    toggleStep(settingName: string, step: string, checked: boolean) {
+      const values = this.stepValues(settingName).filter((value: string) => value !== step);
+      if (checked) {
+        values.push(step);
+      }
+
+      this.settingValues[`${STEPS_PLUGIN}.${settingName}`] = values;
+    },
     loadFunnels() {
       AjaxHelper.fetch<FunnelsSetup>({
         method: 'EcommerceEnhanced.getFunnelsSetup',
@@ -169,6 +303,40 @@ export default defineComponent({
       }).finally(() => {
         this.isCreatingFunnels = false;
       });
+    },
+    updateSalesFunnel() {
+      this.isCreatingFunnels = true;
+      AjaxHelper.post(
+        { method: 'EcommerceEnhanced.updateSalesFunnel', idSite: this.idSite },
+        {},
+      ).then(() => {
+        const id = NotificationsStore.show({
+          message: translate('EcommerceEnhanced_FunnelsSalesUpdated'),
+          context: 'success',
+          id: 'ecommerceEnhancedFunnels',
+          type: 'transient',
+        });
+        NotificationsStore.scrollToNotification(id);
+        this.loadFunnels();
+      }).finally(() => {
+        this.isCreatingFunnels = false;
+      });
+    },
+    stateIcon(state: FunnelStatus['state']): string {
+      if (state === 'exists') {
+        return 'icon-ok';
+      }
+
+      return state === 'outdated' ? 'icon-warning' : 'icon-minus';
+    },
+    stateLabel(state: FunnelStatus['state']): string {
+      if (state === 'exists') {
+        return translate('EcommerceEnhanced_FunnelExists');
+      }
+
+      return state === 'outdated'
+        ? translate('EcommerceEnhanced_FunnelOutdated')
+        : translate('EcommerceEnhanced_FunnelMissing');
     },
     sectionTitle(pluginName: string): string {
       return pluginName === 'EcommerceEnhanced'

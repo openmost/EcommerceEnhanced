@@ -9,6 +9,7 @@
 
 namespace Piwik\Plugins\EcommerceEnhanced\tests\Integration;
 
+use Piwik\API\Request;
 use Piwik\Plugins\EcommerceEnhanced\FunnelSetup;
 
 /**
@@ -95,8 +96,25 @@ class ArchivingTest extends ShopTestCase
             $this->markTestSkipped('The Funnels plugin is not activated.');
         }
 
-        $this->assertSame(['Sales', 'Shopping behavior (GA4)', 'Checkout behavior (GA4)'], FunnelSetup::create($this->idSite));
-        $this->assertSame([true, true, true], array_column(FunnelSetup::getStatus($this->idSite), 'exists'));
+        $this->assertSame(['Sales funnel', 'Purchase journey', 'Checkout journey'], FunnelSetup::create($this->idSite));
+        $this->assertSame(array_fill(0, 3, FunnelSetup::STATE_EXISTS), array_column(FunnelSetup::getStatus($this->idSite), 'state'));
         $this->assertSame([], FunnelSetup::create($this->idSite), 'existing funnels are kept');
+    }
+
+    public function test_funnelSetup_keepsACustomSalesFunnelUntilTheUserUpdatesIt(): void
+    {
+        if (!FunnelSetup::isAvailable($this->idSite)) {
+            $this->markTestSkipped('The Funnels plugin is not activated.');
+        }
+
+        Request::processRequest('Funnels.setGoalFunnel', ['idSite' => $this->idSite, 'idGoal' => 0, 'isActivated' => 1, 'steps' => [
+            ['position' => 1, 'name' => 'Cart', 'pattern_type' => 'path_contains', 'pattern' => '/cart', 'required' => 0],
+        ]], []);
+
+        $this->assertNotContains('Sales funnel', FunnelSetup::create($this->idSite), 'a configured sales funnel is not replaced');
+        $this->assertSame(FunnelSetup::STATE_OUTDATED, FunnelSetup::getStatus($this->idSite)[0]['state']);
+
+        FunnelSetup::updateSalesFunnel($this->idSite);
+        $this->assertSame(FunnelSetup::STATE_EXISTS, FunnelSetup::getStatus($this->idSite)[0]['state']);
     }
 }

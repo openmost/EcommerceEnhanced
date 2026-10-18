@@ -72,3 +72,100 @@
     }
   }
 }
+
+// The "how to send" box of an item dimension, see javascripts/itemDimensions.js
+.alert.eeItemDimensionHowTo {
+  margin: 24px 0;
+
+  // As specific as the core rule giving the code its light color, which it must win over
+  pre strong.eeItemDimensionKeyLine {
+    color: #7ee787;
+    font-weight: bold;
+  }
+}
+
+// Settings page: the ecommerce steps table and the funnels status, see vue/src/ManageSettings
+.ecommerceEnhancedEventSteps {
+  margin: 24px 0;
+
+  // Plain monospace text, without the dark chip of the core code style
+  table.entityTable td code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  // Category, action and name values stay on one line, the switch columns take what is left. Headers wrap,
+  // they are much longer in some languages and would push the table out of the card.
+  table.entityTable th {
+    white-space: normal;
+  }
+
+  table.entityTable td:nth-child(-n+3) {
+    white-space: nowrap;
+  }
+
+  .switch {
+    margin: 0;
+  }
+
+  // More specific than the core .form-help, which removes the margin
+  > p.form-help {
+    margin-top: 8px;
+  }
+
+  > table + p.form-help {
+    margin-top: 24px;
+  }
+}
+
+ul.ecommerceEnhancedFunnels {
+  margin: 16px 0 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+  }
+
+  .ecommerceEnhancedFunnelState {
+    opacity: 0.7;
+  }
+
+  .ecommerceEnhancedFunnel-exists [class^="icon-"] {
+    color: #43a047;
+  }
+
+  .ecommerceEnhancedFunnel-outdated [class^="icon-"] {
+    color: #fb8c00;
+  }
+
+  .ecommerceEnhancedFunnel-missing [class^="icon-"] {
+    opacity: 0.4;
+  }
+}
+
+.ecommerceEnhancedFunnelsActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+// The Item scope of Custom Dimensions without Premium, see javascripts/itemDimensions.js
+.eeItemDimensionsLocked {
+  .eeItemDimensionsLockNotice {
+    margin: 16px 0;
+
+    p {
+      margin-bottom: 12px;
+    }
+  }
+
+  table td.action a,
+  .tableActionBar button {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
