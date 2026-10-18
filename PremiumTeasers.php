@@ -46,7 +46,7 @@ class PremiumTeasers
         'MultiCurrency' => ['EcommerceEnhanced_OrderDetails', 112, self::IMAGE_TABLE],
         'RepeatPurchase' => ['EcommerceEnhanced_Customers', 1, self::IMAGE_GRAPH],
         'TimeToPurchase' => ['EcommerceEnhanced_Customers', 104, self::IMAGE_GRAPH],
-        'RetentionCohorts' => ['EcommerceEnhanced_Customers', 106, self::IMAGE_TABLE],
+        'RetentionCohorts' => ['EcommerceEnhanced_Customers', 103, self::IMAGE_TABLE],
         'LifetimeValue' => ['EcommerceEnhanced_Customers', 107, self::IMAGE_TABLE],
     ];
 
