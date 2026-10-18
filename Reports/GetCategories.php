@@ -36,10 +36,11 @@ class GetCategories extends Base
         $this->action = 'getCategories';
         $this->name = Piwik::translate('EcommerceEnhanced_ProductCategoriesReport');
         $this->documentation = Piwik::translate('EcommerceEnhanced_BrandsDocumentation');
-        $this->subcategoryId = 'EcommerceEnhanced_Merchandising';
+        $this->subcategoryId = 'Goals_Products';
         $this->order = 2;
         // A product counts in each of its categories: a total would add it once per level
         $this->showTotalsRow = false;
         $this->dimension = new ProductCategory();
+        $this->inProductsSwitcher = true;
     }
 }

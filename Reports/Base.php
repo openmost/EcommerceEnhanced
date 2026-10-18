@@ -17,9 +17,11 @@ use Piwik\Plugins\CoreVisualizations\Visualizations\HtmlTable;
 use Piwik\Plugins\CoreVisualizations\Visualizations\JqplotGraph\Bar;
 use Piwik\Plugins\CoreVisualizations\Visualizations\JqplotGraph\Pie;
 use Piwik\Plugins\EcommerceEnhanced\Metrics;
+use Piwik\Report\ReportWidgetFactory;
 use Piwik\Request;
 use Piwik\Site;
 use Piwik\Url;
+use Piwik\Widget\WidgetsList;
 
 /**
  * A report of the Ecommerce category, available on sites with ecommerce enabled.
@@ -49,6 +51,14 @@ abstract class Base extends Report
      * @var bool
      */
     protected $keepRowOrder = false;
+
+    /**
+     * A product property (brand, variant, category...) offered in the dimension switcher of the native Products
+     * report, after Product Name, SKU and Category, as Matomo shows the product dimensions, and nowhere else.
+     *
+     * @var bool
+     */
+    protected $inProductsSwitcher = false;
 
     /**
      * Visualization shown first, a table unless a distribution reads better as a pie or bars.
@@ -95,6 +105,18 @@ abstract class Base extends Report
         $idSite = $infos['idSite'] ?? null;
         if (!empty($idSite) && is_numeric($idSite) && (new Site((int) $idSite))->isEcommerceEnabled()) {
             $availableReports[] = $this->buildReportMetadata();
+        }
+    }
+
+    public function configureWidgets(WidgetsList $widgetsList, ReportWidgetFactory $factory)
+    {
+        if (!$this->inProductsSwitcher) {
+            parent::configureWidgets($widgetsList, $factory);
+            return;
+        }
+
+        if ($this->subcategoryId) {
+            $widgetsList->addToContainerWidget('Products', $factory->createWidget()->setOrder(200 + $this->order));
         }
     }
 
