@@ -1,8 +1,8 @@
 ## Changelog
 
-### v6.0.0
+### v5.0.0
 
-- First release, for Matomo 6.x (`>=6.0.0-b1,<7.0.0-b1`), PHP 8.1+.
+- First release, for Matomo 5.x (`>=5.0.0,<6.0.0-b1`), PHP 7.2.5+.
 - Reads the GA4 ecommerce dataLayer (GA4 objects, `gtag()` calls, Universal Analytics Enhanced Ecommerce), the Matomo Tag Manager data layer (`_mtm`, and the dataLayer when the container synchronises it) and `_paq.push(['EcommerceEnhanced::track', ...])` calls. Carts and orders keep being sent as native Matomo ecommerce requests.
 - Records brands, variants, item lists, promotions, coupons, payment types, shipping tiers, customer types, checkout steps, wishlists and refunds in its own log tables, covered by segments, GDPR tools and the raw data purge.
 - Item dimensions (size, color, stock status...) recorded from the items of the dataLayer, configured with Premium as an "Item" scope of the Custom Dimensions page: a dataLayer key set at creation and a free label, 10 per website, more with `./console customdimensions:add-custom-dimension --scope=item`. Without Premium they are listed marked "Premium" in the segment editor and Custom Reports.
@@ -18,4 +18,4 @@
 
 Development notes:
 - `tracker.min.js` is the file Matomo merges into `matomo.js`. Rebuild it after any change to `tracker.js`, from the Matomo directory: `node_modules/.bin/terser plugins/EcommerceEnhanced/tracker.js -c -m --comments false --preamble "/*! Ecommerce Enhanced tracker for Matomo, GPL v3 or later. Minified build of tracker.js, see CHANGELOG.md */" -o plugins/EcommerceEnhanced/tracker.min.js`, then run the JS tests on it: `TRACKER_FILE=tracker.min.js node --test plugins/EcommerceEnhanced/tests/javascript/tracker.test.js`.
-- The Vue components are built with `./console vue:build EcommerceEnhanced`.
+- The Vue components are built with `./console vue:build EcommerceEnhanced` (webpack in Matomo 5: on Node 17 or later, set `NODE_OPTIONS=--openssl-legacy-provider`). The build lints the code, lines are limited to 100 characters.
