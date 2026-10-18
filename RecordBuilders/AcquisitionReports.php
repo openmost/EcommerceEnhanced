@@ -62,6 +62,11 @@ class AcquisitionReports extends Base
         $campaignSource = $hasCampaignColumns ? "COALESCE(NULLIF(LOWER({t}.campaign_source), ''), LOWER({t}.referer_name))" : 'LOWER({t}.referer_name)';
         $campaignMedium = $hasCampaignColumns ? "COALESCE(NULLIF(LOWER({t}.campaign_medium), ''), 'campaign')" : "'campaign'";
 
+        // The AI assistant channel only exists in recent Matomo 5 releases, not in the 5.0 this line supports
+        $aiAssistant = defined(Common::class . '::REFERRER_TYPE_AI_ASSISTANT')
+            ? "WHEN " . constant(Common::class . '::REFERRER_TYPE_AI_ASSISTANT') . " THEN 'ai'"
+            : '';
+
         $sql = "CONCAT(
             CASE {t}.referer_type
                 WHEN " . Common::REFERRER_TYPE_DIRECT_ENTRY . " THEN '(direct)'
@@ -75,7 +80,7 @@ class AcquisitionReports extends Base
                 WHEN " . Common::REFERRER_TYPE_WEBSITE . " THEN 'referral'
                 WHEN " . Common::REFERRER_TYPE_CAMPAIGN . " THEN " . $campaignMedium . "
                 WHEN " . Common::REFERRER_TYPE_SOCIAL_NETWORK . " THEN 'social'
-                WHEN " . Common::REFERRER_TYPE_AI_ASSISTANT . " THEN 'ai'
+                " . $aiAssistant . "
                 ELSE '(not set)'
             END
         )";

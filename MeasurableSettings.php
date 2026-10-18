@@ -19,12 +19,30 @@ class MeasurableSettings extends \Piwik\Settings\Measurable\MeasurableSettings
     public const COUPON_FULL = 'full';
     public const COUPON_HASHED = 'hashed';
 
-    public MeasurableSetting $valueIncludesTaxAndShipping;
-    public MeasurableSetting $eventsReportTypes;
-    public MeasurableSetting $nonInteractionTypes;
-    public MeasurableSetting $storeCouponCodes;
-    public MeasurableSetting $itemCustomParams;
-    public MeasurableSetting $itemCustomParamMeta;
+    /**
+     * @var MeasurableSetting
+     */
+    public $valueIncludesTaxAndShipping;
+    /**
+     * @var MeasurableSetting
+     */
+    public $eventsReportTypes;
+    /**
+     * @var MeasurableSetting
+     */
+    public $nonInteractionTypes;
+    /**
+     * @var MeasurableSetting
+     */
+    public $storeCouponCodes;
+    /**
+     * @var MeasurableSetting
+     */
+    public $itemCustomParams;
+    /**
+     * @var MeasurableSetting
+     */
+    public $itemCustomParamMeta;
 
     /**
      * Settings edited as the "Item" scope of the Custom Dimensions page, not on the settings page.
