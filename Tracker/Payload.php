@@ -25,7 +25,6 @@ class Payload
     public const MAX_JSON_BYTES = 131072;
     public const MAX_ITEMS = 200;
     public const MAX_MONEY = 1000000000000;
-    public const MAX_CUSTOM_PARAMS = 10;
 
     /**
      * Shops often add more fields to their items than the website records: up to 30 are read, the configured item
@@ -37,16 +36,6 @@ class Payload
      * Item lists, promotions and search results: a page shows a few dozen products, never 200.
      */
     public const MAX_LIST_ITEMS = 30;
-
-    /**
-     * Free text fields a visitor or a form may fill with personal data, and that no setting chooses.
-     */
-    private const FREE_TEXT_FIELDS = ['search_term', 'lead_source', 'lead_status'];
-
-    /**
-     * An email address, or a phone number written with a + prefix or as 0X XX XX XX XX.
-     */
-    private const PERSONAL_VALUE = '/[^\s@]+@[^\s@]+\.[^\s@]{2,}|\+\d[\d\s().-]{7,}\d|\b0[1-9](?:[\s.-]?\d{2}){4}\b/u';
 
     public const SOURCE_DATALAYER_GA4 = 1;
     public const SOURCE_GTAG = 2;
@@ -77,9 +66,6 @@ class Payload
         'promotion_name' => 100,
         'creative_name' => 100,
         'creative_slot' => 100,
-        'search_term' => 100,
-        'lead_source' => 100,
-        'lead_status' => 100,
     ];
 
     private const EVENT_MONEY = ['value', 'tax', 'shipping', 'discount', 'customer_lifetime_value'];
@@ -163,10 +149,6 @@ class Payload
             $event[$key] = self::toText($data[$key] ?? null, $max);
         }
 
-        foreach (self::FREE_TEXT_FIELDS as $key) {
-            $event[$key] = self::withoutPersonalData($event[$key]);
-        }
-
         foreach (self::EVENT_MONEY as $key) {
             $event[$key] = self::toMoney($data[$key] ?? null);
         }
@@ -184,7 +166,7 @@ class Payload
 
         $items = [];
         $rawItems = isset($data['items']) && is_array($data['items']) ? array_values($data['items']) : [];
-        $isListOnly = in_array($type, [EventType::VIEW_ITEM_LIST, EventType::VIEW_PROMOTION, EventType::VIEW_SEARCH_RESULTS], true);
+        $isListOnly = in_array($type, [EventType::VIEW_ITEM_LIST, EventType::VIEW_PROMOTION], true);
         $maxItems = $isListOnly ? self::MAX_LIST_ITEMS : self::MAX_ITEMS;
         foreach ($rawItems as $rawItem) {
             if (count($items) >= $maxItems) {
@@ -203,7 +185,7 @@ class Payload
 
         // GA4 allows the list and the promotion on the items only: list and promotion steps take them from their
         // first item. Other steps keep them on their items only, the list there is an attribution, not a view
-        $isListStep = in_array($type, [EventType::VIEW_ITEM_LIST, EventType::SELECT_ITEM, EventType::VIEW_PROMOTION, EventType::SELECT_PROMOTION, EventType::VIEW_SEARCH_RESULTS], true);
+        $isListStep = in_array($type, [EventType::VIEW_ITEM_LIST, EventType::SELECT_ITEM, EventType::VIEW_PROMOTION, EventType::SELECT_PROMOTION], true);
         foreach (self::ITEM_INHERITED as $key) {
             if ($isListStep && $event[$key] === null && !empty($items) && $items[0][$key] !== null) {
                 $event[$key] = $items[0][$key];
@@ -279,15 +261,6 @@ class Payload
         }
 
         return $item;
-    }
-
-    /**
-     * Drops a value that holds an email address or a phone number: requests built outside the tracker, server side
-     * or by hand, never went through its personal key filter.
-     */
-    public static function withoutPersonalData(?string $value): ?string
-    {
-        return $value !== null && preg_match(self::PERSONAL_VALUE, $value) ? null : $value;
     }
 
     public static function toText($value, int $max): ?string

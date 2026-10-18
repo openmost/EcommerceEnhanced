@@ -43,7 +43,6 @@ class ArchivingTest extends ShopTestCase
         $this->assertEquals(['Nike' => 50, 'Puma' => 5], $this->column($this->api('EcommerceEnhanced.getBrands'), 'ee_item_revenue'));
         $this->assertEquals(['Accessories' => 5, 'Apparel' => 30, 'Shoes' => 20], $this->column($this->api('EcommerceEnhanced.getCategories'), 'ee_item_revenue'));
         $this->assertSame(['Home' => 1], $this->column($this->api('EcommerceEnhanced.getItemLists'), 'ee_list_views'));
-        $this->assertSame(['shoes' => 1], $this->column($this->api('EcommerceEnhanced.getSearchTerms'), 'ee_searches'));
     }
 
     public function test_buyerKpis_countEachPurchaserOnce_andFirstOrdersOnly(): void

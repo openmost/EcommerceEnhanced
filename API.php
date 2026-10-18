@@ -74,16 +74,6 @@ class API extends \Piwik\Plugin\API
     }
 
     /**
-     * Product search terms with their searches, visits, products listed and visits that ordered.
-     *
-     * @return DataTable|DataTable\Map
-     */
-    public function getSearchTerms($idSite, $period, $date, $segment = false)
-    {
-        return $this->getRecord(Records::SEARCH_TERMS, $idSite, $period, $date, $segment);
-    }
-
-    /**
      * The orders of the period, most recent first, with their revenue split and their GA4 details. Read from the
      * orders themselves, like the Ecommerce log, at most 500 orders.
      *

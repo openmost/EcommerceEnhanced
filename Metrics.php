@@ -31,8 +31,6 @@ class Metrics
     public const PROMOTION_VIEWS = 'ee_promotion_views';
     public const PROMOTION_CLICKS = 'ee_promotion_clicks';
     public const REVENUE = 'ee_revenue';
-    public const SEARCHES = 'ee_searches';
-    public const ITEMS_LISTED = 'ee_items_listed';
     public const ITEMS = 'ee_items';
     public const SUBTOTAL = 'ee_subtotal';
     public const TAX = 'ee_tax';
@@ -73,8 +71,6 @@ class Metrics
         self::PROMOTION_VIEWS => ['EcommerceEnhanced_PromotionViews', Dimension::TYPE_NUMBER],
         self::PROMOTION_CLICKS => ['EcommerceEnhanced_PromotionClicks', Dimension::TYPE_NUMBER],
         self::REVENUE => ['General_ColumnRevenue', Dimension::TYPE_MONEY],
-        self::SEARCHES => ['EcommerceEnhanced_Searches', Dimension::TYPE_NUMBER],
-        self::ITEMS_LISTED => ['EcommerceEnhanced_ItemsListed', Dimension::TYPE_NUMBER],
         self::ITEMS => ['EcommerceEnhanced_ItemsInOrders', Dimension::TYPE_NUMBER],
         self::VISITS => ['General_ColumnNbVisits', Dimension::TYPE_NUMBER],
         self::CONVERTED_VISITS => ['EcommerceEnhanced_ConvertedVisits', Dimension::TYPE_NUMBER],

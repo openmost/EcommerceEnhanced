@@ -142,23 +142,6 @@ class PayloadTest extends TestCase
         $this->assertSame(64.2, Payload::getItemsTotal($items));
     }
 
-    public function testFreeTextWithPersonalDataIsDropped()
-    {
-        $event = Payload::fromArray(EventType::VIEW_SEARCH_RESULTS, ['search_term' => 'john.doe@mail.com'])['event'];
-        $this->assertNull($event['search_term']);
-
-        $event = Payload::fromArray(EventType::GENERATE_LEAD, ['lead_source' => 'call +33 6 12 34 56 78', 'lead_status' => '06 12 34 56 78'])['event'];
-        $this->assertNull($event['lead_source']);
-        $this->assertNull($event['lead_status']);
-
-        $event = Payload::fromArray(EventType::VIEW_SEARCH_RESULTS, ['search_term' => 'trail shoes 42'])['event'];
-        $this->assertSame('trail shoes 42', $event['search_term']);
-
-        // Item dimensions are chosen by the website: their values are kept as sent
-        $item = Payload::fromArray(EventType::ADD_TO_CART, ['items' => [['item_id' => 'A', 'custom' => ['note' => 'me@x.io', 'size' => 'M']]]])['items'][0];
-        $this->assertSame(['note' => 'me@x.io', 'size' => 'M'], $item['custom']);
-    }
-
     public function testListStepsKeepThirtyItems()
     {
         $items = [];
