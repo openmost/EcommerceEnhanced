@@ -149,7 +149,7 @@ class RequestProcessor extends Tracker\RequestProcessor
     {
         $eeRequest = $this->getEeRequest($request);
         if ($eeRequest === null || $eeRequest['kind'] !== self::KIND_EVENT) {
-            return;
+            return false;
         }
 
         if (!$this->getConfig($request->getIdSite())->isInEventsReport($eeRequest['type'])) {
@@ -157,6 +157,8 @@ class RequestProcessor extends Tracker\RequestProcessor
             $request->setMetadata('Goals', 'goalsConverted', []);
             $request->setMetadata('Goals', 'visitIsConverted', false);
         }
+
+        return false;
     }
 
     public function onNewVisit(VisitProperties $visitProperties, Request $request)
