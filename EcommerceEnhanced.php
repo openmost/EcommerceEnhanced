@@ -16,6 +16,7 @@ use Piwik\Piwik;
 use Piwik\Plugins\EcommerceEnhanced\Dao\Schema;
 use Piwik\Plugins\EcommerceEnhanced\Dimension\PremiumItemDimension;
 use Piwik\Plugins\EcommerceEnhanced\Tracker\SiteConfig;
+use Piwik\Request;
 use Piwik\Tracker\Cache;
 
 class EcommerceEnhanced extends \Piwik\Plugin
@@ -120,7 +121,7 @@ class EcommerceEnhanced extends \Piwik\Plugin
      */
     public function addPremiumItemDimensions(&$instances)
     {
-        $idSite = Common::getRequestVar('idSite', 0, 'int');
+        $idSite = Request::fromRequest()->getIntegerParameter('idSite', 0);
         if (empty($idSite) || PremiumTeasers::isPremiumActivated()) {
             return;
         }
