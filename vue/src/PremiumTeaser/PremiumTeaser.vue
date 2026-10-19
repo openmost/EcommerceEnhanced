@@ -8,11 +8,11 @@
 <template>
   <div class="card ee-premium">
     <div class="card-content">
-      <h2 class="card-title">{{ name }}</h2>
-      <p class="ee-premium-description">
+      <h2 class="card-title ee-premium-title">
+        <span class="ee-premium-title-text">{{ name }}</span>
         <span class="ee-premium-badge">Premium</span>
-        {{ description }}
-      </p>
+      </h2>
+      <p class="ee-premium-description">{{ description }}</p>
       <div class="ee-premium-preview">
         <img class="ee-premium-image" :src="image" alt="" loading="lazy">
         <div class="ee-premium-overlay">

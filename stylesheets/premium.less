@@ -3,13 +3,26 @@
     padding-bottom: 0 !important;
   }
 
+  // More specific than the core .card .card-content .card-title, which forces display: block
+  .card-content h2.ee-premium-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .ee-premium-title-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
   .ee-premium-description {
     margin: 0 0 12px;
   }
 
   .ee-premium-badge {
-    display: inline-block;
-    margin-right: 6px;
+    flex-shrink: 0;
     padding: 2px 8px;
     border-radius: 1rem;
     background-color: #FFA32A;
@@ -18,9 +31,12 @@
     line-height: normal;
   }
 
+  // The preview runs flush to the bottom of the card, its corners follow the card radius (8px minus the 1px border)
   .ee-premium-preview {
     position: relative;
+    overflow: hidden;
     margin: 0 -20px;
+    border-radius: 0 0 7px 7px;
   }
 
   .ee-premium-image {
@@ -45,13 +61,15 @@
     margin: 0;
     padding: 1rem;
     border-radius: 8px;
-    background-color: rgba(255, 255, 255, .92);
+    // Same box as the Events Enhanced Premium teasers, following the Matomo theme (light and dark mode)
+    background: @theme-color-background-contrast;
+    color: @theme-color-text;
     box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, .05);
     text-align: center;
     transition: .2s ease transform, .2s ease box-shadow;
 
     &:hover {
-      box-shadow: 2px 2px 6px 0 rgba(255, 163, 42, .2);
+      box-shadow: 2px 2px 6px 0 rgba(255, 163, 42, .1);
       transform: scale(1.03);
     }
 
