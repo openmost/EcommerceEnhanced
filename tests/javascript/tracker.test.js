@@ -25,14 +25,14 @@ function createStorage() {
     };
 }
 
-function load({pageViews = 1, dataLayer, tagManagerEvents} = {}) {
+function load({pageViews = 1, dataLayer, tagManagerEvents, localStorage = createStorage(), cookiesEnabled = true} = {}) {
     const calls = [];
     const plugins = {};
     let pending = null;
 
     const tracker = {
         getSiteId: () => 1,
-        areCookiesEnabled: () => true,
+        areCookiesEnabled: () => cookiesEnabled,
         getNumTrackedPageViews: () => pageViews,
         trackRequest: (request) => calls.push(['request', parse(request)]),
         clearEcommerceCart: () => calls.push(['clear']),
@@ -59,7 +59,7 @@ function load({pageViews = 1, dataLayer, tagManagerEvents} = {}) {
 
     const window = {
         sessionStorage: createStorage(),
-        localStorage: createStorage(),
+        localStorage,
         Matomo: {
             addPlugin: (name, plugin) => { plugins[name] = plugin; },
             getAsyncTrackers: () => [tracker],
@@ -194,6 +194,48 @@ test('removing an item updates the mirrored cart', () => {
     const carts = calls.filter((c) => c[0] === 'cart');
     assert.strictEqual(carts[1][1], 20);
     assert.strictEqual(carts[1][2].eex_d.items.length, 1);
+});
+
+test('the mirrored cart is shared by tabs, so an add from a new tab resends the whole cart', () => {
+    const localStorage = createStorage();
+    load({localStorage}).ee.track('add_to_cart', {items: [ga4Items[0]]});
+
+    const {ee, calls} = load({localStorage});
+    ee.track('add_to_cart', {items: [{item_id: 'SKU2', item_name: 'Cap', price: 10, quantity: 1}]});
+
+    const cart = calls.find((c) => c[0] === 'cart');
+    assert.strictEqual(cart[1], 30);
+    assert.strictEqual(cart[2].eex_d.items.length, 2);
+});
+
+test('an expired mirrored cart is dropped instead of being resent', () => {
+    const localStorage = createStorage();
+    localStorage.setItem('mtm_ee_cart_1', JSON.stringify({time: Date.now() - 3 * 24 * 60 * 60 * 1000, value: [ga4Items[0]]}));
+
+    const {ee, calls} = load({localStorage});
+    ee.track('add_to_cart', {items: [{item_id: 'SKU2', item_name: 'Cap', price: 10, quantity: 1}]});
+
+    assert.strictEqual(calls.find((c) => c[0] === 'cart')[1], 10);
+});
+
+test('without cookie consent the cart mirror is never written to the browser storage', () => {
+    const localStorage = createStorage();
+    load({localStorage, cookiesEnabled: false}).ee.track('add_to_cart', {items: [ga4Items[0]]});
+
+    assert.strictEqual(localStorage.getItem('mtm_ee_cart_1'), null);
+});
+
+test('once cookie consent is withdrawn, what earlier pages stored is removed', () => {
+    const localStorage = createStorage();
+    load({localStorage}).ee.track('purchase', {transaction_id: 'T1', items: [ga4Items[0]]});
+    load({localStorage}).ee.track('add_to_cart', {items: [ga4Items[0]]});
+    assert.notStrictEqual(localStorage.getItem('mtm_ee_cart_1'), null);
+    assert.notStrictEqual(localStorage.getItem('mtm_ee_tx'), null);
+
+    load({localStorage, cookiesEnabled: false}).ee.track('view_cart', {items: [ga4Items[0]]});
+
+    assert.strictEqual(localStorage.getItem('mtm_ee_cart_1'), null);
+    assert.strictEqual(localStorage.getItem('mtm_ee_tx'), null);
 });
 
 test('records a purchase once, with remembered checkout choices and list attribution', () => {
