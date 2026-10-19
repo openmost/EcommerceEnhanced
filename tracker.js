@@ -702,25 +702,81 @@
     }
 
     /*
-     * Storage: sessionStorage while the tracker may use cookies, memory only otherwise
+     * Storage: only while the tracker may use cookies (Matomo consent rules), memory only otherwise.
+     * The cart mirror lives in localStorage, like the shop cart it is shared by every tab and outlives the
+     * session, a per tab copy would send a cart holding only the last added item from a new tab. It expires
+     * after CART_TTL_MS without change so a cart the shop already dropped is not resent. Other state is per tab.
      */
 
-    function canStore(tracker) {
+    var CART_TTL_MS = 2 * 24 * 60 * 60 * 1000;
+    var SHARED_KEYS = {cart: CART_TTL_MS};
+    var STORED_KEYS = ['cart', 'checkout'];
+    var TRANSACTIONS_KEY = 'mtm_ee_tx';
+
+    // Matomo clears its own cookies when consent is withdrawn (forgetCookieConsentGiven), not this storage
+    function purgeStorage(tracker) {
+        var keys = [TRANSACTIONS_KEY];
+        for (var i = 0; i < STORED_KEYS.length; i++) {
+            keys.push('mtm_ee_' + STORED_KEYS[i] + '_' + tracker.getSiteId());
+        }
+
+        var storages = ['localStorage', 'sessionStorage'];
+        for (var s = 0; s < storages.length; s++) {
+            try {
+                var storage = window[storages[s]];
+                for (var k = 0; storage && k < keys.length; k++) {
+                    storage.removeItem(keys[k]);
+                }
+            } catch (e) {
+                // blocked storage holds nothing to remove
+            }
+        }
+    }
+
+    function mayStore(tracker) {
+        var allowed;
         try {
-            return !!window.sessionStorage && (!tracker.areCookiesEnabled || tracker.areCookiesEnabled());
+            allowed = !tracker.areCookiesEnabled || !!tracker.areCookiesEnabled();
         } catch (e) {
-            return false;
+            allowed = false;
+        }
+
+        if (!allowed) {
+            purgeStorage(tracker);
+        }
+
+        return allowed;
+    }
+
+    function getStorage(tracker, key) {
+        if (!mayStore(tracker)) {
+            return null;
+        }
+
+        try {
+            return (hasOwn(SHARED_KEYS, key) ? window.localStorage : window.sessionStorage) || null;
+        } catch (e) {
+            return null;
         }
     }
 
     function load(tracker, key, fallback) {
         var fullKey = 'mtm_ee_' + key + '_' + tracker.getSiteId();
+        var storage = getStorage(tracker, key);
 
-        if (canStore(tracker)) {
+        if (storage) {
             try {
-                var stored = window.sessionStorage.getItem(fullKey);
+                var stored = storage.getItem(fullKey);
                 if (stored) {
-                    return JSON.parse(stored);
+                    stored = JSON.parse(stored);
+                    if (!hasOwn(SHARED_KEYS, key)) {
+                        return stored;
+                    }
+                    if (isObject(stored) && new Date().getTime() - stored.time <= SHARED_KEYS[key]) {
+                        return stored.value;
+                    }
+                    storage.removeItem(fullKey);
+                    return fallback;
                 }
             } catch (e) {
                 // corrupted or blocked storage, start from scratch
@@ -732,11 +788,12 @@
 
     function save(tracker, key, value) {
         var fullKey = 'mtm_ee_' + key + '_' + tracker.getSiteId();
+        var storage = getStorage(tracker, key);
         memory[fullKey] = value;
 
-        if (canStore(tracker)) {
+        if (storage) {
             try {
-                window.sessionStorage.setItem(fullKey, JSON.stringify(value));
+                storage.setItem(fullKey, JSON.stringify(hasOwn(SHARED_KEYS, key) ? {time: new Date().getTime(), value: value} : value));
             } catch (e) {
                 // storage full or blocked, memory copy is enough for this page
             }
@@ -998,11 +1055,11 @@
 
     // Same consent rule as the other storage: without cookie consent the list lives in the page only
     function isNewTransaction(tracker, transactionId) {
-        var key = 'mtm_ee_tx';
+        var key = TRANSACTIONS_KEY;
         var hash = hashString(transactionId);
         var persistent = false;
         try {
-            persistent = !!window.localStorage && (!tracker.areCookiesEnabled || tracker.areCookiesEnabled());
+            persistent = mayStore(tracker) && !!window.localStorage;
         } catch (e) {
             persistent = false;
         }

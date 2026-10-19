@@ -90,9 +90,9 @@ Ecommerce events can then be pushed with either syntax:
 
 In Tag Manager, Ecommerce Enhanced reads the container data layer only, so a push synchronised from the dataLayer is never counted twice.
 
-### Without a dataLayer
+### Without a dataLayer, or choosing each event yourself
 
-Every event can be sent from JavaScript instead, with the same GA4 fields:
+Once enabled, Ecommerce Enhanced reads every ecommerce push of the dataLayer: this is the recommended setup. To decide yourself which events are sent and when, for example from your own Matomo Tag Manager tags, do not call `EcommerceEnhanced::enable` and send each event from JavaScript instead, with the same GA4 fields. The mapping, reports and settings stay the same:
 
 ```js
 _paq.push(['EcommerceEnhanced::track', 'add_to_cart', {
@@ -207,7 +207,7 @@ dataLayer.push({
 });
 ```
 
-Read: `currency`, `value`, items. The plugin keeps the cart content for the visit and sends the native Matomo cart update, so abandoned carts are reported natively. `remove_from_cart` has the same shape.
+Read: `currency`, `value`, items. GA4 only sends the items added or removed, while a native Matomo cart update needs the whole cart: the plugin keeps a copy of the cart in the browser, applies each add and removal to it and sends the whole cart, so abandoned carts are reported natively. `remove_from_cart` has the same shape. See [Browser storage and consent](#browser-storage-and-consent).
 
 ### view_cart
 
@@ -323,10 +323,23 @@ A page of search results is an item list: send it as `view_item_list` with a lis
 - **gtag:** `gtag('event', 'purchase', {...})` calls are read like the GA4 pushes above, `gtag('set', {currency: 'EUR'})` sets the default currency.
 - **Universal Analytics Enhanced Ecommerce:** `impressions`, `click`, `detail`, `add`, `remove`, `checkout` (step 1 begin checkout, 2 shipping, 3 payment), `checkout_option`, `purchase`, `refund`, `promoView` and `promoClick` are converted to their GA4 events. UA `revenue` is the grand total and is converted to the GA4 `value`.
 - Event names prefixed with `dl_` (Elevar) or suffixed with `_stape` (Stape) are recognised.
+- Event names otherwise follow GA4 exactly, letter case aside: `add_to_cart` is read, `addToCart` or `AddToCart` is ignored.
 
 ## What is never recorded
 
 `user_data` and the other event level fields outside the GA4 ecommerce parameters are never read. Coupon codes are stored as a hash unless "Keep coupon codes readable" is turned on in the website settings. Item dimensions are only recorded when you create them: choosing what they hold is the responsibility of the site owner and their DPO.
+
+## Browser storage and consent
+
+To send whole carts and to never record an order twice, the tracker keeps a little state in the browser:
+
+- `mtm_ee_cart_<idSite>` in `localStorage`: the copy of the cart. It is shared by every tab and kept between visits, like the shop cart, and expires after 48 hours without change.
+- `mtm_ee_checkout_<idSite>` in `sessionStorage`: the shipping and payment choices of the current checkout.
+- `mtm_ee_tx` in `localStorage`: a hash of the last 50 order ids already sent.
+
+This storage follows the cookie rules of your Matomo tracker. When cookies are disabled (`disableCookies`) or wait for consent (`requireCookieConsent` before `rememberCookieConsentGiven`), nothing is written and the state only lives in the current page. When consent is withdrawn (`forgetCookieConsentGiven`), these keys are removed at the next ecommerce event. Browser storage is subject to the same consent rules as cookies: if your site relies on a consent exemption for audience measurement, check with your DPO that it covers these keys.
+
+Without browser storage, an add to cart on a new page only sends the item just added. Push `view_cart` and `begin_checkout` with every item of the cart, as GA4 expects: the plugin then corrects the cart it sends.
 
 ## Website settings
 
