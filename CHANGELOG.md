@@ -15,8 +15,3 @@
 - Personal data: `user_data` is never read, coupon codes are hashed unless the website stores them as sent, item dimensions only record what the site owner created.
 - Uninstalling keeps the data.
 - Translated into 12 languages.
-- Tests: unit (tracker, payload) and archiving integration tests, `./console tests:run plugins/EcommerceEnhanced`.
-
-Development notes:
-- `tracker.min.js` is the file Matomo merges into `matomo.js`. Rebuild it after any change to `tracker.js`, from the Matomo directory: `node_modules/.bin/terser plugins/EcommerceEnhanced/tracker.js -c -m --comments false --preamble "/*! Ecommerce Enhanced tracker for Matomo, GPL v3 or later. Minified build of tracker.js, see CHANGELOG.md */" -o plugins/EcommerceEnhanced/tracker.min.js`, then run the JS tests on it: `TRACKER_FILE=tracker.min.js node --test plugins/EcommerceEnhanced/tests/javascript/tracker.test.js`.
-- The Vue components are built with `./console vue:build EcommerceEnhanced` (webpack in Matomo 5: on Node 17 or later, set `NODE_OPTIONS=--openssl-legacy-provider`). The build lints the code, lines are limited to 100 characters.
