@@ -1,6 +1,6 @@
 {
   "name": "EcommerceEnhanced",
-  "description": "GA4 ecommerce for Matomo: reads your GA4 dataLayer and records brands, variants, item lists, promotions, coupons, checkout steps and every shopping step, on top of the native Matomo ecommerce.",
+  "description": "Reads your shop's GA4 dataLayer and adds brands, variants, item lists, promotions, coupons, checkout funnels and buyer reports to Matomo ecommerce.",
   "version": "6.0.0",
   "theme": false,
   "require": {
@@ -25,13 +25,13 @@
     "source": "https://github.com/openmost/EcommerceEnhanced"
   },
   "homepage": "https://openmost.com/matomo/extensions/ecommerce-enhanced",
-  "license": "GPL v3+",
+  "license": "GPL-3.0+",
   "keywords": [
     "ecommerce",
     "e-commerce",
     "ga4",
     "datalayer",
-    "enhanced ecommerce",
+    "enhanced-ecommerce",
     "brand",
     "variant",
     "coupon",
