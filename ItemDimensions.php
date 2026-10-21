@@ -10,6 +10,8 @@
 namespace Piwik\Plugins\EcommerceEnhanced;
 
 use Piwik\API\Request;
+use Piwik\Common;
+use Piwik\Db;
 use Piwik\Piwik;
 use Piwik\Plugins\EcommerceEnhanced\Dao\Schema;
 use Piwik\Site;
@@ -169,6 +171,46 @@ class ItemDimensions
         $settings->save();
 
         Cache::deleteCacheWebsiteAttributes($idSite);
+    }
+
+    /**
+     * The tracker only sends the item keys of the active item dimensions of the website: their list is written into
+     * matomo.js, as the tracker cannot ask the server before sending. Called while Matomo rebuilds matomo.js, which
+     * happens when the item dimensions change (see EcommerceEnhanced::onMeasurableSettingsUpdated).
+     */
+    public static function addToJsTracker(string &$content): void
+    {
+        $keysBySite = self::getKeysBySite();
+        if (empty($keysBySite)) {
+            return;
+        }
+
+        $content .= "\n/* GENERATED: EcommerceEnhanced item dimensions */\nwindow.matomoEcommerceEnhancedItemDimensions="
+            . json_encode($keysBySite, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
+            . ";\n/* END GENERATED: EcommerceEnhanced item dimensions */\n";
+    }
+
+    /**
+     * Same keys as the ones the server stores (SiteConfig::getItemCustomParamSlots), so a value sent is never dropped.
+     *
+     * @return array<int, string[]>
+     */
+    public static function getKeysBySite(): array
+    {
+        $idSites = Db::fetchAll(
+            'SELECT DISTINCT idsite FROM ' . Common::prefixTable('site_setting') . ' WHERE plugin_name = ? AND setting_name = ?',
+            ['EcommerceEnhanced', 'item_custom_params']
+        );
+
+        $keysBySite = [];
+        foreach (array_column($idSites, 'idsite') as $idSite) {
+            $keys = array_keys((new MeasurableSettings((int) $idSite))->getItemCustomParamSlots());
+            if (!empty($keys)) {
+                $keysBySite[(int) $idSite] = $keys;
+            }
+        }
+
+        return $keysBySite;
     }
 
     private static function validateName(string $name): string

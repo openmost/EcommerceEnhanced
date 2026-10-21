@@ -9,7 +9,8 @@
  *   plugin is later deactivated.
  *
  * Turned on with _paq.push(['EcommerceEnhanced::enable']). Personal data (user_data, emails, addresses,
- * hashed identifiers) is never read.
+ * hashed identifiers) is never read, and an item key outside the GA4 fields is only sent when the website has an
+ * active item dimension reading it.
  *
  * @link    https://matomo.org
  * @license https://www.gnu.org/licenses/gpl-3.0.html GPL v3 or later
@@ -21,7 +22,7 @@
     var EVENT_CATEGORY = 'Ecommerce';
     var MAX_ITEMS = 200;
     var MAX_LIST_ITEMS = 30;
-    // Unknown item keys sent per item: the server keeps the configured item dimensions among them, up to 10
+    // Unknown item keys read per item, then narrowed to the website item dimensions before anything is sent
     var MAX_CUSTOM_PARAMS = 30;
     var MAX_REMEMBERED = 200;
     var MAX_TRANSACTIONS = 50;
@@ -710,8 +711,11 @@
 
     var CART_TTL_MS = 2 * 24 * 60 * 60 * 1000;
     var SHARED_KEYS = {cart: CART_TTL_MS};
-    var STORED_KEYS = ['cart', 'checkout'];
+    // Every key written, as mtm_ee_<key>_<idSite>: cart mirror (localStorage), checkout choices and product or
+    // promotion selections (sessionStorage), plus the hashed transaction ids already sent (localStorage)
+    var STORED_KEYS = ['cart', 'checkout', 'sel'];
     var TRANSACTIONS_KEY = 'mtm_ee_tx';
+    var CONSENT_WITHDRAWAL_METHODS = ['forgetCookieConsentGiven', 'forgetConsentGiven', 'optUserOut'];
 
     // Matomo clears its own cookies when consent is withdrawn (forgetCookieConsentGiven), not this storage
     function purgeStorage(tracker) {
@@ -746,6 +750,38 @@
         }
 
         return allowed;
+    }
+
+    // The page copy of the transaction ids is kept: it only prevents resending an order already sent from this page
+    function forgetState(tracker) {
+        purgeStorage(tracker);
+        for (var i = 0; i < STORED_KEYS.length; i++) {
+            delete memory['mtm_ee_' + STORED_KEYS[i] + '_' + tracker.getSiteId()];
+        }
+    }
+
+    // Withdrawing consent clears the state at once, not at the next ecommerce event that would read it
+    function watchConsentWithdrawal(tracker) {
+        if (!isObject(tracker) || tracker.ecommerceEnhancedWatched) {
+            return;
+        }
+
+        tracker.ecommerceEnhancedWatched = true;
+
+        for (var i = 0; i < CONSENT_WITHDRAWAL_METHODS.length; i++) {
+            (function (method) {
+                var original = tracker[method];
+                if ('function' !== typeof original) {
+                    return;
+                }
+
+                tracker[method] = function () {
+                    var result = original.apply(this, arguments);
+                    forgetState(tracker);
+                    return result;
+                };
+            })(CONSENT_WITHDRAWAL_METHODS[i]);
+        }
     }
 
     function getStorage(tracker, key) {
@@ -884,6 +920,40 @@
         }
 
         return window.Matomo.getAsyncTrackers();
+    }
+
+    // Matomo writes the item dimension keys of each website into matomo.js and rewrites the file when one changes
+    function getItemDimensionKeys(tracker) {
+        var keys = window.matomoEcommerceEnhancedItemDimensions;
+        keys = isObject(keys) ? keys[tracker.getSiteId()] : null;
+
+        return isArray(keys) ? keys : [];
+    }
+
+    // An item key without an active item dimension on the website never leaves the page, sent or stored
+    function keepItemDimensionValues(tracker, items) {
+        var keys = getItemDimensionKeys(tracker);
+
+        for (var i = 0; isArray(items) && i < items.length; i++) {
+            var custom = items[i].custom;
+            if (!custom) {
+                continue;
+            }
+
+            var kept = {}, count = 0;
+            for (var k = 0; k < keys.length; k++) {
+                if (hasOwn(custom, keys[k])) {
+                    kept[keys[k]] = custom[keys[k]];
+                    count++;
+                }
+            }
+
+            if (count) {
+                items[i].custom = kept;
+            } else {
+                delete items[i].custom;
+            }
+        }
     }
 
     function encode(value) {
@@ -1137,6 +1207,8 @@
         var name = event.name;
         var data = event.data;
 
+        keepItemDimensionValues(tracker, data.items);
+
         if (name === 'select_item' || name === 'select_promotion') {
             rememberSelection(tracker, data);
         }
@@ -1323,6 +1395,15 @@
                 return pendingEcommerceParams ? '&' + pendingEcommerceParams : '';
             }
         });
+
+        var trackers = getTrackers();
+        for (var t = 0; t < trackers.length; t++) {
+            watchConsentWithdrawal(trackers[t]);
+        }
+
+        if ('function' === typeof Matomo.on) {
+            Matomo.on('TrackerSetup', watchConsentWithdrawal);
+        }
 
         if (Matomo.retryMissedPluginCalls) {
             Matomo.retryMissedPluginCalls();

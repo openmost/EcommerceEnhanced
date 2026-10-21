@@ -41,7 +41,7 @@ No. Reloading the confirmation page does not send the order again, and Matomo ke
 
 **Is it compatible with consent banners and cookieless tracking?**
 
-Yes. The plugin follows the cookie settings of your Matomo tracker: with `disableCookies`, or while `requireCookieConsent` waits for consent, nothing is written in the browser. Emails, phone numbers, addresses and hashed identifiers are never read, and coupon codes are hashed by default. See "Browser storage and consent" in the Documentation tab.
+Yes. The plugin follows the cookie settings of your Matomo tracker: with `disableCookies`, or while `requireCookieConsent` waits for consent, nothing is written in the browser, and withdrawing consent removes what was stored at once. `user_data` (emails, phone numbers, addresses, hashed identifiers) is never read, a product field outside the GA4 ones is only sent when you created an item dimension for it, and coupon codes are hashed by default. See "Browser storage and consent" in the Documentation tab.
 
 **Do I need the Funnels plugin?**
 

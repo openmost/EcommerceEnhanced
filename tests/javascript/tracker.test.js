@@ -25,7 +25,7 @@ function createStorage() {
     };
 }
 
-function load({pageViews = 1, dataLayer, tagManagerEvents, localStorage = createStorage(), cookiesEnabled = true} = {}) {
+function load({pageViews = 1, dataLayer, tagManagerEvents, localStorage = createStorage(), sessionStorage = createStorage(), cookiesEnabled = true, itemDimensions} = {}) {
     const calls = [];
     const plugins = {};
     let pending = null;
@@ -40,6 +40,8 @@ function load({pageViews = 1, dataLayer, tagManagerEvents, localStorage = create
         setEcommerceView: (...args) => calls.push(['view', ...args]),
         trackEcommerceCartUpdate: (total) => calls.push(['cart', total, parse(hook())]),
         trackEcommerceOrder: (...args) => calls.push(['order', ...args.slice(0, 6), parse(hook())]),
+        forgetCookieConsentGiven: () => { cookiesEnabled = false; },
+        rememberCookieConsentGiven: () => { cookiesEnabled = true; },
     };
 
     function hook() {
@@ -58,7 +60,7 @@ function load({pageViews = 1, dataLayer, tagManagerEvents, localStorage = create
     }
 
     const window = {
-        sessionStorage: createStorage(),
+        sessionStorage,
         localStorage,
         Matomo: {
             addPlugin: (name, plugin) => { plugins[name] = plugin; },
@@ -67,6 +69,7 @@ function load({pageViews = 1, dataLayer, tagManagerEvents, localStorage = create
         },
     };
     if (dataLayer) window.dataLayer = dataLayer;
+    if (itemDimensions) window.matomoEcommerceEnhancedItemDimensions = itemDimensions;
     if (tagManagerEvents) {
         const callbacks = [];
         window.MatomoTagManager = {dataLayer: {
@@ -80,7 +83,7 @@ function load({pageViews = 1, dataLayer, tagManagerEvents, localStorage = create
     const context = vm.createContext({window, Matomo: window.Matomo, JSON, Math, Date, Object, String, isFinite, isNaN, parseFloat, encodeURIComponent, decodeURIComponent, unescape, setTimeout});
     vm.runInContext(source, context);
 
-    return {ee: window.Matomo.EcommerceEnhanced, calls, window};
+    return {ee: window.Matomo.EcommerceEnhanced, calls, window, tracker};
 }
 
 const ga4Items = [
@@ -98,9 +101,32 @@ test('parses a GA4 dataLayer push with clean values and never reads user_data', 
     assert.strictEqual(event.data.items.length, 2);
     assert.strictEqual(event.data.items[1].price, 22);
     assert.strictEqual(event.data.items[1].quantity, 2);
-    // Unknown item keys are all sent, the server stores the item dimensions the website created
+    // Unknown item keys stay in the page until the tracker narrows them to the website item dimensions
     assert.deepStrictEqual(plain(event.data.items[0].custom), {size: 'M', email: 'x@y.z'});
     assert.ok(!('user_data' in event.data));
+});
+
+test('sends and stores only the item keys of the website active item dimensions', () => {
+    const localStorage = createStorage();
+    const items = [{item_id: 'SKU1', price: 20, size: 'M', canary: 'never-sent'}, {item_id: 'SKU2', price: 5, canary: 'never-sent'}];
+    const {ee, calls} = load({localStorage, itemDimensions: {1: ['size'], 2: ['canary']}});
+    ee.track('add_to_cart', {items});
+    ee.track('purchase', {transaction_id: 'T1', items});
+
+    const sent = JSON.stringify(calls) + localStorage.getItem('mtm_ee_cart_1');
+    assert.ok(sent.includes('"size":"M"'));
+    assert.ok(!sent.includes('never-sent'));
+    assert.strictEqual(calls.find((c) => c[0] === 'request')[1].eex_d.items[1].custom, undefined);
+});
+
+test('without item dimensions, no item key outside the GA4 fields is sent or stored', () => {
+    const localStorage = createStorage();
+    const {ee, calls} = load({localStorage});
+    ee.track('add_to_cart', {items: ga4Items});
+
+    const sent = JSON.stringify(calls) + localStorage.getItem('mtm_ee_cart_1');
+    assert.ok(!sent.includes('x@y.z'));
+    assert.ok(!sent.includes('"custom"'));
 });
 
 test('parses gtag arguments, gtag set currency and prefixed event names', () => {
@@ -238,6 +264,30 @@ test('once cookie consent is withdrawn, what earlier pages stored is removed', (
     assert.strictEqual(localStorage.getItem('mtm_ee_tx'), null);
 });
 
+test('withdrawing consent clears every stored key at once, and a later consent does not reuse old selections', () => {
+    const localStorage = createStorage();
+    const sessionStorage = createStorage();
+    const {ee, calls, tracker} = load({localStorage, sessionStorage});
+    ee.track('select_item', {item_list_name: 'Search results', items: [{item_id: 'SKU2'}]});
+    ee.track('add_shipping_info', {shipping_tier: 'Express', items: []});
+    ee.track('add_to_cart', {items: [ga4Items[0]]});
+    ee.track('purchase', {transaction_id: 'T1', items: [ga4Items[0]]});
+    for (const key of ['mtm_ee_sel_1', 'mtm_ee_checkout_1']) assert.notStrictEqual(sessionStorage.getItem(key), null);
+    for (const key of ['mtm_ee_cart_1', 'mtm_ee_tx']) assert.notStrictEqual(localStorage.getItem(key), null);
+
+    tracker.forgetCookieConsentGiven();
+
+    for (const key of ['mtm_ee_sel_1', 'mtm_ee_checkout_1']) assert.strictEqual(sessionStorage.getItem(key), null);
+    for (const key of ['mtm_ee_cart_1', 'mtm_ee_tx']) assert.strictEqual(localStorage.getItem(key), null);
+
+    tracker.rememberCookieConsentGiven();
+    ee.track('add_to_cart', {items: [{item_id: 'SKU2', price: 10}]});
+
+    const cart = calls.filter((c) => c[0] === 'cart').pop();
+    assert.strictEqual(cart[2].eex_d.items.length, 1);
+    assert.strictEqual(cart[2].eex_d.items[0].item_list_name, undefined);
+});
+
 test('records a purchase once, with remembered checkout choices and list attribution', () => {
     const {ee, calls} = load();
     ee.track('select_item', {item_list_name: 'Search results', items: [{item_id: 'SKU2'}]});
@@ -297,7 +347,7 @@ test('in Tag Manager, reads the container data layer only, so a synchronised pus
 });
 
 test('trims a payload above the server limit by dropping the last items, and counts them', () => {
-    const {ee, calls} = load();
+    const {ee, calls} = load({itemDimensions: {1: Array.from({length: 30}, (_, k) => 'param' + k)}});
     const items = [];
     for (let i = 0; i < 200; i++) {
         const item = {item_id: 'SKU' + i, item_name: 'Product '.repeat(30) + i, price: 10, quantity: 1};
