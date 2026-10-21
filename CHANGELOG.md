@@ -1,5 +1,11 @@
 ## Changelog
 
+### v6.0.1
+
+- Product fields outside GA4 are only sent by the tracker, and kept in the browser, when the website has an active item dimension for them. Matomo writes the list into `matomo.js` and rewrites it when an item dimension changes.
+- Withdrawing consent (`forgetCookieConsentGiven`, `forgetConsentGiven`, `optUserOut`) removes every key the plugin stored in the browser at once, including the products selected from a list or a promotion.
+- New command `./console ecommerceenhanced:remove-data` to delete the data recorded by the plugin, for every website or some of them, before uninstalling it.
+
 ### v6.0.0
 
 - First release, for Matomo 6.x (`>=6.0.0-b1,<7.0.0-b1`), PHP 8.1+.
