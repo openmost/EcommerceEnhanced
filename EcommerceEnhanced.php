@@ -28,6 +28,7 @@ class EcommerceEnhanced extends \Piwik\Plugin
             'Db.getActionReferenceColumnsByTable' => 'addActionReferenceColumnsByTable',
             'Tracker.Cache.getSiteAttributes' => 'addSiteAttributes',
             'MeasurableSettings.updated' => 'onMeasurableSettingsUpdated',
+            'CustomJsTracker.manipulateJsTracker' => 'addItemDimensionsToJsTracker',
             'TagManager.filterVariables' => 'replaceMatomoConfigurationVariable',
             'Widget.addWidgetConfigs' => 'addPremiumTeasers',
             'AssetManager.getStylesheetFiles' => 'getStylesheetFiles',
@@ -257,7 +258,14 @@ class EcommerceEnhanced extends \Piwik\Plugin
     {
         if ($settings instanceof MeasurableSettings && !empty($idSite)) {
             Cache::deleteCacheWebsiteAttributes($idSite);
+            // matomo.js lists the item dimension keys, it is only rewritten when its content changes
+            Piwik::postEvent('CustomJsTracker.updateTracker');
         }
+    }
+
+    public function addItemDimensionsToJsTracker(&$content)
+    {
+        ItemDimensions::addToJsTracker($content);
     }
 
     public function renderOpenmostCommunication(&$out, $layout, $module = '', $action = '')

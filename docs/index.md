@@ -270,7 +270,7 @@ A page of search results is an item list: send it as `view_item_list` with a lis
 
 ### What is never recorded
 
-`user_data` and the other event level fields outside the GA4 ecommerce parameters are never read. Coupon codes are stored as a hash unless "Keep coupon codes readable" is turned on in the website settings. Item dimensions are only recorded when you create them: choosing what they hold is the responsibility of the site owner and their DPO.
+`user_data` and the other event level fields outside the GA4 ecommerce parameters are never read. Coupon codes are stored as a hash unless "Keep coupon codes readable" is turned on in the website settings. Other product fields are only sent by the tracker, and recorded, when you create an item dimension for them: choosing what they hold is the responsibility of the site owner and their DPO.
 
 ### Browser storage and consent
 
@@ -278,9 +278,10 @@ To send whole carts and to never record an order twice, the tracker keeps a litt
 
 - `mtm_ee_cart_<idSite>` in `localStorage`: the copy of the cart. It is shared by every tab and kept between visits, like the shop cart, and expires after 48 hours without change.
 - `mtm_ee_checkout_<idSite>` in `sessionStorage`: the shipping and payment choices of the current checkout.
+- `mtm_ee_sel_<idSite>` in `sessionStorage`: the list and promotion of the products selected in the current tab, to credit them when the product is added to cart or bought.
 - `mtm_ee_tx` in `localStorage`: a hash of the last 50 order ids already sent.
 
-This storage follows the cookie rules of your Matomo tracker. When cookies are disabled (`disableCookies`) or wait for consent (`requireCookieConsent` before `rememberCookieConsentGiven`), nothing is written and the state only lives in the current page. When consent is withdrawn (`forgetCookieConsentGiven`), these keys are removed at the next ecommerce event. Browser storage is subject to the same consent rules as cookies: if your site relies on a consent exemption for audience measurement, check with your DPO that it covers these keys.
+This storage follows the cookie rules of your Matomo tracker. When cookies are disabled (`disableCookies`) or wait for consent (`requireCookieConsent` before `rememberCookieConsentGiven`), nothing is written and the state only lives in the current page. When consent is withdrawn (`forgetCookieConsentGiven`, `forgetConsentGiven` or `optUserOut`), every key above is removed at once, and so is the copy kept in the page. Browser storage is subject to the same consent rules as cookies: if your site relies on a consent exemption for audience measurement, check with your DPO that it covers these keys.
 
 Without browser storage, an add to cart on a new page only sends the item just added. Push `view_cart` and `begin_checkout` with every item of the cart, as GA4 expects: the plugin then corrects the cart it sends.
 
@@ -327,6 +328,8 @@ Add the parameter the same way to the items of every ecommerce event (`view_item
 ./console customdimensions:add-custom-dimension --scope=item --count=5
 ```
 
+The tracker only sends the item keys of the active item dimensions of the website: their list is written into `matomo.js`, which Matomo rewrites as soon as an item dimension is created, renamed, activated or deactivated. If your website loads a copy of the tracker (CDN, self-hosted file), refresh that copy after changing your item dimensions, as after any change of the Matomo tracker.
+
 Renaming an item dimension keeps the values recorded before, deactivating it stops recording new values. Only the item dimensions you create are stored, whatever their key: what they collect is the choice of the site owner and their DPO. Without Premium, the item dimensions already created are kept and still recorded, and they are listed marked "Premium" in the segment editor and in Custom Reports.
 
 ### Reports
@@ -358,7 +361,26 @@ For example `eeStep==add_to_cart;eeStep!=purchase` selects the visits that added
 
 The native Matomo ecommerce keeps working: carts and orders are always sent as native requests. While the plugin is deactivated its data is kept, but GDPR deletions and the deletion of old raw data no longer cover it.
 
-Uninstalling the plugin keeps its data as well: the `log_ee_order_item`, `log_ee_event` and `log_ee_event_item` tables and the `ee_*` columns of `log_conversion` stay in the database, and installing the plugin again reuses them. Matomo itself deletes the website settings of a plugin when it is uninstalled. To delete the data for good, drop the three tables and the six `ee_*` columns of `log_conversion` by hand after uninstalling.
+Uninstalling the plugin keeps its data as well: the `log_ee_order_item`, `log_ee_event` and `log_ee_event_item` tables and the `ee_*` columns of `log_conversion` stay in the database, and installing the plugin again reuses them. Matomo itself deletes the website settings of a plugin when it is uninstalled.
+
+### Removing the data
+
+To delete the data recorded by the plugin, run this command **before** deactivating or uninstalling it:
+
+```
+./console ecommerceenhanced:remove-data
+./console ecommerceenhanced:remove-data --idsite=3,7
+```
+
+Without `--idsite` it deletes the data of every website. The native Matomo ecommerce data (orders, carts, products) is kept, and so are the reports already archived, which only hold totals. Then, to also drop the tables and columns, uninstall the plugin and run (with your table prefix):
+
+```sql
+DROP TABLE matomo_log_ee_order_item, matomo_log_ee_event, matomo_log_ee_event_item;
+ALTER TABLE matomo_log_conversion DROP COLUMN ee_affiliation, DROP COLUMN ee_coupon, DROP COLUMN ee_currency,
+    DROP COLUMN ee_customer_type, DROP COLUMN ee_payment_type, DROP COLUMN ee_shipping_tier;
+```
+
+Database backups made before keep their copy of the data: delete or expire them as your retention policy requires.
 
 ### Large databases
 

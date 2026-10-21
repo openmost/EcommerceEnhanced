@@ -94,6 +94,47 @@ class Schema
         return $target;
     }
 
+    /**
+     * The order level columns added to log_conversion, see Dimension\OrderConversionDimension.
+     */
+    public const CONVERSION_COLUMNS = ['ee_affiliation', 'ee_coupon', 'ee_currency', 'ee_customer_type', 'ee_payment_type', 'ee_shipping_tier'];
+
+    /**
+     * Deletes the recorded data and keeps the schema, see Commands\RemoveData. The native ecommerce data stays.
+     *
+     * @param int[]|null $idSites null for every website
+     */
+    public function deleteData(?array $idSites): void
+    {
+        $siteFilter = $idSites === null ? '' : ' idsite IN (' . implode(',', array_map('intval', $idSites)) . ')';
+
+        foreach (self::getTables() as $table) {
+            $table = Common::prefixTable($table);
+            if ($idSites === null) {
+                Db::exec("TRUNCATE TABLE `$table`");
+            } else {
+                Db::query("DELETE FROM `$table` WHERE$siteFilter");
+            }
+        }
+
+        $table = Common::prefixTable('log_conversion');
+        $existing = array_column(Db::fetchAll("SHOW COLUMNS FROM `$table` LIKE 'ee\_%'"), 'Field');
+        $columns = array_values(array_intersect(self::CONVERSION_COLUMNS, $existing));
+        if (empty($columns)) {
+            return;
+        }
+
+        $set = [];
+        $notNull = [];
+        foreach ($columns as $column) {
+            $set[] = "`$column` = NULL";
+            $notNull[] = "`$column` IS NOT NULL";
+        }
+
+        Db::query("UPDATE `$table` SET " . implode(', ', $set) . ' WHERE (' . implode(' OR ', $notNull) . ')'
+            . ($siteFilter === '' ? '' : ' AND' . $siteFilter));
+    }
+
     public static function getTables(): array
     {
         return [self::TABLE_ORDER_ITEM, self::TABLE_EVENT, self::TABLE_EVENT_ITEM];

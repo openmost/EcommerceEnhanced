@@ -10,6 +10,8 @@
 namespace Piwik\Plugins\EcommerceEnhanced\tests\Integration;
 
 use Piwik\API\Request;
+use Piwik\DI;
+use Piwik\Plugins\CustomJsTracker\TrackerUpdater;
 use Piwik\Tests\Framework\Fixture;
 use Piwik\Tests\Framework\Mock\FakeAccess;
 use Piwik\Tests\Framework\TestCase\IntegrationTestCase;
@@ -50,6 +52,20 @@ abstract class ShopTestCase extends IntegrationTestCase
 
         $this->configureSite();
         $this->trackShop();
+    }
+
+    /**
+     * Saving item dimensions rebuilds matomo.js: the file of the instance running the tests is left untouched.
+     */
+    public function provideContainerConfig()
+    {
+        return [
+            TrackerUpdater::class => DI::value(new class extends TrackerUpdater {
+                public function update()
+                {
+                }
+            }),
+        ];
     }
 
     /**

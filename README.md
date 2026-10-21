@@ -19,7 +19,7 @@ One checkbox in Matomo Tag Manager, or one line in your tracking code, and it wo
 - Variants kept apart, even when they share a SKU, with brand, list, promotion, coupon and discount per product line.
 - Item lists and promotions remembered from the click to the order, as GA4 attributes them.
 - Duplicate orders blocked, even when the confirmation page is reloaded or order ids are anonymised.
-- Privacy by design: emails, phone numbers, addresses and hashed identifiers are never read, coupon codes can be hashed or skipped.
+- Privacy by design: `user_data` (emails, phone numbers, addresses, hashed identifiers) is never read, product fields outside GA4 are only sent for the item dimensions you created, coupon codes can be hashed or skipped.
 
 **Reports GA4 users expect**
 
