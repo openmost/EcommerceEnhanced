@@ -1,5 +1,9 @@
 ## Changelog
 
+### v6.0.2
+
+- Fix: the funnel update messages of the settings page are translated instead of showing a missing translation message.
+
 ### v6.0.1
 
 - Product fields outside GA4 are only sent by the tracker, and kept in the browser, when the website has an active item dimension for them. Matomo writes the list into `matomo.js` and rewrites it when an item dimension changes.

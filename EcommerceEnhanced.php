@@ -231,6 +231,9 @@ class EcommerceEnhanced extends \Piwik\Plugin
         $translationKeys[] = 'EcommerceEnhanced_FunnelMissing';
         $translationKeys[] = 'EcommerceEnhanced_FunnelsCreate';
         $translationKeys[] = 'EcommerceEnhanced_FunnelsCreated';
+        $translationKeys[] = 'EcommerceEnhanced_FunnelOutdated';
+        $translationKeys[] = 'EcommerceEnhanced_FunnelsUpdateSales';
+        $translationKeys[] = 'EcommerceEnhanced_FunnelsSalesUpdated';
         $translationKeys[] = 'EcommerceEnhanced_ItemDimensionCreateTitle';
         $translationKeys[] = 'EcommerceEnhanced_ItemDimensionHowTo';
         $translationKeys[] = 'EcommerceEnhanced_ItemDimensionHowToExample';

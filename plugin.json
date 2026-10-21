@@ -1,7 +1,7 @@
 {
   "name": "EcommerceEnhanced",
   "description": "Reads your shop's GA4 dataLayer and adds brands, variants, item lists, promotions, coupons, checkout funnels and buyer reports to Matomo ecommerce.",
-  "version": "6.0.1",
+  "version": "6.0.2",
   "theme": false,
   "require": {
     "matomo": ">=6.0.0-b1,<7.0.0-b1",
