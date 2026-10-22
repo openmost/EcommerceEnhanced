@@ -10,7 +10,6 @@
 namespace Piwik\Plugins\EcommerceEnhanced;
 
 use Piwik\Common;
-use Piwik\Container\StaticContainer;
 use Piwik\Notification;
 use Piwik\Piwik;
 use Piwik\Plugins\EcommerceEnhanced\Dao\Schema;
@@ -101,17 +100,12 @@ class EcommerceEnhanced extends \Piwik\Plugin
     }
 
     /**
-     * Adds the "read the GA4 ecommerce dataLayer" option to the Matomo Configuration variable of Tag Manager.
-     *
-     * @param \Piwik\Plugins\TagManager\Template\Variable\BaseVariable[] $variables
+     * Adds the Ecommerce Enhanced option to the "Matomo Configuration" variable, on top of the other plugins
+     * extending it
      */
     public function replaceMatomoConfigurationVariable(&$variables)
     {
-        foreach ($variables as $index => $variable) {
-            if ($variable->getId() === TagManager\MatomoConfigurationVariable::ID && !$variable instanceof TagManager\MatomoConfigurationVariable) {
-                $variables[$index] = StaticContainer::get(TagManager\MatomoConfigurationVariable::class);
-            }
-        }
+        TagManager\MatomoConfigurationVariable::extendVariables($variables);
     }
 
     /**
