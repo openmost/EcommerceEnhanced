@@ -1,5 +1,9 @@
 ## Changelog
 
+### v6.0.4
+
+- The plugin is now listed in the Ecommerce category of the Marketplace.
+
 ### v6.0.3
 
 - Fix: the Ecommerce Enhanced option of the Tag Manager "Matomo Configuration" variable no longer replaces the variable, it extends it. Other plugins extending the same variable, such as Profile Gravatar and its "Gravatar hash" field, now keep their fields and their tracking code.
