@@ -1,34 +1,17 @@
 (function () {
-    return function (parameters, TagManager) {
+    // Extension of the Matomo Configuration variable, called with the config built by the core template (and by
+    // the other plugins extending it): turns on Ecommerce Enhanced when the option is checked
+    return function (config, parameters, TagManager) {
+        if (!config.enableEcommerceEnhanced) {
+            return;
+        }
 
-        // Same as the core Matomo Configuration variable, plus the Ecommerce Enhanced option
-        this.get = function () {
-            var config = {};
-            for (var i in parameters) {
-                if (i === 'document' || i === 'window' || i === 'container' || i === 'variable' || TagManager.utils.isFunction(parameters[i])) {
-                    continue;
-                }
-
-                if (TagManager.utils.hasProperty(parameters, i)) {
-                    config[i] = parameters.get(i);
-                }
-            }
-
-            if (config.enableEcommerceEnhanced) {
-                var win = parameters.window;
-                if (win.Matomo && win.Matomo.EcommerceEnhanced) {
-                    win.Matomo.EcommerceEnhanced.enable({tagManager: true});
-                } else {
-                    win._paq = win._paq || [];
-                    win._paq.push(['EcommerceEnhanced::enable', {tagManager: true}]);
-                }
-            }
-
-            return config;
-        };
-
-        this.toString = function () {
-            return '';
-        };
+        var win = parameters.window;
+        if (win.Matomo && win.Matomo.EcommerceEnhanced) {
+            win.Matomo.EcommerceEnhanced.enable({tagManager: true});
+        } else {
+            win._paq = win._paq || [];
+            win._paq.push(['EcommerceEnhanced::enable', {tagManager: true}]);
+        }
     };
 })();
