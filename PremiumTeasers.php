@@ -10,6 +10,8 @@
 namespace Piwik\Plugins\EcommerceEnhanced;
 
 use Piwik\Plugin\Manager;
+use Piwik\Request;
+use Piwik\Site;
 use Piwik\Widget\WidgetConfig;
 
 /**
@@ -53,6 +55,17 @@ class PremiumTeasers
     public static function isPremiumActivated(): bool
     {
         return Manager::getInstance()->isPluginActivated(self::PREMIUM_PLUGIN);
+    }
+
+    /**
+     * The teasers are standalone widgets, they would otherwise create the Ecommerce category on sites where
+     * ecommerce is off, the same rule as Reports\Base::isEnabled.
+     */
+    public static function isEcommerceSite(): bool
+    {
+        $idSite = Request::fromRequest()->getIntegerParameter('idSite', 0);
+
+        return !empty($idSite) && (new Site($idSite))->isEcommerceEnabled();
     }
 
     public static function exists(string $id): bool

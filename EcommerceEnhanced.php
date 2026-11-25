@@ -184,7 +184,7 @@ class EcommerceEnhanced extends \Piwik\Plugin
      */
     public function addPremiumTeasers(&$configs)
     {
-        if (!PremiumTeasers::isPremiumActivated()) {
+        if (!PremiumTeasers::isPremiumActivated() && PremiumTeasers::isEcommerceSite()) {
             $configs = array_merge($configs, PremiumTeasers::getWidgetConfigs());
         }
     }
