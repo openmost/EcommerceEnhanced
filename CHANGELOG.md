@@ -1,5 +1,9 @@
 ## Changelog
 
+### v5.0.5
+
+- Fix: the locked Premium report cards no longer show on websites where ecommerce is off, so the Ecommerce menu only appears on ecommerce websites.
+
 ### v5.0.4
 
 - The plugin is now listed in the Ecommerce category of the Marketplace.
